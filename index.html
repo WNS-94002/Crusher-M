@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crusher M — Cost Summary</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0e12; --surface:#15171e; --surface2:#1d1f28;
+    --border:#252830; --accent:#f5a623; --accent2:#e8441a;
+    --text:#e8e9ef; --muted:#636776;
+    --green:#27ae60; --red:#e74c3c; --blue:#3b82f6; --purple:#8b5cf6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;min-height:100vh;}
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:linear-gradient(rgba(245,166,35,.025)1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.025)1px,transparent 1px);
+    background-size:44px 44px;pointer-events:none;z-index:0;
+  }
+  .container{max-width:1280px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+
+  /* HEADER */
+  header{padding:36px 0 28px;border-bottom:1px solid var(--border);}
+  .header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:16px;}
+  .logo-mark{
+    width:54px;height:54px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue',sans-serif;font-size:22px;color:#000;
+    clip-path:polygon(10% 0%,90% 0%,100% 10%,100% 90%,90% 100%,10% 100%,0% 90%,0% 10%);
+  }
+  .title-group h1{
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4.5vw,50px);
+    letter-spacing:3px;background:linear-gradient(90deg,var(--accent) 30%,#fff);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;
+  }
+  .title-group p{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+  .header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{
+    padding:10px 18px;border-radius:6px;
+    font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;font-weight:500;
+    cursor:pointer;border:none;transition:all .18s;
+    display:flex;align-items:center;gap:7px;text-decoration:none;white-space:nowrap;
+  }
+  .btn-primary{background:var(--accent);color:#000;}
+  .btn-primary:hover{background:#ffb83d;transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-share{background:var(--surface2);color:var(--blue);border:1px solid var(--blue);}
+  .btn-share:hover{background:var(--blue);color:#fff;}
+
+  /* STATUS */
+  .status-bar{
+    display:flex;align-items:center;gap:14px;
+    padding:10px 0;border-bottom:1px solid var(--border);
+    font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--muted);
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+  .dot.live{background:var(--green);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* CARDS */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;padding:28px 0 20px;}
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:10px;padding:18px 22px;position:relative;overflow:hidden;
+    transition:border-color .2s,transform .2s;
+  }
+  .card:hover{border-color:rgba(245,166,35,.4);transform:translateY(-2px);}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .card.c-orange::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+  .card.c-green::before{background:var(--green);}
+  .card.c-red::before{background:var(--red);}
+  .card.c-blue::before{background:var(--blue);}
+  .card.c-purple::before{background:var(--purple);}
+  .card-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
+  .card-value{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:1px;line-height:1;}
+  .card.c-orange .card-value{color:var(--accent);}
+  .card.c-green  .card-value{color:var(--green);}
+  .card.c-red    .card-value{color:var(--red);}
+  .card.c-blue   .card-value{color:var(--blue);}
+  .card.c-purple .card-value{color:var(--purple);}
+  .card-sub{font-size:11px;color:var(--muted);margin-top:5px;}
+
+  /* SECTION HEADING */
+  .sec{margin:30px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--accent);display:flex;align-items:center;gap:10px;}
+  .sec-title::before{content:'';width:4px;height:18px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+  .sec-right{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+
+  /* CHARTS */
+  .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:24px;}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px 22px 18px;}
+  .chart-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:18px;}
+
+  /* BvA horizontal bars */
+  .bva-row{margin-bottom:16px;}
+  .bva-name{font-size:12px;color:var(--text);margin-bottom:5px;display:flex;justify-content:space-between;gap:8px;}
+  .bva-name span:last-child{color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;white-space:nowrap;}
+  .bva-track{position:relative;height:22px;background:var(--border);border-radius:5px;overflow:hidden;}
+  .bva-budget-bar{position:absolute;top:0;left:0;height:100%;border-radius:5px;background:rgba(59,130,246,.3);border-right:2px solid rgba(59,130,246,.8);transition:width .7s cubic-bezier(.4,0,.2,1);}
+  .bva-actual-bar{position:absolute;top:4px;left:0;height:calc(100% - 8px);border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1) .1s;}
+  .bva-actual-bar.under{background:linear-gradient(90deg,#27ae60,#16a34a);}
+  .bva-actual-bar.over{background:linear-gradient(90deg,var(--red),#b91c1c);}
+  .bva-legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+  .leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+
+  /* Top 5 bars */
+  .top-row{margin-bottom:12px;}
+  .top-meta{display:flex;align-items:baseline;margin-bottom:4px;gap:8px;}
+  .top-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);width:22px;flex-shrink:0;}
+  .top-name{font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .top-val{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--accent);white-space:nowrap;}
+  .top-track{height:7px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .top-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .7s cubic-bezier(.4,0,.2,1);}
+
+  /* FILTER BAR */
+  .filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .search-box{
+    flex:1;min-width:180px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:6px;padding:9px 13px;
+    color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;
+    transition:border-color .2s;
+  }
+  .search-box:focus{border-color:var(--accent);}
+  .search-box::placeholder{color:var(--muted);}
+  .filter-select{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:6px;padding:9px 13px;
+    color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;cursor:pointer;
+  }
+  .filter-select:focus{border-color:var(--accent);}
+
+  /* TABLE */
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead{background:var(--surface2);position:sticky;top:0;z-index:2;}
+  th{
+    padding:13px 14px;text-align:left;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);
+    border-bottom:1px solid var(--border);white-space:nowrap;
+    cursor:pointer;user-select:none;transition:color .2s;
+  }
+  th:hover,th.sorted{color:var(--accent);}
+  td{padding:11px 14px;border-bottom:1px solid rgba(37,40,48,.7);vertical-align:middle;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(245,166,35,.035);}
+  .num{text-align:right;font-family:'IBM Plex Mono',monospace;}
+  .amt-budget{color:var(--blue);}
+  .amt-actual{color:var(--accent);}
+  .diff-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;}
+  .diff-pill.over{background:rgba(231,76,60,.15);color:var(--red);}
+  .diff-pill.under{background:rgba(39,174,96,.15);color:var(--green);}
+
+  /* PAGINATION */
+  .pagination{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;border-top:1px solid var(--border);
+    font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    gap:12px;flex-wrap:wrap;
+  }
+  .page-btns{display:flex;gap:5px;}
+  .page-btn{
+    width:28px;height:28px;border-radius:5px;border:1px solid var(--border);
+    background:transparent;color:var(--text);cursor:pointer;font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s;font-family:'IBM Plex Mono',monospace;
+  }
+  .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .page-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+  .page-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+  /* STATES */
+  .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;color:var(--muted);gap:12px;text-align:center;line-height:1.7;}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* SHARE MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:520px;width:100%;}
+  .modal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent);margin-bottom:8px;}
+  .modal p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;}
+  .url-box{display:flex;gap:8px;}
+  .url-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 13px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;}
+  .modal-close{margin-top:14px;width:100%;}
+  .copy-msg{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
+
+  footer{
+    padding:28px 0;border-top:1px solid var(--border);margin-top:32px;
+    color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  }
+
+  @media(max-width:640px){
+    .summary-grid{grid-template-columns:repeat(2,1fr);}
+    .chart-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo-mark">CM</div>
+        <div class="title-group">
+          <h1>CRUSHER M</h1>
+          <p>Cost Summary Dashboard</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-share" onclick="openShare()">🔗 Share Link</button>
+        <button class="btn btn-ghost" onclick="refreshData()">↺ Refresh</button>
+        <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="dot" id="sDot"></span>
+    <span id="sText">กำลังโหลดข้อมูล...</span>
+    <span id="sTime"></span>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-grid">
+    <div class="card c-blue">
+      <div class="card-label">Total Budget</div>
+      <div class="card-value" id="cBudget">—</div>
+      <div class="card-sub">THB</div>
+    </div>
+    <div class="card c-orange">
+      <div class="card-label">Total Actual Expense</div>
+      <div class="card-value" id="cActual">—</div>
+      <div class="card-sub">THB</div>
+    </div>
+    <div class="card c-red" id="cDiffCard">
+      <div class="card-label" id="cDiffLabel">Budget vs Actual</div>
+      <div class="card-value" id="cDiff">—</div>
+      <div class="card-sub" id="cDiffSub">—</div>
+    </div>
+    <div class="card c-purple">
+      <div class="card-label">จำนวนรายการ</div>
+      <div class="card-value" id="cItems">—</div>
+      <div class="card-sub">รายการทั้งหมด</div>
+    </div>
+    <div class="card c-green" id="cPctCard">
+      <div class="card-label">% Budget Used</div>
+      <div class="card-value" id="cPct">—</div>
+      <div class="card-sub">of total budget</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div id="chartGrid" style="display:none">
+    <div class="sec"><span class="sec-title">Budget vs Actual Expense</span></div>
+    <div class="chart-grid">
+      <div class="chart-card" style="grid-column:span 2">
+        <div class="chart-label">เปรียบเทียบ Budget กับ Actual — ตามหมวดหมู่</div>
+        <div id="bvaChart"></div>
+        <div class="bva-legend">
+          <div class="leg"><div class="leg-dot" style="background:rgba(59,130,246,.35);border:1px solid #3b82f6"></div>Budget</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Actual ≤ Budget</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>Actual &gt; Budget</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec"><span class="sec-title">Top 5 Actual Expense</span></div>
+    <div class="chart-grid" style="grid-template-columns:1fr">
+      <div class="chart-card">
+        <div class="chart-label">5 รายการ Actual Expense สูงสุด</div>
+        <div id="top5Chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="sec">
+    <span class="sec-title">รายละเอียดค่าใช้จ่าย</span>
+    <span class="sec-right" id="rowCount">—</span>
+  </div>
+
+  <div class="filter-bar">
+    <input class="search-box" type="text" id="searchInput" placeholder="ค้นหารายการ..." oninput="applyFilter()">
+    <select class="filter-select" id="catFilter" onchange="applyFilter()">
+      <option value="">ทุกหมวดหมู่</option>
+    </select>
+    <select class="filter-select" id="pageSize" onchange="changePageSize()">
+      <option value="25">25 รายการ</option>
+      <option value="50">50 รายการ</option>
+      <option value="100">100 รายการ</option>
+      <option value="0">ทั้งหมด</option>
+    </select>
+  </div>
+
+  <div class="table-wrap" id="tableWrap">
+    <div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูลจาก Google Sheets...</div></div>
+  </div>
+
+  <footer>
+    <span>Crusher M · Cost Summary Dashboard</span>
+    <span>Data: Google Sheets (auto-refresh)</span>
+  </footer>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal" style="display:none" onclick="if(event.target===this)closeShare()">
+  <div class="modal">
+    <h3>🔗 Share Dashboard</h3>
+    <p>คัดลอกลิงก์ด้านล่างนี้เพื่อแชร์ Dashboard ให้ผู้อื่น<br>
+    ผู้เปิดลิงก์จะเห็นข้อมูลล่าสุดจาก Google Sheets โดยตรง ไม่ต้องติดตั้งอะไรเพิ่ม</p>
+    <div class="url-box">
+      <input class="url-input" id="shareUrl" readonly onclick="this.select()">
+      <button class="btn btn-primary" onclick="copyLink()">Copy</button>
+    </div>
+    <p class="copy-msg" id="copyMsg"></p>
+    <button class="btn btn-ghost modal-close" onclick="closeShare()">ปิด</button>
+  </div>
+</div>
+
+<script>
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub?gid=0&single=true&output=csv';
+
+let allRows=[],headers=[],filtered=[];
+let sortCol=-1,sortAsc=true,curPage=1,pageSize=25;
+let colB=-1,colA=-1,colCat=-1,colName=-1; // Budget, Actual, Category, Name
+
+// ─── CSV ───────────────────────────────────────────────
+function parseCSV(txt){
+  return txt.split('\n').filter(l=>l.trim()).map(line=>{
+    const row=[];let inQ=false,cur='';
+    for(const c of line){
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){row.push(cur.trim());cur='';}
+      else{cur+=c;}
+    }
+    row.push(cur.trim());return row;
+  });
+}
+function pn(v){const n=parseFloat(String(v||0).replace(/[^0-9.-]/g,''));return isNaN(n)?0:n;}
+function fmt(n){
+  if(Math.abs(n)>=1e6)return(n/1e6).toFixed(2)+'M';
+  return n.toLocaleString('th-TH',{maximumFractionDigits:0});
+}
+function fmtF(n){return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+// ─── DETECT COLUMNS ────────────────────────────────────
+function detectCols(h){
+  const hl=h.map(x=>x.toLowerCase().replace(/\s/g,''));
+  const find=(kws,excl=[])=>hl.findIndex(x=>kws.some(k=>x.includes(k))&&!excl.some(k=>x.includes(k)));
+  colB=find(['budget','งบประมาณ','งบ']);
+  colA=find(['actual','จริง','expense','ค่าใช้จ่าย','cost','ราคา','ยอด'],['budget','งบ']);
+  if(colA===-1)colA=find(['actual','expense','cost','ราคา','ยอด']);
+  colCat=find(['category','cat','type','หมวด','ประเภท','กลุ่ม','section']);
+  colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
+  if(colName===-1)colName=0;
+}
+
+// ─── LOAD ──────────────────────────────────────────────
+async function loadData(){
+  setSt('','กำลังดึงข้อมูล...');
+  try{
+    const res=await fetch(CSV_URL+'&_='+Date.now());
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const txt=await res.text();
+    const rows=parseCSV(txt);
+    if(rows.length<2)throw new Error('ไม่พบข้อมูลในชีต');
+    headers=rows[0];
+    allRows=rows.slice(1).filter(r=>r.some(c=>c));
+    detectCols(headers);
+    buildCatFilter();
+    applyFilter();
+    buildCards();
+    buildCharts();
+    document.getElementById('chartGrid').style.display='';
+    setSt('live','โหลดสำเร็จ · '+allRows.length+' รายการ');
+    document.getElementById('sTime').textContent='· '+new Date().toLocaleTimeString('th-TH');
+  }catch(e){
+    setSt('','โหลดไม่สำเร็จ: '+e.message);
+    document.getElementById('tableWrap').innerHTML=`<div class="state-box"><div style="font-size:36px">⚠️</div><div>ไม่สามารถโหลดข้อมูลได้<br><small>${e.message}</small><br><br><small>ตรวจสอบว่า Google Sheet ถูก Publish เป็น Public แล้วลอง Refresh</small></div></div>`;
+  }
+}
+function setSt(state,text){
+  document.getElementById('sDot').className='dot'+(state==='live'?' live':'');
+  document.getElementById('sText').textContent=text;
+}
+
+// ─── CARDS ─────────────────────────────────────────────
+function buildCards(){
+  let budget=0,actual=0;
+  allRows.forEach(r=>{
+    budget+=colB>=0?pn(r[colB]):0;
+    actual+=colA>=0?pn(r[colA]):0;
+  });
+  document.getElementById('cBudget').textContent=fmt(budget);
+  document.getElementById('cActual').textContent=fmt(actual);
+  document.getElementById('cItems').textContent=allRows.length;
+
+  const diff=actual-budget,over=diff>0;
+  document.getElementById('cDiffCard').className='card '+(over?'c-red':'c-green');
+  document.getElementById('cDiff').textContent=(over?'+':'')+fmt(diff);
+  document.getElementById('cDiffSub').textContent=over?'⚠ เกิน Budget':'✓ อยู่ใน Budget';
+
+  const pct=budget>0?(actual/budget*100).toFixed(1):'—';
+  document.getElementById('cPctCard').className='card '+(parseFloat(pct)>100?'c-red':'c-green');
+  document.getElementById('cPct').textContent=pct+'%';
+}
+
+// ─── CHARTS ────────────────────────────────────────────
+function buildCharts(){
+  // BvA by category
+  const cats={};
+  allRows.forEach(r=>{
+    const cat=(colCat>=0&&r[colCat])?r[colCat]:'อื่นๆ';
+    if(!cats[cat])cats[cat]={b:0,a:0};
+    cats[cat].b+=colB>=0?pn(r[colB]):0;
+    cats[cat].a+=colA>=0?pn(r[colA]):0;
+  });
+  const entries=Object.entries(cats).sort((x,y)=>y[1].b-x[1].b).slice(0,10);
+  const maxV=Math.max(...entries.flatMap(([,v])=>[v.b,v.a]),1);
+  document.getElementById('bvaChart').innerHTML=entries.map(([cat,v])=>{
+    const bp=(v.b/maxV*100).toFixed(1),ap=(v.a/maxV*100).toFixed(1);
+    const over=v.a>v.b;
+    return`<div class="bva-row">
+      <div class="bva-name"><span>${cat}</span><span>B: ${fmtF(v.b)} &nbsp;|&nbsp; A: ${fmtF(v.a)}</span></div>
+      <div class="bva-track">
+        <div class="bva-budget-bar" style="width:${bp}%"></div>
+        <div class="bva-actual-bar ${over?'over':'under'}" style="width:${ap}%"></div>
+      </div>
+    </div>`;
+  }).join('')||'<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลหมวดหมู่</div>';
+
+  // Top 5 Actual
+  if(colA<0){
+    document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบคอลัมน์ Actual Expense</div>';
+    return;
+  }
+  const top5=[...allRows].sort((a,b)=>pn(b[colA])-pn(a[colA])).slice(0,5);
+  const maxA=pn(top5[0]?.[colA])||1;
+  document.getElementById('top5Chart').innerHTML=top5.map((r,i)=>{
+    const name=r[colName]||r[0]||'—';
+    const val=pn(r[colA]);
+    const budgetVal=colB>=0?pn(r[colB]):0;
+    const over=budgetVal>0&&val>budgetVal;
+    return`<div class="top-row">
+      <div class="top-meta">
+        <span class="top-rank">${i+1}</span>
+        <span class="top-name" title="${name}">${name}</span>
+        <span class="top-val">${fmtF(val)}</span>
+      </div>
+      <div class="top-track"><div class="top-fill" style="width:${(val/maxA*100).toFixed(1)}%"></div></div>
+      ${budgetVal>0?`<div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:'IBM Plex Mono',monospace;">Budget: ${fmtF(budgetVal)} &nbsp;<span style="color:${over?'var(--red)':'var(--green)'}">${over?'▲ เกิน '+(fmtF(val-budgetVal)):'✓ เหลือ '+(fmtF(budgetVal-val))}</span></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ─── CAT FILTER ────────────────────────────────────────
+function buildCatFilter(){
+  const sel=document.getElementById('catFilter');
+  sel.innerHTML='<option value="">ทุกหมวดหมู่</option>';
+  if(colCat<0)return;
+  [...new Set(allRows.map(r=>r[colCat]).filter(Boolean))].sort().forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
+  });
+}
+
+// ─── FILTER / SORT / PAGINATE ──────────────────────────
+function applyFilter(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const cat=document.getElementById('catFilter').value;
+  filtered=allRows.filter(r=>{
+    return(!q||r.some(c=>c.toLowerCase().includes(q)))&&(!cat||r[colCat]===cat);
+  });
+  if(sortCol>=0){
+    filtered.sort((a,b)=>{
+      const av=a[sortCol]||'',bv=b[sortCol]||'';
+      const an=pn(av),bn=pn(bv);
+      const cmp=(an||bn)?an-bn:String(av).localeCompare(String(bv),'th');
+      return sortAsc?cmp:-cmp;
+    });
+  }
+  curPage=1;renderTable();
+}
+function sortBy(i){sortAsc=sortCol===i?!sortAsc:true;sortCol=i;applyFilter();}
+function changePageSize(){pageSize=parseInt(document.getElementById('pageSize').value);applyFilter();}
+function goPage(p){
+  const ps=pageSize||filtered.length;
+  const tp=Math.ceil(filtered.length/(ps||1));
+  if(p<1||p>tp)return;curPage=p;renderTable();
+}
+
+// ─── RENDER TABLE ──────────────────────────────────────
+function renderTable(){
+  const ps=pageSize||filtered.length;
+  const tp=Math.ceil(filtered.length/(ps||1));
+  const s=(curPage-1)*ps;
+  const page=filtered.slice(s,s+ps);
+  document.getElementById('rowCount').textContent=filtered.length+' รายการ';
+
+  if(!filtered.length){
+    document.getElementById('tableWrap').innerHTML='<div class="state-box"><div style="font-size:32px">🔍</div><div>ไม่พบรายการที่ค้นหา</div></div>';
+    return;
+  }
+
+  const arrow=i=>sortCol===i?(sortAsc?' ↑':' ↓'):' ↕';
+  // Extra "Diff" column header
+  const hasDiff=colB>=0&&colA>=0;
+  const extraTH=hasDiff?'<th onclick="sortDiff()" title="Actual − Budget">Diff ↕</th>':'';
+
+  const thead=`<thead><tr>${headers.map((h,i)=>`<th class="${sortCol===i?'sorted':''}" onclick="sortBy(${i})">${h}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
+
+  const tbody=`<tbody>${page.map(r=>{
+    const cells=headers.map((_,i)=>{
+      const v=r[i]||'';
+      if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
+      if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
+      return`<td>${v}</td>`;
+    }).join('');
+    const diffCell=hasDiff?`<td class="num">${diffPill(pn(r[colB]),pn(r[colA]))}</td>`:'';
+    return`<tr>${cells}${diffCell}</tr>`;
+  }).join('')}</tbody>`;
+
+  const pg=tp>1?`<div class="pagination">
+    <span>แสดง ${s+1}–${Math.min(s+ps,filtered.length)} จาก ${filtered.length} รายการ</span>
+    <div class="page-btns">
+      <button class="page-btn" onclick="goPage(${curPage-1})" ${curPage<=1?'disabled':''}>‹</button>
+      ${pNums(curPage,tp)}
+      <button class="page-btn" onclick="goPage(${curPage+1})" ${curPage>=tp?'disabled':''}>›</button>
+    </div>
+  </div>`:'';
+
+  document.getElementById('tableWrap').innerHTML=`<table>${thead}${tbody}</table>${pg}`;
+}
+
+let diffSortAsc=true;
+function sortDiff(){
+  // Custom sort on diff column
+  diffSortAsc=sortCol===-999?!diffSortAsc:true;sortCol=-999;
+  const dSign=diffSortAsc?1:-1;
+  filtered.sort((a,b)=>((pn(a[colA])-pn(a[colB]))-(pn(b[colA])-pn(b[colB])))*dSign);
+  curPage=1;renderTable();
+}
+
+function diffPill(b,a){
+  if(!b&&!a)return'—';
+  const d=a-b;
+  const cls=d>0?'over':'under';
+  return`<span class="diff-pill ${cls}">${d>0?'+':''}${fmtF(d)}</span>`;
+}
+
+function pNums(cur,total){
+  let lo=Math.max(1,cur-3),hi=Math.min(total,lo+6);
+  if(hi-lo<6)lo=Math.max(1,hi-6);
+  let r='';for(let p=lo;p<=hi;p++)r+=`<button class="page-btn ${p===cur?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  return r;
+}
+
+// ─── EXTRA ACTIONS ─────────────────────────────────────
+function refreshData(){
+  allRows=[];headers=[];filtered=[];sortCol=-1;sortAsc=true;
+  document.getElementById('chartGrid').style.display='none';
+  document.getElementById('tableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
+  loadData();
+}
+
+function exportCSV(){
+  if(!filtered.length)return;
+  const rows=[headers.join(','),...filtered.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(','))];
+  const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='crusher-m-cost.csv';a.click();
+}
+
+function openShare(){
+  document.getElementById('shareUrl').value=window.location.href;
+  document.getElementById('shareModal').style.display='flex';
+  document.getElementById('copyMsg').textContent='';
+}
+function closeShare(){document.getElementById('shareModal').style.display='none';}
+function copyLink(){
+  const inp=document.getElementById('shareUrl');
+  inp.select();inp.setSelectionRange(0,9999);
+  navigator.clipboard.writeText(inp.value).then(()=>{
+    document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';
+  }).catch(()=>{document.execCommand('copy');document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';});
+}
+
+loadData();
+</script>
+</body>
+</html>
