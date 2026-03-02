@@ -275,10 +275,10 @@
       </div>
     </div>
 
-    <div class="sec"><span class="sec-title">Top 5 Actual Expense</span></div>
+    <div class="sec"><span class="sec-title">Top 5 Actual Expense for Recondition</span></div>
     <div class="chart-grid" style="grid-template-columns:1fr">
       <div class="chart-card">
-        <div class="chart-label">5 รายการ Actual Expense สูงสุด</div>
+        <div class="chart-label">5 รายการ Actual Expense สูงสุด — ประเภท Recondition (Column C)</div>
         <div id="top5Chart"></div>
       </div>
     </div>
@@ -440,12 +440,17 @@ function buildCharts(){
     </div>`;
   }).join('')||'<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลหมวดหมู่</div>';
 
-  // Top 5 Actual
+  // Top 5 Actual — Recondition only (Column C = index 2)
   if(colA<0){
     document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบคอลัมน์ Actual Expense</div>';
     return;
   }
-  const top5=[...allRows].sort((a,b)=>pn(b[colA])-pn(a[colA])).slice(0,5);
+  const reconRows=allRows.filter(r=>(r[2]||'').trim().toLowerCase()==='recondition');
+  if(!reconRows.length){
+    document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลประเภท Recondition ใน Column C</div>';
+    return;
+  }
+  const top5=reconRows.sort((a,b)=>pn(b[colA])-pn(a[colA])).slice(0,5);
   const maxA=pn(top5[0]?.[colA])||1;
   document.getElementById('top5Chart').innerHTML=top5.map((r,i)=>{
     const name=r[colName]||r[0]||'—';
