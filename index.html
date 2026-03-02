@@ -175,6 +175,27 @@
   .diff-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;}
   .diff-pill.over{background:rgba(231,76,60,.15);color:var(--red);}
   .diff-pill.under{background:rgba(39,174,96,.15);color:var(--green);}
+  /* Status badge */
+  .status-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 10px;border-radius:20px;
+    font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;
+    letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;
+  }
+  .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .status-badge.wait{
+    background:rgba(231,76,60,.12);color:#ff6b6b;border:1px solid rgba(231,76,60,.3);
+  }
+  .status-badge.wait::before{background:#e74c3c;box-shadow:0 0 4px #e74c3c;}
+  .status-badge.active{
+    background:rgba(245,166,35,.12);color:#f5a623;border:1px solid rgba(245,166,35,.3);
+  }
+  .status-badge.active::before{background:#f5a623;box-shadow:0 0 4px #f5a623;animation:glowPulse 1.8s infinite;}
+  .status-badge.complete{
+    background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3);
+  }
+  .status-badge.complete::before{background:#27ae60;box-shadow:0 0 4px #27ae60;}
+  @keyframes glowPulse{0%,100%{opacity:1}50%{opacity:.4}}
 
   /* PAGINATION */
   .pagination{
@@ -351,7 +372,7 @@ const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vn
 
 let allRows=[],headers=[],filtered=[];
 let sortCol=-1,sortAsc=true,curPage=1,pageSize=25;
-let colB=-1,colA=-1,colCat=-1,colName=-1; // Budget, Actual, Category, Name
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colType=-1; // Budget, Actual, Category, Name, Action, Type
 
 // ─── CSV ───────────────────────────────────────────────
 function parseCSV(txt){
@@ -382,6 +403,10 @@ function detectCols(h){
   colCat=find(['category','cat','type','หมวด','ประเภท','กลุ่ม','section']);
   colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
   if(colName===-1)colName=0;
+  colAction=find(['action','สถานะ','status']);
+  // TYPE column = Column C (index 2) based on sheet structure, or detect by header
+  colType=find(['type','ประเภท']);
+  if(colType===-1)colType=2; // fallback to column C (index 2) per sheet structure
 }
 
 // ─── LOAD ──────────────────────────────────────────────
@@ -544,6 +569,14 @@ function goPage(p){
 function isUrl(v){return typeof v==='string'&&/^https?:\/\//i.test(v.trim());}
 function isLinkCol(h){return/(link|url|href|เว็บ|ลิงก์)/i.test(h);}
 
+function actionBadge(val){
+  const v=(val||'').trim().toLowerCase();
+  if(v==='wait')   return`<span class="status-badge wait">Wait</span>`;
+  if(v==='active') return`<span class="status-badge active">Active</span>`;
+  if(v==='complete'||v==='completed') return`<span class="status-badge complete">Complete</span>`;
+  return`<span style="color:var(--muted);font-size:12px">${val||'—'}</span>`;
+}
+
 function renderTable(){
   const ps=pageSize||filtered.length;
   const tp=Math.ceil(filtered.length/(ps||1));
@@ -558,19 +591,24 @@ function renderTable(){
 
   const arrow=i=>sortCol===i?(sortAsc?' ↑':' ↓'):' ↕';
   const hasDiff=colB>=0&&colA>=0;
-  const extraTH=hasDiff?'<th onclick="sortDiff()" title="Actual − Budget">Diff ↕</th>':'';
 
-  const thead=`<thead><tr>${headers.map((h,i)=>`<th class="${sortCol===i?'sorted':''}" onclick="sortBy(${i})">${h}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
+  // Build visible column indices (hide TYPE column)
+  const visibleCols=headers.map((_,i)=>i).filter(i=>i!==colType);
+
+  const extraTH=hasDiff?'<th onclick="sortDiff()" title="Actual − Budget">Diff ↕</th>':'';
+  const thead=`<thead><tr>${visibleCols.map(i=>`<th class="${sortCol===i?'sorted':''}" onclick="sortBy(${i})">${headers[i]}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
 
   const tbody=`<tbody>${page.map(r=>{
-    const cells=headers.map((h,i)=>{
+    const cells=visibleCols.map(i=>{
       const v=r[i]||'';
+      // Action column → status badge
+      if(i===colAction) return`<td>${actionBadge(v)}</td>`;
       // Budget column
-      if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
+      if(i===colB) return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
       // Actual column
-      if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
+      if(i===colA) return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
       // Link column — header says link/url OR value looks like URL
-      if(isLinkCol(h)||isUrl(v)){
+      if(isLinkCol(headers[i])||isUrl(v)){
         if(v&&isUrl(v)){
           return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;
         }
