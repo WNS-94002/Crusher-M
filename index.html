@@ -290,7 +290,7 @@
     <div class="card c-purple">
       <div class="card-label">จำนวนรายการ</div>
       <div class="card-value" id="cItems">—</div>
-      <div class="card-sub">รายการทั้งหมด</div>
+      <div class="card-sub" id="cItemsSub" style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;"></div>
     </div>
     <div class="card c-green" id="cPctCard">
       <div class="card-label">% Budget Used</div>
@@ -315,9 +315,8 @@
     </div>
 
     <div class="sec"><span class="sec-title">Top 5 Actual Expense for Recondition</span></div>
-    <div style="margin-bottom:24px;">
+    <div style="margin-bottom:24px;display:none">
       <div class="chart-card">
-        <div class="chart-label">5 รายการ Actual Expense สูงสุด — เฉพาะ Type = Recondition (Column C)</div>
         <div id="top5Chart"></div>
       </div>
     </div>
@@ -372,7 +371,7 @@ const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vn
 
 let allRows=[],headers=[],filtered=[];
 let sortCol=-1,sortAsc=true,curPage=1,pageSize=25;
-let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colType=-1; // Budget, Actual, Category, Name, Action, Type
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colType=-1,colNo=-1; // Budget, Actual, Category, Name, Action, Type, No
 
 // ─── CSV ───────────────────────────────────────────────
 function parseCSV(txt){
@@ -407,6 +406,9 @@ function detectCols(h){
   // TYPE column = Column C (index 2) based on sheet structure, or detect by header
   colType=find(['type','ประเภท']);
   if(colType===-1)colType=2; // fallback to column C (index 2) per sheet structure
+  // NO column — first col or header named no/no./number
+  colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ'||x==='ที่');
+  if(colNo===-1&&(hl[0]==='no'||hl[0]==='no.'||hl[0]===''||/^#?no\.?$/i.test(headers[0])))colNo=0;
 }
 
 // ─── LOAD ──────────────────────────────────────────────
@@ -441,13 +443,31 @@ function setSt(state,text){
 // ─── CARDS ─────────────────────────────────────────────
 function buildCards(){
   let budget=0,actual=0;
+  let cntWait=0,cntActive=0,cntComplete=0;
   allRows.forEach(r=>{
     budget+=colB>=0?pn(r[colB]):0;
     actual+=colA>=0?pn(r[colA]):0;
+    if(colAction>=0){
+      const s=(r[colAction]||'').trim().toLowerCase();
+      if(s==='wait')cntWait++;
+      else if(s==='active')cntActive++;
+      else if(s==='complete'||s==='completed')cntComplete++;
+    }
   });
   document.getElementById('cBudget').textContent=fmt(budget);
   document.getElementById('cActual').textContent=fmt(actual);
   document.getElementById('cItems').textContent=allRows.length;
+  // Status breakdown chips
+  document.getElementById('cItemsSub').innerHTML=`
+    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#ff6b6b;font-family:'IBM Plex Mono',monospace;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#e74c3c;display:inline-block;flex-shrink:0;"></span>Wait ${cntWait}
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#f5a623;font-family:'IBM Plex Mono',monospace;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#f5a623;display:inline-block;flex-shrink:0;"></span>Active ${cntActive}
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#2ecc71;font-family:'IBM Plex Mono',monospace;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#27ae60;display:inline-block;flex-shrink:0;"></span>Complete ${cntComplete}
+    </span>`;
 
   const diff=actual-budget,over=diff>0;
   document.getElementById('cDiffCard').className='card '+(over?'c-red':'c-green');
@@ -592,8 +612,8 @@ function renderTable(){
   const arrow=i=>sortCol===i?(sortAsc?' ↑':' ↓'):' ↕';
   const hasDiff=colB>=0&&colA>=0;
 
-  // Build visible column indices (hide TYPE column)
-  const visibleCols=headers.map((_,i)=>i).filter(i=>i!==colType);
+  // Build visible column indices (hide TYPE and NO columns)
+  const visibleCols=headers.map((_,i)=>i).filter(i=>i!==colType&&i!==colNo);
 
   const extraTH=hasDiff?'<th onclick="sortDiff()" title="Actual − Budget">Diff ↕</th>':'';
   const thead=`<thead><tr>${visibleCols.map(i=>`<th class="${sortCol===i?'sorted':''}" onclick="sortBy(${i})">${headers[i]}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
