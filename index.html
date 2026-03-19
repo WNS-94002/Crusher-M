@@ -347,7 +347,7 @@
 
   <footer>
     <span>Crusher M · Cost Summary Dashboard</span>
-    <span>Data: Google Sheets (auto-refresh)</span>
+    <span>Data: Google Sheets (auto-refresh every 1 min)</span>
   </footer>
 </div>
 
@@ -371,7 +371,30 @@ const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vn
 
 let allRows=[],headers=[],filtered=[];
 let sortCol=-1,sortAsc=true,curPage=1,pageSize=25;
-let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colType=-1,colNo=-1; // Budget, Actual, Category, Name, Action, Type, No
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colType=-1,colNo=-1;
+
+// ─── AUTO-REFRESH ──────────────────────────────────────
+const REFRESH_INTERVAL = 60; // seconds
+let countdown = REFRESH_INTERVAL;
+let countdownTimer = null;
+
+function startAutoRefresh() {
+  clearInterval(countdownTimer);
+  countdown = REFRESH_INTERVAL;
+
+  countdownTimer = setInterval(() => {
+    countdown--;
+    const timeEl = document.getElementById('sTime');
+    if (timeEl) {
+      const now = new Date().toLocaleTimeString('th-TH');
+      timeEl.textContent = `· ${now} · รีเฟรชใน ${countdown}s`;
+    }
+    if (countdown <= 0) {
+      countdown = REFRESH_INTERVAL;
+      refreshData();
+    }
+  }, 1000);
+}
 
 // ─── CSV ───────────────────────────────────────────────
 function parseCSV(txt){
@@ -403,10 +426,8 @@ function detectCols(h){
   colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
   if(colName===-1)colName=0;
   colAction=find(['action','สถานะ','status']);
-  // TYPE column = Column C (index 2) based on sheet structure, or detect by header
   colType=find(['type','ประเภท']);
-  if(colType===-1)colType=2; // fallback to column C (index 2) per sheet structure
-  // NO column — first col or header named no/no./number
+  if(colType===-1)colType=2;
   colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ'||x==='ที่');
   if(colNo===-1&&(hl[0]==='no'||hl[0]==='no.'||hl[0]===''||/^#?no\.?$/i.test(headers[0])))colNo=0;
 }
@@ -429,10 +450,15 @@ async function loadData(){
     buildCharts();
     document.getElementById('chartGrid').style.display='';
     setSt('live','โหลดสำเร็จ · '+allRows.length+' รายการ');
-    document.getElementById('sTime').textContent='· '+new Date().toLocaleTimeString('th-TH');
+    // Update time display and restart countdown
+    const now = new Date().toLocaleTimeString('th-TH');
+    document.getElementById('sTime').textContent = `· ${now} · รีเฟรชใน ${REFRESH_INTERVAL}s`;
+    startAutoRefresh();
   }catch(e){
     setSt('','โหลดไม่สำเร็จ: '+e.message);
     document.getElementById('tableWrap').innerHTML=`<div class="state-box"><div style="font-size:36px">⚠️</div><div>ไม่สามารถโหลดข้อมูลได้<br><small>${e.message}</small><br><br><small>ตรวจสอบว่า Google Sheet ถูก Publish เป็น Public แล้วลอง Refresh</small></div></div>`;
+    // Still restart countdown even on error so we retry
+    startAutoRefresh();
   }
 }
 function setSt(state,text){
@@ -457,7 +483,6 @@ function buildCards(){
   document.getElementById('cBudget').textContent=fmt(budget);
   document.getElementById('cActual').textContent=fmt(actual);
   document.getElementById('cItems').textContent=allRows.length;
-  // Status breakdown chips
   document.getElementById('cItemsSub').innerHTML=`
     <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#ff6b6b;font-family:'IBM Plex Mono',monospace;">
       <span style="width:7px;height:7px;border-radius:50%;background:#e74c3c;display:inline-block;flex-shrink:0;"></span>Wait ${cntWait}
@@ -486,7 +511,6 @@ function buildCharts(){
 }
 
 function buildBvaChart(){
-  // Group all rows by category, sum budget & actual
   const cats={};
   allRows.forEach(r=>{
     const cat=(colCat>=0&&r[colCat])?r[colCat]:'อื่นๆ';
@@ -525,7 +549,6 @@ function buildTop5Recondition(){
     document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบคอลัมน์ Actual Expense</div>';
     return;
   }
-  // Filter only rows where Column C (index 2) = "Recondition" (case-insensitive)
   const reconRows=allRows.filter(r=>(r[2]||'').trim().toLowerCase()==='recondition');
   if(!reconRows.length){
     document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลประเภท Recondition ใน Column C</div>';
@@ -612,7 +635,6 @@ function renderTable(){
   const arrow=i=>sortCol===i?(sortAsc?' ↑':' ↓'):' ↕';
   const hasDiff=colB>=0&&colA>=0;
 
-  // Build visible column indices (hide TYPE and NO columns)
   const visibleCols=headers.map((_,i)=>i).filter(i=>i!==colType&&i!==colNo);
 
   const extraTH=hasDiff?'<th onclick="sortDiff()" title="Actual − Budget">Diff ↕</th>':'';
@@ -621,13 +643,9 @@ function renderTable(){
   const tbody=`<tbody>${page.map(r=>{
     const cells=visibleCols.map(i=>{
       const v=r[i]||'';
-      // Action column → status badge
       if(i===colAction) return`<td>${actionBadge(v)}</td>`;
-      // Budget column
       if(i===colB) return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
-      // Actual column
       if(i===colA) return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
-      // Link column — header says link/url OR value looks like URL
       if(isLinkCol(headers[i])||isUrl(v)){
         if(v&&isUrl(v)){
           return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;
@@ -654,7 +672,6 @@ function renderTable(){
 
 let diffSortAsc=true;
 function sortDiff(){
-  // Custom sort on diff column
   diffSortAsc=sortCol===-999?!diffSortAsc:true;sortCol=-999;
   const dSign=diffSortAsc?1:-1;
   filtered.sort((a,b)=>((pn(a[colA])-pn(a[colB]))-(pn(b[colA])-pn(b[colB])))*dSign);
