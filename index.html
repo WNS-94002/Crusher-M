@@ -227,6 +227,31 @@
   .td-pct{text-align:center;width:44px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
   .prog-empty{padding:40px;text-align:center;color:var(--muted);font-size:13px;}
 
+  /* ── DONUT OVERVIEW ── */
+  .overview-wrap{display:flex;gap:16px;margin-bottom:18px;align-items:stretch;flex-wrap:wrap;}
+  .donut-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;display:flex;align-items:center;gap:22px;flex-shrink:0;}
+  .donut-svg-wrap{position:relative;width:130px;height:130px;flex-shrink:0;}
+  .donut-svg-wrap svg{width:130px;height:130px;}
+  .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+  .donut-pct{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;color:var(--accent);line-height:1;}
+  .donut-sub{font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+  .donut-legend{display:flex;flex-direction:column;gap:8px;min-width:110px;}
+  .dleg{display:flex;align-items:center;gap:7px;}
+  .dleg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .dleg-info{display:flex;flex-direction:column;}
+  .dleg-label{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;}
+  .dleg-val{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1.1;}
+  .funnel-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;flex:1;min-width:240px;}
+  .funnel-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:12px;}
+  .funnel-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .funnel-step-name{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);width:36px;flex-shrink:0;text-align:right;}
+  .funnel-track{flex:1;height:13px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .funnel-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s cubic-bezier(.4,0,.2,1);}
+  .funnel-fill.c-done{background:linear-gradient(90deg,var(--green),#16a34a);}
+  .funnel-nums{font-family:'IBM Plex Mono',monospace;font-size:10px;width:68px;text-align:right;flex-shrink:0;color:var(--muted);}
+  .funnel-nums b{color:var(--accent);font-weight:500;}
+  .funnel-nums b.done{color:var(--green);}
+
   /* ── MODAL ── */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
   .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:520px;width:100%;}
@@ -329,6 +354,56 @@
        TAB: PROGRESS
   ══════════════════════════════ -->
   <div class="tab-panel" id="panel-progress">
+
+    <!-- OVERVIEW ROW -->
+    <div class="overview-wrap" style="margin-top:18px;">
+      <!-- Donut chart -->
+      <div class="donut-card">
+        <div class="donut-svg-wrap">
+          <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+            <circle id="donut-bg"   cx="65" cy="65" r="52" fill="none" stroke="#252830" stroke-width="16"/>
+            <circle id="donut-ring" cx="65" cy="65" r="52" fill="none" stroke="#f5a623" stroke-width="16"
+              stroke-linecap="round"
+              stroke-dasharray="0 327"
+              transform="rotate(-90 65 65)"
+              style="transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1);"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-pct" id="donutPct">0%</div>
+            <div class="donut-sub">overall</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="dleg">
+            <div class="dleg-dot" style="background:var(--green)"></div>
+            <div class="dleg-info">
+              <div class="dleg-label">PO Done</div>
+              <div class="dleg-val" id="dlegDone" style="color:var(--green)">—</div>
+            </div>
+          </div>
+          <div class="dleg">
+            <div class="dleg-dot" style="background:var(--accent)"></div>
+            <div class="dleg-info">
+              <div class="dleg-label">In Progress</div>
+              <div class="dleg-val" id="dlegWIP" style="color:var(--accent)">—</div>
+            </div>
+          </div>
+          <div class="dleg">
+            <div class="dleg-dot" style="background:var(--border)"></div>
+            <div class="dleg-info">
+              <div class="dleg-label">Not Started</div>
+              <div class="dleg-val" id="dlegNone" style="color:var(--muted)">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step funnel -->
+      <div class="funnel-card">
+        <div class="funnel-title">รายการที่ผ่านแต่ละขั้นตอน</div>
+        <div id="funnelBars"></div>
+      </div>
+    </div>
 
     <div class="prog-stats">
       <div class="prog-stat ps-blue"><div class="prog-stat-label">Total Items</div><div class="prog-stat-value" id="psTotal">—</div></div>
@@ -705,6 +780,41 @@ function updateProgStats(){
   document.getElementById('psPO').textContent=done;
   document.getElementById('psWIP').textContent=wip;
   document.getElementById('psNone').textContent=none;
+  buildOverview(total,done,wip,none);
+}
+
+function buildOverview(total,done,wip,none){
+  if(!total) return;
+
+  /* ── Donut ── */
+  const pct = Math.round(done/total*100);
+  const C = 2*Math.PI*52; // circumference ≈ 326.7
+  const filled = (pct/100)*C;
+  const ring = document.getElementById('donut-ring');
+  ring.setAttribute('stroke-dasharray', filled.toFixed(1)+' '+C.toFixed(1));
+  ring.setAttribute('stroke', pct===100 ? 'var(--green)' : 'var(--accent)');
+  document.getElementById('donutPct').textContent = pct+'%';
+  document.getElementById('donutPct').style.color = pct===100 ? 'var(--green)' : 'var(--accent)';
+  document.getElementById('dlegDone').textContent = done+' items';
+  document.getElementById('dlegWIP').textContent  = wip+' items';
+  document.getElementById('dlegNone').textContent = none+' items';
+
+  /* ── Funnel bars ── */
+  const stepCounts = STEPS.map((_,si)=>progItems.filter(it=>it.steps[si]).length);
+  const maxCount = total;
+  const isLast = si => si === 5; // PO = final meaningful step
+  document.getElementById('funnelBars').innerHTML = STEPS.map((name,si)=>{
+    const cnt = stepCounts[si];
+    const pctW = Math.round(cnt/maxCount*100);
+    const isDone = si===5;
+    return`<div class="funnel-row">
+      <div class="funnel-step-name">${name}</div>
+      <div class="funnel-track">
+        <div class="funnel-fill${isDone?' c-done':''}" style="width:${pctW}%"></div>
+      </div>
+      <div class="funnel-nums"><b class="${isDone?'done':''}">${cnt}</b>/${total}</div>
+    </div>`;
+  }).join('');
 }
 
 function progSetFilter(f){
