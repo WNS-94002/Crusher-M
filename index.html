@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crusher M — Cost Summary</title>
+<title>Crusher M — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -21,30 +21,26 @@
   }
   .container{max-width:1280px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
 
-  /* HEADER */
-  header{padding:36px 0 28px;border-bottom:1px solid var(--border);}
-  .header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  /* ── HEADER ── */
+  header{padding:32px 0 0;border-bottom:1px solid var(--border);}
+  .header-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-bottom:20px;}
   .brand{display:flex;align-items:center;gap:16px;}
   .logo-mark{
-    width:54px;height:54px;
+    width:52px;height:52px;
     background:linear-gradient(135deg,var(--accent),var(--accent2));
     display:flex;align-items:center;justify-content:center;
-    font-family:'Bebas Neue',sans-serif;font-size:22px;color:#000;
+    font-family:'Bebas Neue',sans-serif;font-size:20px;color:#000;
     clip-path:polygon(10% 0%,90% 0%,100% 10%,100% 90%,90% 100%,10% 100%,0% 90%,0% 10%);
+    flex-shrink:0;
   }
   .title-group h1{
-    font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4.5vw,50px);
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);
     letter-spacing:3px;background:linear-gradient(90deg,var(--accent) 30%,#fff);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;
   }
-  .title-group p{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+  .title-group p{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
   .header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-  .btn{
-    padding:10px 18px;border-radius:6px;
-    font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;font-weight:500;
-    cursor:pointer;border:none;transition:all .18s;
-    display:flex;align-items:center;gap:7px;text-decoration:none;white-space:nowrap;
-  }
+  .btn{padding:9px 16px;border-radius:6px;font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .18s;display:flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;}
   .btn-primary{background:var(--accent);color:#000;}
   .btn-primary:hover{background:#ffb83d;transform:translateY(-1px);}
   .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
@@ -52,23 +48,35 @@
   .btn-share{background:var(--surface2);color:var(--blue);border:1px solid var(--blue);}
   .btn-share:hover{background:var(--blue);color:#fff;}
 
-  /* STATUS */
-  .status-bar{
-    display:flex;align-items:center;gap:14px;
-    padding:10px 0;border-bottom:1px solid var(--border);
-    font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--muted);
+  /* ── TABS ── */
+  .tab-bar{display:flex;gap:0;margin-top:0;}
+  .tab-btn{
+    padding:12px 28px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+    text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;
+    border:none;background:transparent;color:var(--muted);
+    border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;
+    display:flex;align-items:center;gap:8px;
   }
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+  .tab-btn.active .tab-dot{background:var(--accent);}
+
+  /* ── STATUS BAR ── */
+  .status-bar{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
   .dot.live{background:var(--green);animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-  /* CARDS */
-  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;padding:28px 0 20px;}
-  .card{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:10px;padding:18px 22px;position:relative;overflow:hidden;
-    transition:border-color .2s,transform .2s;
-  }
+  /* ── TAB PANELS ── */
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* ════════════════════════════════
+     COST SUMMARY TAB
+  ════════════════════════════════ */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding:28px 0 20px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
   .card:hover{border-color:rgba(245,166,35,.4);transform:translateY(-2px);}
   .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
   .card.c-orange::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
@@ -77,7 +85,7 @@
   .card.c-blue::before{background:var(--blue);}
   .card.c-purple::before{background:var(--purple);}
   .card-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
-  .card-value{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:1px;line-height:1;}
+  .card-value{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;line-height:1;}
   .card.c-orange .card-value{color:var(--accent);}
   .card.c-green  .card-value{color:var(--green);}
   .card.c-red    .card-value{color:var(--red);}
@@ -85,18 +93,14 @@
   .card.c-purple .card-value{color:var(--purple);}
   .card-sub{font-size:11px;color:var(--muted);margin-top:5px;}
 
-  /* SECTION HEADING */
-  .sec{margin:30px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--accent);display:flex;align-items:center;gap:10px;}
-  .sec-title::before{content:'';width:4px;height:18px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+  .sec{margin:28px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--accent);display:flex;align-items:center;gap:10px;}
+  .sec-title::before{content:'';width:4px;height:16px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
   .sec-right{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
 
-  /* CHARTS */
-  .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:24px;}
-  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px 22px 18px;}
+  /* BvA Chart */
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px 22px 18px;margin-bottom:24px;}
   .chart-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:18px;}
-
-  /* BvA single-bar chart */
   .bva-row{margin-bottom:22px;}
   .bva-cat-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px;}
   .bva-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
@@ -118,53 +122,19 @@
   .bva-legend{display:flex;gap:16px;margin-top:18px;flex-wrap:wrap;}
   .leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
   .leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
-  /* Link cell */
-  .link-cell a{
-    color:var(--blue);font-size:12px;font-family:'IBM Plex Mono',monospace;
-    text-decoration:none;display:inline-flex;align-items:center;gap:4px;
-    padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.3);
-    background:rgba(59,130,246,.06);transition:all .15s;white-space:nowrap;
-  }
-  .link-cell a:hover{background:rgba(59,130,246,.18);border-color:var(--blue);color:#fff;}
 
-  /* Top 5 bars */
-  .top-row{margin-bottom:12px;}
-  .top-meta{display:flex;align-items:baseline;margin-bottom:4px;gap:8px;}
-  .top-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);width:22px;flex-shrink:0;}
-  .top-name{font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .top-val{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--accent);white-space:nowrap;}
-  .top-track{height:7px;background:var(--border);border-radius:3px;overflow:hidden;}
-  .top-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .7s cubic-bezier(.4,0,.2,1);}
-
-  /* FILTER BAR */
+  /* Filter + Table */
   .filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-  .search-box{
-    flex:1;min-width:180px;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:6px;padding:9px 13px;
-    color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;
-    transition:border-color .2s;
-  }
+  .search-box{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 13px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
   .search-box:focus{border-color:var(--accent);}
   .search-box::placeholder{color:var(--muted);}
-  .filter-select{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:6px;padding:9px 13px;
-    color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;cursor:pointer;
-  }
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 13px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;cursor:pointer;}
   .filter-select:focus{border-color:var(--accent);}
 
-  /* TABLE */
   .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;overflow-x:auto;}
   table{width:100%;border-collapse:collapse;font-size:13px;}
   thead{background:var(--surface2);position:sticky;top:0;z-index:2;}
-  th{
-    padding:13px 14px;text-align:left;
-    font-family:'IBM Plex Mono',monospace;font-size:11px;
-    text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);
-    border-bottom:1px solid var(--border);white-space:nowrap;
-    cursor:pointer;user-select:none;transition:color .2s;
-  }
+  th{padding:13px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s;}
   th:hover,th.sorted{color:var(--accent);}
   td{padding:11px 14px;border-bottom:1px solid rgba(37,40,48,.7);vertical-align:middle;white-space:nowrap;}
   tr:last-child td{border-bottom:none;}
@@ -175,52 +145,93 @@
   .diff-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;}
   .diff-pill.over{background:rgba(231,76,60,.15);color:var(--red);}
   .diff-pill.under{background:rgba(39,174,96,.15);color:var(--green);}
-  /* Status badge */
-  .status-badge{
-    display:inline-flex;align-items:center;gap:5px;
-    padding:3px 10px;border-radius:20px;
-    font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;
-    letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;
-  }
+  .status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
   .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-  .status-badge.wait{
-    background:rgba(231,76,60,.12);color:#ff6b6b;border:1px solid rgba(231,76,60,.3);
-  }
-  .status-badge.wait::before{background:#e74c3c;box-shadow:0 0 4px #e74c3c;}
-  .status-badge.active{
-    background:rgba(245,166,35,.12);color:#f5a623;border:1px solid rgba(245,166,35,.3);
-  }
-  .status-badge.active::before{background:#f5a623;box-shadow:0 0 4px #f5a623;animation:glowPulse 1.8s infinite;}
-  .status-badge.complete{
-    background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3);
-  }
-  .status-badge.complete::before{background:#27ae60;box-shadow:0 0 4px #27ae60;}
+  .status-badge.wait{background:rgba(231,76,60,.12);color:#ff6b6b;border:1px solid rgba(231,76,60,.3);}
+  .status-badge.wait::before{background:#e74c3c;}
+  .status-badge.active{background:rgba(245,166,35,.12);color:#f5a623;border:1px solid rgba(245,166,35,.3);}
+  .status-badge.active::before{background:#f5a623;animation:glowPulse 1.8s infinite;}
+  .status-badge.complete{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3);}
+  .status-badge.complete::before{background:#27ae60;}
   @keyframes glowPulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .link-cell a{color:var(--blue);font-size:12px;font-family:'IBM Plex Mono',monospace;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);transition:all .15s;white-space:nowrap;}
+  .link-cell a:hover{background:rgba(59,130,246,.18);border-color:var(--blue);color:#fff;}
 
-  /* PAGINATION */
-  .pagination{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:12px 14px;border-top:1px solid var(--border);
-    font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;
-    gap:12px;flex-wrap:wrap;
-  }
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;gap:12px;flex-wrap:wrap;}
   .page-btns{display:flex;gap:5px;}
-  .page-btn{
-    width:28px;height:28px;border-radius:5px;border:1px solid var(--border);
-    background:transparent;color:var(--text);cursor:pointer;font-size:12px;
-    display:flex;align-items:center;justify-content:center;
-    transition:all .15s;font-family:'IBM Plex Mono',monospace;
-  }
+  .page-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'IBM Plex Mono',monospace;}
   .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
   .page-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
   .page-btn:disabled{opacity:.3;cursor:not-allowed;}
 
-  /* STATES */
   .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;color:var(--muted);gap:12px;text-align:center;line-height:1.7;}
-  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+  .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* SHARE MODAL */
+  /* ════════════════════════════════
+     PROGRESS TAB
+  ════════════════════════════════ */
+  .prog-stats{display:flex;gap:12px;margin:24px 0 20px;flex-wrap:wrap;}
+  .prog-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 20px;flex:1;min-width:130px;}
+  .prog-stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
+  .prog-stat-value{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;}
+  .ps-blue .prog-stat-value{color:var(--blue);}
+  .ps-green .prog-stat-value{color:var(--green);}
+  .ps-orange .prog-stat-value{color:var(--accent);}
+  .ps-purple .prog-stat-value{color:var(--purple);}
+
+  /* Step legend */
+  .prog-legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .prog-leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+  .prog-leg-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
+
+  /* Filter row for progress */
+  .prog-filter{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .prog-search{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 13px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+  .prog-search:focus{border-color:var(--accent);}
+  .prog-search::placeholder{color:var(--muted);}
+  .prog-filter-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 16px;color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
+  .prog-filter-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+  .prog-filter-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+
+  /* Column headers */
+  .prog-col-head{display:grid;grid-template-columns:300px repeat(7,1fr) 70px;gap:8px;margin-bottom:8px;padding:0 14px;}
+  .prog-col-head .pch{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;font-family:'IBM Plex Mono',monospace;}
+  .prog-col-head .pch.item-col{text-align:left;}
+
+  /* Item rows */
+  .prog-list{display:flex;flex-direction:column;gap:6px;}
+  .prog-row{
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;display:grid;
+    grid-template-columns:300px repeat(7,1fr) 70px;
+    gap:8px;align-items:center;
+    transition:border-color .2s,transform .15s;
+  }
+  .prog-row:hover{border-color:rgba(245,166,35,.35);transform:translateY(-1px);}
+  .prog-item-no{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:3px;}
+  .prog-item-name{font-size:12px;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .prog-bar-wrap{margin-top:6px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s;}
+
+  /* Step cell */
+  .step-cell{display:flex;justify-content:center;align-items:center;}
+  .step-dot{
+    width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;border:1.5px solid transparent;
+    transition:all .3s;
+  }
+  .step-dot.done{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+  .step-dot.wip{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue);animation:wip-glow 2s infinite;}
+  .step-dot.wait{background:var(--surface2);border-color:var(--border);color:var(--muted);}
+  @keyframes wip-glow{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.25)}50%{box-shadow:0 0 0 4px rgba(59,130,246,.07)}}
+
+  /* Pct col */
+  .pct-col{text-align:center;}
+  .pct-val{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
+
+  /* ── MODAL ── */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
   .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:520px;width:100%;}
   .modal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent);margin-bottom:8px;}
@@ -230,15 +241,16 @@
   .modal-close{margin-top:14px;width:100%;}
   .copy-msg{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
 
-  footer{
-    padding:28px 0;border-top:1px solid var(--border);margin-top:32px;
-    color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;
-    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
-  }
+  footer{padding:24px 0;border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 
+  @media(max-width:900px){
+    .prog-col-head,.prog-row{grid-template-columns:1fr repeat(7,28px) 50px;}
+    .step-dot{width:22px;height:22px;font-size:10px;}
+  }
   @media(max-width:640px){
     .summary-grid{grid-template-columns:repeat(2,1fr);}
-    .chart-grid{grid-template-columns:1fr;}
+    .prog-col-head,.prog-row{grid-template-columns:1fr repeat(7,22px) 40px;}
+    .step-dot{width:20px;height:20px;font-size:9px;}
   }
 </style>
 </head>
@@ -247,19 +259,29 @@
 
   <!-- HEADER -->
   <header>
-    <div class="header-inner">
+    <div class="header-top">
       <div class="brand">
         <div class="logo-mark">CM</div>
         <div class="title-group">
           <h1>CRUSHER M</h1>
-          <p>Cost Summary Dashboard</p>
+          <p>Project Dashboard</p>
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-share" onclick="openShare()">🔗 Share Link</button>
-        <button class="btn btn-ghost" onclick="refreshData()">↺ Refresh</button>
-        <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-share" onclick="openShare()">🔗 Share</button>
+        <button class="btn btn-ghost" id="refreshBtn" onclick="refreshAll()">↺ Refresh</button>
+        <button class="btn btn-primary" id="exportBtn" onclick="doExport()">⬇ Export CSV</button>
       </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-cost" onclick="switchTab('cost')">
+        <span class="tab-dot"></span> Cost Summary
+      </button>
+      <button class="tab-btn" id="tab-progress" onclick="switchTab('progress')">
+        <span class="tab-dot"></span> Procurement Progress
+      </button>
     </div>
   </header>
 
@@ -270,41 +292,23 @@
     <span id="sTime"></span>
   </div>
 
-  <!-- SUMMARY CARDS -->
-  <div class="summary-grid">
-    <div class="card c-blue">
-      <div class="card-label">Total Budget</div>
-      <div class="card-value" id="cBudget">—</div>
-      <div class="card-sub">THB</div>
-    </div>
-    <div class="card c-orange">
-      <div class="card-label">Total Actual Expense</div>
-      <div class="card-value" id="cActual">—</div>
-      <div class="card-sub">THB</div>
-    </div>
-    <div class="card c-red" id="cDiffCard">
-      <div class="card-label" id="cDiffLabel">Budget vs Actual</div>
-      <div class="card-value" id="cDiff">—</div>
-      <div class="card-sub" id="cDiffSub">—</div>
-    </div>
-    <div class="card c-purple">
-      <div class="card-label">จำนวนรายการ</div>
-      <div class="card-value" id="cItems">—</div>
-      <div class="card-sub" id="cItemsSub" style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;"></div>
-    </div>
-    <div class="card c-green" id="cPctCard">
-      <div class="card-label">% Budget Used</div>
-      <div class="card-value" id="cPct">—</div>
-      <div class="card-sub">of total budget</div>
-    </div>
-  </div>
+  <!-- ══════════════════════════════
+       TAB: COST SUMMARY
+  ══════════════════════════════ -->
+  <div class="tab-panel active" id="panel-cost">
 
-  <!-- CHARTS -->
-  <div id="chartGrid" style="display:none">
-    <div class="sec"><span class="sec-title">Budget vs Actual Expense</span></div>
-    <div style="margin-bottom:24px;">
+    <div class="summary-grid">
+      <div class="card c-blue"><div class="card-label">Total Budget</div><div class="card-value" id="cBudget">—</div><div class="card-sub">THB</div></div>
+      <div class="card c-orange"><div class="card-label">Total Actual</div><div class="card-value" id="cActual">—</div><div class="card-sub">THB</div></div>
+      <div class="card c-red" id="cDiffCard"><div class="card-label" id="cDiffLabel">Budget vs Actual</div><div class="card-value" id="cDiff">—</div><div class="card-sub" id="cDiffSub">—</div></div>
+      <div class="card c-purple"><div class="card-label">จำนวนรายการ</div><div class="card-value" id="cItems">—</div><div class="card-sub" id="cItemsSub" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;"></div></div>
+      <div class="card c-green" id="cPctCard"><div class="card-label">% Budget Used</div><div class="card-value" id="cPct">—</div><div class="card-sub">of total budget</div></div>
+    </div>
+
+    <div id="costChartArea" style="display:none">
+      <div class="sec"><span class="sec-title">Budget vs Actual Expense</span></div>
       <div class="chart-card">
-        <div class="chart-label">เปรียบเทียบ Budget กับ Actual — ทั้งหมดตามหมวดหมู่</div>
+        <div class="chart-label">เปรียบเทียบ Budget กับ Actual — ตามหมวดหมู่</div>
         <div id="bvaChart"></div>
         <div class="bva-legend">
           <div class="leg"><div class="leg-dot" style="background:rgba(59,130,246,.6)"></div>Budget</div>
@@ -314,40 +318,70 @@
       </div>
     </div>
 
-    <div class="sec"><span class="sec-title">Top 5 Actual Expense for Recondition</span></div>
-    <div style="margin-bottom:24px;display:none">
-      <div class="chart-card">
-        <div id="top5Chart"></div>
-      </div>
+    <div class="sec">
+      <span class="sec-title">รายละเอียดค่าใช้จ่าย</span>
+      <span class="sec-right" id="costRowCount">—</span>
+    </div>
+    <div class="filter-bar">
+      <input class="search-box" type="text" id="costSearch" placeholder="ค้นหารายการ..." oninput="costApplyFilter()">
+      <select class="filter-select" id="catFilter" onchange="costApplyFilter()"><option value="">ทุกหมวดหมู่</option></select>
+      <select class="filter-select" id="costPageSize" onchange="costChangePageSize()">
+        <option value="25">25 รายการ</option><option value="50">50 รายการ</option><option value="100">100 รายการ</option><option value="0">ทั้งหมด</option>
+      </select>
+    </div>
+    <div class="table-wrap" id="costTableWrap">
+      <div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล Cost...</div></div>
     </div>
   </div>
 
-  <!-- TABLE -->
-  <div class="sec">
-    <span class="sec-title">รายละเอียดค่าใช้จ่าย</span>
-    <span class="sec-right" id="rowCount">—</span>
-  </div>
+  <!-- ══════════════════════════════
+       TAB: PROGRESS
+  ══════════════════════════════ -->
+  <div class="tab-panel" id="panel-progress">
 
-  <div class="filter-bar">
-    <input class="search-box" type="text" id="searchInput" placeholder="ค้นหารายการ..." oninput="applyFilter()">
-    <select class="filter-select" id="catFilter" onchange="applyFilter()">
-      <option value="">ทุกหมวดหมู่</option>
-    </select>
-    <select class="filter-select" id="pageSize" onchange="changePageSize()">
-      <option value="25">25 รายการ</option>
-      <option value="50">50 รายการ</option>
-      <option value="100">100 รายการ</option>
-      <option value="0">ทั้งหมด</option>
-    </select>
-  </div>
+    <div class="prog-stats">
+      <div class="prog-stat ps-blue"><div class="prog-stat-label">Total Items</div><div class="prog-stat-value" id="psTotal">—</div></div>
+      <div class="prog-stat ps-green"><div class="prog-stat-label">PO Complete</div><div class="prog-stat-value" id="psPO">—</div></div>
+      <div class="prog-stat ps-orange"><div class="prog-stat-label">In Progress</div><div class="prog-stat-value" id="psWIP">—</div></div>
+      <div class="prog-stat ps-purple"><div class="prog-stat-label">Not Started</div><div class="prog-stat-value" id="psNone">—</div></div>
+    </div>
 
-  <div class="table-wrap" id="tableWrap">
-    <div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูลจาก Google Sheets...</div></div>
+    <div class="prog-legend">
+      <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;">Legend :</span>
+      <div class="prog-leg"><div class="prog-leg-dot" style="background:rgba(245,166,35,.18);border:1.5px solid var(--accent);"></div>ทำเสร็จแล้ว</div>
+      <div class="prog-leg"><div class="prog-leg-dot" style="background:rgba(59,130,246,.18);border:1.5px solid var(--blue);"></div>ขั้นตอนถัดไป (WIP)</div>
+      <div class="prog-leg"><div class="prog-leg-dot" style="background:var(--surface2);border:1.5px solid var(--border);"></div>ยังไม่ถึง</div>
+    </div>
+
+    <div class="prog-filter">
+      <input class="prog-search" id="progSearch" type="text" placeholder="ค้นหารายการ..." oninput="progRender()">
+      <button class="prog-filter-btn active" id="pf-all"      onclick="progSetFilter('all')">ทั้งหมด</button>
+      <button class="prog-filter-btn"        id="pf-wip"      onclick="progSetFilter('wip')">กำลังดำเนินการ</button>
+      <button class="prog-filter-btn"        id="pf-done"     onclick="progSetFilter('done')">PO แล้ว</button>
+      <button class="prog-filter-btn"        id="pf-none"     onclick="progSetFilter('none')">ยังไม่เริ่ม</button>
+    </div>
+
+    <!-- Column header -->
+    <div class="prog-col-head">
+      <div class="pch item-col">รายการ</div>
+      <div class="pch">RO</div>
+      <div class="pch">QT</div>
+      <div class="pch">MEMO</div>
+      <div class="pch">PQ</div>
+      <div class="pch">BU</div>
+      <div class="pch">PO</div>
+      <div class="pch">DAP</div>
+      <div class="pch">%</div>
+    </div>
+
+    <div class="prog-list" id="progList">
+      <div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล Progress...</div></div>
+    </div>
   </div>
 
   <footer>
-    <span>Crusher M · Cost Summary Dashboard</span>
-    <span>Data: Google Sheets (auto-refresh every 1 min)</span>
+    <span>Crusher M · Project Dashboard</span>
+    <span id="footerNote">Data: Google Sheets · auto-refresh 60s</span>
   </footer>
 </div>
 
@@ -355,8 +389,7 @@
 <div class="modal-overlay" id="shareModal" style="display:none" onclick="if(event.target===this)closeShare()">
   <div class="modal">
     <h3>🔗 Share Dashboard</h3>
-    <p>คัดลอกลิงก์ด้านล่างนี้เพื่อแชร์ Dashboard ให้ผู้อื่น<br>
-    ผู้เปิดลิงก์จะเห็นข้อมูลล่าสุดจาก Google Sheets โดยตรง ไม่ต้องติดตั้งอะไรเพิ่ม</p>
+    <p>คัดลอกลิงก์ด้านล่างเพื่อแชร์ Dashboard ให้ผู้อื่น<br>ผู้เปิดลิงก์จะเห็นข้อมูลล่าสุดจาก Google Sheets โดยตรง</p>
     <div class="url-box">
       <input class="url-input" id="shareUrl" readonly onclick="this.select()">
       <button class="btn btn-primary" onclick="copyLink()">Copy</button>
@@ -367,56 +400,132 @@
 </div>
 
 <script>
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub?gid=0&single=true&output=csv';
+// ═══════════════════════════════════════════════
+//  DATA SOURCES
+// ═══════════════════════════════════════════════
+const BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub';
+const COST_URL     = BASE_URL + '?gid=0&single=true&output=csv';
+const PROGRESS_URL = BASE_URL + '?gid=1861162286&single=true&output=csv';
 
-let allRows=[],headers=[],filtered=[];
-let sortCol=-1,sortAsc=true,curPage=1,pageSize=25;
-let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colType=-1,colNo=-1;
+// ═══════════════════════════════════════════════
+//  STATE — COST
+// ═══════════════════════════════════════════════
+let cAllRows=[],cHeaders=[],cFiltered=[];
+let cSortCol=-1,cSortAsc=true,cPage=1,cPageSize=25;
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1;
 
-// ─── AUTO-REFRESH ──────────────────────────────────────
-const REFRESH_INTERVAL = 60; // seconds
-let countdown = REFRESH_INTERVAL;
+// ═══════════════════════════════════════════════
+//  STATE — PROGRESS
+// ═══════════════════════════════════════════════
+const STEPS      = ['RO','QT','MEMO','PQ','BU','PO','DAP'];
+const STEP_COLS  = [2,3,4,5,6,7,8]; // C-I (0-indexed)
+let progItems    = [];
+let progFilter   = 'all';
+
+// ═══════════════════════════════════════════════
+//  AUTO REFRESH
+// ═══════════════════════════════════════════════
+const REFRESH_SEC = 60;
+let countdown = REFRESH_SEC;
 let countdownTimer = null;
 
-function startAutoRefresh() {
+function startAutoRefresh(){
   clearInterval(countdownTimer);
-  countdown = REFRESH_INTERVAL;
-
-  countdownTimer = setInterval(() => {
+  countdown = REFRESH_SEC;
+  countdownTimer = setInterval(()=>{
     countdown--;
-    const timeEl = document.getElementById('sTime');
-    if (timeEl) {
-      const now = new Date().toLocaleTimeString('th-TH');
-      timeEl.textContent = `· ${now} · รีเฟรชใน ${countdown}s`;
-    }
-    if (countdown <= 0) {
-      countdown = REFRESH_INTERVAL;
-      refreshData();
-    }
-  }, 1000);
+    const now = new Date().toLocaleTimeString('th-TH');
+    document.getElementById('sTime').textContent = `· ${now} · รีเฟรชใน ${countdown}s`;
+    if(countdown<=0){ countdown=REFRESH_SEC; refreshAll(); }
+  },1000);
 }
 
-// ─── CSV ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
 function parseCSV(txt){
   return txt.split('\n').filter(l=>l.trim()).map(line=>{
     const row=[];let inQ=false,cur='';
     for(const c of line){
       if(c==='"'){inQ=!inQ;}
       else if(c===','&&!inQ){row.push(cur.trim());cur='';}
-      else{cur+=c;}
+      else cur+=c;
     }
     row.push(cur.trim());return row;
   });
 }
 function pn(v){const n=parseFloat(String(v||0).replace(/[^0-9.-]/g,''));return isNaN(n)?0:n;}
-function fmt(n){
-  if(Math.abs(n)>=1e6)return(n/1e6).toFixed(2)+'M';
-  return n.toLocaleString('th-TH',{maximumFractionDigits:0});
-}
+function fmt(n){if(Math.abs(n)>=1e6)return(n/1e6).toFixed(2)+'M';return n.toLocaleString('th-TH',{maximumFractionDigits:0});}
 function fmtF(n){return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function isUrl(v){return typeof v==='string'&&/^https?:\/\//i.test(v.trim());}
+function isLinkCol(h){return/(link|url|href|เว็บ|ลิงก์)/i.test(h);}
 
-// ─── DETECT COLUMNS ────────────────────────────────────
-function detectCols(h){
+function setSt(state,text){
+  document.getElementById('sDot').className='dot'+(state==='live'?' live':'');
+  document.getElementById('sText').textContent=text;
+}
+
+// ═══════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════
+let currentTab = 'cost';
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+//  LOAD ALL DATA
+// ═══════════════════════════════════════════════
+async function loadAll(){
+  setSt('','กำลังโหลดข้อมูล...');
+  const [costOk, progOk] = await Promise.all([loadCost(), loadProgress()]);
+  if(costOk && progOk){
+    setSt('live','โหลดสำเร็จ ·  Cost '+cAllRows.length+' รายการ  |  Progress '+progItems.length+' รายการ');
+  } else {
+    setSt('','โหลดบางส่วนไม่สำเร็จ');
+  }
+  const now = new Date().toLocaleTimeString('th-TH');
+  document.getElementById('sTime').textContent = `· ${now} · รีเฟรชใน ${REFRESH_SEC}s`;
+  startAutoRefresh();
+}
+
+function refreshAll(){
+  cAllRows=[];cHeaders=[];cFiltered=[];cSortCol=-1;cSortAsc=true;cPage=1;
+  progItems=[];
+  document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
+  document.getElementById('progList').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
+  document.getElementById('costChartArea').style.display='none';
+  loadAll();
+}
+
+// ─────────── COST ───────────
+async function loadCost(){
+  try{
+    const res = await fetch(COST_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const txt = await res.text();
+    const rows = parseCSV(txt);
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    cHeaders = rows[0];
+    cAllRows = rows.slice(1).filter(r=>r.some(c=>c));
+    detectCostCols(cHeaders);
+    buildCatFilter();
+    costApplyFilter();
+    buildCostCards();
+    buildBvaChart();
+    document.getElementById('costChartArea').style.display='';
+    return true;
+  }catch(e){
+    document.getElementById('costTableWrap').innerHTML=`<div class="state-box"><div style="font-size:32px">⚠️</div><div>โหลด Cost ไม่สำเร็จ<br><small>${e.message}</small></div></div>`;
+    return false;
+  }
+}
+
+function detectCostCols(h){
   const hl=h.map(x=>x.toLowerCase().replace(/\s/g,''));
   const find=(kws,excl=[])=>hl.findIndex(x=>kws.some(k=>x.includes(k))&&!excl.some(k=>x.includes(k)));
   colB=find(['budget','งบประมาณ','งบ']);
@@ -426,93 +535,47 @@ function detectCols(h){
   colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
   if(colName===-1)colName=0;
   colAction=find(['action','สถานะ','status']);
-  colType=find(['type','ประเภท']);
-  if(colType===-1)colType=2;
-  colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ'||x==='ที่');
-  if(colNo===-1&&(hl[0]==='no'||hl[0]==='no.'||hl[0]===''||/^#?no\.?$/i.test(headers[0])))colNo=0;
+  colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ');
+  if(colNo===-1&&/^#?no\.?$/i.test(cHeaders[0]))colNo=0;
 }
 
-// ─── LOAD ──────────────────────────────────────────────
-async function loadData(){
-  setSt('','กำลังดึงข้อมูล...');
-  try{
-    const res=await fetch(CSV_URL+'&_='+Date.now());
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const txt=await res.text();
-    const rows=parseCSV(txt);
-    if(rows.length<2)throw new Error('ไม่พบข้อมูลในชีต');
-    headers=rows[0];
-    allRows=rows.slice(1).filter(r=>r.some(c=>c));
-    detectCols(headers);
-    buildCatFilter();
-    applyFilter();
-    buildCards();
-    buildCharts();
-    document.getElementById('chartGrid').style.display='';
-    setSt('live','โหลดสำเร็จ · '+allRows.length+' รายการ');
-    // Update time display and restart countdown
-    const now = new Date().toLocaleTimeString('th-TH');
-    document.getElementById('sTime').textContent = `· ${now} · รีเฟรชใน ${REFRESH_INTERVAL}s`;
-    startAutoRefresh();
-  }catch(e){
-    setSt('','โหลดไม่สำเร็จ: '+e.message);
-    document.getElementById('tableWrap').innerHTML=`<div class="state-box"><div style="font-size:36px">⚠️</div><div>ไม่สามารถโหลดข้อมูลได้<br><small>${e.message}</small><br><br><small>ตรวจสอบว่า Google Sheet ถูก Publish เป็น Public แล้วลอง Refresh</small></div></div>`;
-    // Still restart countdown even on error so we retry
-    startAutoRefresh();
-  }
-}
-function setSt(state,text){
-  document.getElementById('sDot').className='dot'+(state==='live'?' live':'');
-  document.getElementById('sText').textContent=text;
-}
-
-// ─── CARDS ─────────────────────────────────────────────
-function buildCards(){
-  let budget=0,actual=0;
-  let cntWait=0,cntActive=0,cntComplete=0;
-  allRows.forEach(r=>{
+function buildCostCards(){
+  let budget=0,actual=0,cntW=0,cntA=0,cntC=0;
+  cAllRows.forEach(r=>{
     budget+=colB>=0?pn(r[colB]):0;
     actual+=colA>=0?pn(r[colA]):0;
     if(colAction>=0){
       const s=(r[colAction]||'').trim().toLowerCase();
-      if(s==='wait')cntWait++;
-      else if(s==='active')cntActive++;
-      else if(s==='complete'||s==='completed')cntComplete++;
+      if(s==='wait')cntW++;
+      else if(s==='active')cntA++;
+      else if(s==='complete'||s==='completed')cntC++;
     }
   });
   document.getElementById('cBudget').textContent=fmt(budget);
   document.getElementById('cActual').textContent=fmt(actual);
-  document.getElementById('cItems').textContent=allRows.length;
+  document.getElementById('cItems').textContent=cAllRows.length;
   document.getElementById('cItemsSub').innerHTML=`
-    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#ff6b6b;font-family:'IBM Plex Mono',monospace;">
-      <span style="width:7px;height:7px;border-radius:50%;background:#e74c3c;display:inline-block;flex-shrink:0;"></span>Wait ${cntWait}
+    <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#ff6b6b;font-family:'IBM Plex Mono',monospace;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#e74c3c;display:inline-block;"></span>Wait ${cntW}
     </span>
-    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#f5a623;font-family:'IBM Plex Mono',monospace;">
-      <span style="width:7px;height:7px;border-radius:50%;background:#f5a623;display:inline-block;flex-shrink:0;"></span>Active ${cntActive}
+    <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#f5a623;font-family:'IBM Plex Mono',monospace;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#f5a623;display:inline-block;"></span>Active ${cntA}
     </span>
-    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#2ecc71;font-family:'IBM Plex Mono',monospace;">
-      <span style="width:7px;height:7px;border-radius:50%;background:#27ae60;display:inline-block;flex-shrink:0;"></span>Complete ${cntComplete}
+    <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#2ecc71;font-family:'IBM Plex Mono',monospace;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;"></span>Complete ${cntC}
     </span>`;
-
   const diff=actual-budget,over=diff>0;
   document.getElementById('cDiffCard').className='card '+(over?'c-red':'c-green');
   document.getElementById('cDiff').textContent=(over?'+':'')+fmt(diff);
   document.getElementById('cDiffSub').textContent=over?'⚠ เกิน Budget':'✓ อยู่ใน Budget';
-
   const pct=budget>0?(actual/budget*100).toFixed(1):'—';
   document.getElementById('cPctCard').className='card '+(parseFloat(pct)>100?'c-red':'c-green');
   document.getElementById('cPct').textContent=pct+'%';
 }
 
-// ─── CHARTS ────────────────────────────────────────────
-function buildCharts(){
-  buildBvaChart();
-  buildTop5Recondition();
-}
-
 function buildBvaChart(){
   const cats={};
-  allRows.forEach(r=>{
+  cAllRows.forEach(r=>{
     const cat=(colCat>=0&&r[colCat])?r[colCat]:'อื่นๆ';
     if(!cats[cat])cats[cat]={b:0,a:0};
     cats[cat].b+=colB>=0?pn(r[colB]):0;
@@ -520,97 +583,44 @@ function buildBvaChart(){
   });
   const entries=Object.entries(cats).sort((x,y)=>y[1].b-x[1].b);
   const maxV=Math.max(...entries.flatMap(([,v])=>[v.b,v.a]),1);
-
   document.getElementById('bvaChart').innerHTML=entries.map(([cat,v])=>{
     const bp=(v.b/maxV*100).toFixed(1);
     const ap=(v.a/maxV*100).toFixed(1);
     const over=v.a>v.b;
     const diff=v.a-v.b;
-    const diffTxt=(over?'▲ เกิน +':'✓ เหลือ ')+fmtF(Math.abs(diff));
     return`<div class="bva-row">
       <div class="bva-cat-name">${cat}</div>
-      <div class="bva-bar-row">
-        <span class="bva-bar-tag budget">Budget</span>
-        <div class="bva-track"><div class="bva-budget-fill" style="width:${bp}%"></div></div>
-        <span class="bva-bar-num b">${fmtF(v.b)}</span>
-      </div>
-      <div class="bva-bar-row">
-        <span class="bva-bar-tag actual">Actual</span>
-        <div class="bva-track"><div class="bva-actual-fill ${over?'over':'under'}" style="width:${ap}%"></div></div>
-        <span class="bva-bar-num a ${over?'over':'under'}">${fmtF(v.a)}</span>
-      </div>
-      <div class="bva-diff ${over?'over':'under'}">${diffTxt}</div>
+      <div class="bva-bar-row"><span class="bva-bar-tag budget">Budget</span><div class="bva-track"><div class="bva-budget-fill" style="width:${bp}%"></div></div><span class="bva-bar-num b">${fmtF(v.b)}</span></div>
+      <div class="bva-bar-row"><span class="bva-bar-tag actual">Actual</span><div class="bva-track"><div class="bva-actual-fill ${over?'over':'under'}" style="width:${ap}%"></div></div><span class="bva-bar-num a ${over?'over':'under'}">${fmtF(v.a)}</span></div>
+      <div class="bva-diff ${over?'over':'under'}">${over?'▲ เกิน +':'✓ เหลือ '}${fmtF(Math.abs(diff))}</div>
     </div>`;
   }).join('')||'<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลหมวดหมู่</div>';
 }
 
-function buildTop5Recondition(){
-  if(colA<0){
-    document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบคอลัมน์ Actual Expense</div>';
-    return;
-  }
-  const reconRows=allRows.filter(r=>(r[2]||'').trim().toLowerCase()==='recondition');
-  if(!reconRows.length){
-    document.getElementById('top5Chart').innerHTML='<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลประเภท Recondition ใน Column C</div>';
-    return;
-  }
-  const top5=[...reconRows].sort((a,b)=>pn(b[colA])-pn(a[colA])).slice(0,5);
-  const maxA=pn(top5[0]?.[colA])||1;
-  document.getElementById('top5Chart').innerHTML=top5.map((r,i)=>{
-    const name=r[colName]||r[0]||'—';
-    const val=pn(r[colA]);
-    const budgetVal=colB>=0?pn(r[colB]):0;
-    const over=budgetVal>0&&val>budgetVal;
-    return`<div class="top-row">
-      <div class="top-meta">
-        <span class="top-rank">${i+1}</span>
-        <span class="top-name" title="${name}">${name}</span>
-        <span class="top-val">${fmtF(val)}</span>
-      </div>
-      <div class="top-track"><div class="top-fill" style="width:${(val/maxA*100).toFixed(1)}%"></div></div>
-      ${budgetVal>0?`<div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:'IBM Plex Mono',monospace;">Budget: ${fmtF(budgetVal)} &nbsp;<span style="color:${over?'var(--red)':'var(--green)'}">${over?'▲ เกิน '+fmtF(val-budgetVal):'✓ เหลือ '+fmtF(budgetVal-val)}</span></div>`:''}
-    </div>`;
-  }).join('');
-}
-
-// ─── CAT FILTER ────────────────────────────────────────
 function buildCatFilter(){
   const sel=document.getElementById('catFilter');
   sel.innerHTML='<option value="">ทุกหมวดหมู่</option>';
   if(colCat<0)return;
-  [...new Set(allRows.map(r=>r[colCat]).filter(Boolean))].sort().forEach(c=>{
+  [...new Set(cAllRows.map(r=>r[colCat]).filter(Boolean))].sort().forEach(c=>{
     const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
   });
 }
 
-// ─── FILTER / SORT / PAGINATE ──────────────────────────
-function applyFilter(){
-  const q=document.getElementById('searchInput').value.toLowerCase();
+function costApplyFilter(){
+  const q=document.getElementById('costSearch').value.toLowerCase();
   const cat=document.getElementById('catFilter').value;
-  filtered=allRows.filter(r=>{
-    return(!q||r.some(c=>c.toLowerCase().includes(q)))&&(!cat||r[colCat]===cat);
+  cFiltered=cAllRows.filter(r=>(!q||r.some(c=>c.toLowerCase().includes(q)))&&(!cat||r[colCat]===cat));
+  if(cSortCol>=0) cFiltered.sort((a,b)=>{
+    const av=a[cSortCol]||'',bv=b[cSortCol]||'';
+    const an=pn(av),bn=pn(bv);
+    const cmp=(an||bn)?an-bn:String(av).localeCompare(String(bv),'th');
+    return cSortAsc?cmp:-cmp;
   });
-  if(sortCol>=0){
-    filtered.sort((a,b)=>{
-      const av=a[sortCol]||'',bv=b[sortCol]||'';
-      const an=pn(av),bn=pn(bv);
-      const cmp=(an||bn)?an-bn:String(av).localeCompare(String(bv),'th');
-      return sortAsc?cmp:-cmp;
-    });
-  }
-  curPage=1;renderTable();
+  cPage=1;renderCostTable();
 }
-function sortBy(i){sortAsc=sortCol===i?!sortAsc:true;sortCol=i;applyFilter();}
-function changePageSize(){pageSize=parseInt(document.getElementById('pageSize').value);applyFilter();}
-function goPage(p){
-  const ps=pageSize||filtered.length;
-  const tp=Math.ceil(filtered.length/(ps||1));
-  if(p<1||p>tp)return;curPage=p;renderTable();
-}
-
-// ─── RENDER TABLE ──────────────────────────────────────
-function isUrl(v){return typeof v==='string'&&/^https?:\/\//i.test(v.trim());}
-function isLinkCol(h){return/(link|url|href|เว็บ|ลิงก์)/i.test(h);}
+function costSortBy(i){cSortAsc=cSortCol===i?!cSortAsc:true;cSortCol=i;costApplyFilter();}
+function costChangePageSize(){cPageSize=parseInt(document.getElementById('costPageSize').value);costApplyFilter();}
+function costGoPage(p){const ps=cPageSize||cFiltered.length;const tp=Math.ceil(cFiltered.length/(ps||1));if(p<1||p>tp)return;cPage=p;renderCostTable();}
 
 function actionBadge(val){
   const v=(val||'').trim().toLowerCase();
@@ -619,37 +629,29 @@ function actionBadge(val){
   if(v==='complete'||v==='completed') return`<span class="status-badge complete">Complete</span>`;
   return`<span style="color:var(--muted);font-size:12px">${val||'—'}</span>`;
 }
+function diffPill(b,a){if(!b&&!a)return'—';const d=a-b;const cls=d>0?'over':'under';return`<span class="diff-pill ${cls}">${d>0?'+':''}${fmtF(d)}</span>`;}
+function pNums(cur,total){let lo=Math.max(1,cur-3),hi=Math.min(total,lo+6);if(hi-lo<6)lo=Math.max(1,hi-6);let r='';for(let p=lo;p<=hi;p++)r+=`<button class="page-btn ${p===cur?'active':''}" onclick="costGoPage(${p})">${p}</button>`;return r;}
 
-function renderTable(){
-  const ps=pageSize||filtered.length;
-  const tp=Math.ceil(filtered.length/(ps||1));
-  const s=(curPage-1)*ps;
-  const page=filtered.slice(s,s+ps);
-  document.getElementById('rowCount').textContent=filtered.length+' รายการ';
-
-  if(!filtered.length){
-    document.getElementById('tableWrap').innerHTML='<div class="state-box"><div style="font-size:32px">🔍</div><div>ไม่พบรายการที่ค้นหา</div></div>';
-    return;
-  }
-
-  const arrow=i=>sortCol===i?(sortAsc?' ↑':' ↓'):' ↕';
+function renderCostTable(){
+  const ps=cPageSize||cFiltered.length;
+  const tp=Math.ceil(cFiltered.length/(ps||1));
+  const s=(cPage-1)*ps;
+  const page=cFiltered.slice(s,s+ps);
+  document.getElementById('costRowCount').textContent=cFiltered.length+' รายการ';
+  if(!cFiltered.length){document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div style="font-size:28px">🔍</div><div>ไม่พบรายการ</div></div>';return;}
+  const arrow=i=>cSortCol===i?(cSortAsc?' ↑':' ↓'):' ↕';
   const hasDiff=colB>=0&&colA>=0;
-
-  const visibleCols=headers.map((_,i)=>i).filter(i=>i!==colType&&i!==colNo);
-
-  const extraTH=hasDiff?'<th onclick="sortDiff()" title="Actual − Budget">Diff ↕</th>':'';
-  const thead=`<thead><tr>${visibleCols.map(i=>`<th class="${sortCol===i?'sorted':''}" onclick="sortBy(${i})">${headers[i]}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
-
+  const visCols=cHeaders.map((_,i)=>i).filter(i=>i!==colNo);
+  const extraTH=hasDiff?'<th onclick="costSortDiff()" title="Actual − Budget">Diff ↕</th>':'';
+  const thead=`<thead><tr>${visCols.map(i=>`<th class="${cSortCol===i?'sorted':''}" onclick="costSortBy(${i})">${cHeaders[i]}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
   const tbody=`<tbody>${page.map(r=>{
-    const cells=visibleCols.map(i=>{
+    const cells=visCols.map(i=>{
       const v=r[i]||'';
-      if(i===colAction) return`<td>${actionBadge(v)}</td>`;
-      if(i===colB) return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
-      if(i===colA) return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
-      if(isLinkCol(headers[i])||isUrl(v)){
-        if(v&&isUrl(v)){
-          return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;
-        }
+      if(i===colAction)return`<td>${actionBadge(v)}</td>`;
+      if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
+      if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
+      if(isLinkCol(cHeaders[i])||isUrl(v)){
+        if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;
         return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;
       }
       return`<td>${v}</td>`;
@@ -657,71 +659,134 @@ function renderTable(){
     const diffCell=hasDiff?`<td class="num">${diffPill(pn(r[colB]),pn(r[colA]))}</td>`:'';
     return`<tr>${cells}${diffCell}</tr>`;
   }).join('')}</tbody>`;
-
-  const pg=tp>1?`<div class="pagination">
-    <span>แสดง ${s+1}–${Math.min(s+ps,filtered.length)} จาก ${filtered.length} รายการ</span>
-    <div class="page-btns">
-      <button class="page-btn" onclick="goPage(${curPage-1})" ${curPage<=1?'disabled':''}>‹</button>
-      ${pNums(curPage,tp)}
-      <button class="page-btn" onclick="goPage(${curPage+1})" ${curPage>=tp?'disabled':''}>›</button>
-    </div>
-  </div>`:'';
-
-  document.getElementById('tableWrap').innerHTML=`<table>${thead}${tbody}</table>${pg}`;
+  const pg=tp>1?`<div class="pagination"><span>แสดง ${s+1}–${Math.min(s+ps,cFiltered.length)} จาก ${cFiltered.length} รายการ</span><div class="page-btns"><button class="page-btn" onclick="costGoPage(${cPage-1})" ${cPage<=1?'disabled':''}>‹</button>${pNums(cPage,tp)}<button class="page-btn" onclick="costGoPage(${cPage+1})" ${cPage>=tp?'disabled':''}>›</button></div></div>`:'';
+  document.getElementById('costTableWrap').innerHTML=`<table>${thead}${tbody}</table>${pg}`;
 }
 
-let diffSortAsc=true;
-function sortDiff(){
-  diffSortAsc=sortCol===-999?!diffSortAsc:true;sortCol=-999;
-  const dSign=diffSortAsc?1:-1;
-  filtered.sort((a,b)=>((pn(a[colA])-pn(a[colB]))-(pn(b[colA])-pn(b[colB])))*dSign);
-  curPage=1;renderTable();
+let cDiffSortAsc=true;
+function costSortDiff(){
+  cDiffSortAsc=cSortCol===-999?!cDiffSortAsc:true;cSortCol=-999;
+  cFiltered.sort((a,b)=>((pn(a[colA])-pn(a[colB]))-(pn(b[colA])-pn(b[colB])))*(cDiffSortAsc?1:-1));
+  cPage=1;renderCostTable();
 }
 
-function diffPill(b,a){
-  if(!b&&!a)return'—';
-  const d=a-b;
-  const cls=d>0?'over':'under';
-  return`<span class="diff-pill ${cls}">${d>0?'+':''}${fmtF(d)}</span>`;
+// ─────────── PROGRESS ───────────
+async function loadProgress(){
+  try{
+    const res = await fetch(PROGRESS_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const txt = await res.text();
+    const rows = parseCSV(txt);
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    // header row at index 0; data from index 1
+    // col A=0 (No), B=1 (Description), C-I = step cols 2-8
+    const dataRows = rows.slice(1).filter(r=>r[1]&&r[1].trim());
+    progItems = dataRows.map(r=>{
+      const steps = STEP_COLS.map(ci=>{
+        const v=(r[ci]||'').trim();
+        return v==='1'||v.toLowerCase()==='yes'||v==='✓'||v==='x'||v.toLowerCase()==='true'||parseFloat(v)>=1;
+      });
+      return { no:r[0]||'', name:r[1]||'', steps };
+    });
+    updateProgStats();
+    progRender();
+    return true;
+  }catch(e){
+    document.getElementById('progList').innerHTML=`<div class="state-box"><div style="font-size:32px">⚠️</div><div>โหลด Progress ไม่สำเร็จ<br><small>${e.message}</small></div></div>`;
+    return false;
+  }
 }
 
-function pNums(cur,total){
-  let lo=Math.max(1,cur-3),hi=Math.min(total,lo+6);
-  if(hi-lo<6)lo=Math.max(1,hi-6);
-  let r='';for(let p=lo;p<=hi;p++)r+=`<button class="page-btn ${p===cur?'active':''}" onclick="goPage(${p})">${p}</button>`;
-  return r;
+function updateProgStats(){
+  const total=progItems.length;
+  const done=progItems.filter(it=>it.steps[5]).length; // PO = index 5
+  const none=progItems.filter(it=>!it.steps.some(Boolean)).length;
+  const wip=total-done-none;
+  document.getElementById('psTotal').textContent=total;
+  document.getElementById('psPO').textContent=done;
+  document.getElementById('psWIP').textContent=wip;
+  document.getElementById('psNone').textContent=none;
 }
 
-// ─── EXTRA ACTIONS ─────────────────────────────────────
-function refreshData(){
-  allRows=[];headers=[];filtered=[];sortCol=-1;sortAsc=true;
-  document.getElementById('chartGrid').style.display='none';
-  document.getElementById('tableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
-  loadData();
+function progSetFilter(f){
+  progFilter=f;
+  ['all','wip','done','none'].forEach(x=>document.getElementById('pf-'+x).classList.toggle('active',f===x));
+  progRender();
 }
 
-function exportCSV(){
-  if(!filtered.length)return;
-  const rows=[headers.join(','),...filtered.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(','))];
+function progRender(){
+  const q=document.getElementById('progSearch').value.toLowerCase();
+  const list=progItems.filter(it=>{
+    if(q&&!it.name.toLowerCase().includes(q)&&!it.no.toString().includes(q))return false;
+    if(progFilter==='done'&&!it.steps[5])return false;
+    if(progFilter==='none'&&it.steps.some(Boolean))return false;
+    if(progFilter==='wip'&&(it.steps[5]||!it.steps.some(Boolean)))return false;
+    return true;
+  });
+  if(!list.length){document.getElementById('progList').innerHTML='<div class="state-box"><div style="font-size:28px">🔍</div><div>ไม่พบรายการ</div></div>';return;}
+  document.getElementById('progList').innerHTML=list.map(it=>{
+    const doneCount=it.steps.filter(Boolean).length;
+    const pct=Math.round(doneCount/STEPS.length*100);
+    const wipIdx=it.steps.findIndex(s=>!s);
+    const cells=STEPS.map((s,si)=>{
+      let cls='wait',icon='·';
+      if(it.steps[si]){cls='done';icon='✓';}
+      else if(si===wipIdx){cls='wip';icon=si+1;}
+      return`<div class="step-cell"><div class="step-dot ${cls}">${icon}</div></div>`;
+    }).join('');
+    const pctColor=pct===100?'var(--green)':pct>0?'var(--accent)':'var(--muted)';
+    return`<div class="prog-row">
+      <div>
+        <div class="prog-item-no">#${it.no}</div>
+        <div class="prog-item-name">${it.name}</div>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      ${cells}
+      <div class="pct-col"><span class="pct-val" style="color:${pctColor}">${pct}%</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════
+function doExport(){
+  if(currentTab==='cost') exportCostCSV();
+  else exportProgCSV();
+}
+function exportCostCSV(){
+  if(!cFiltered.length)return;
+  const rows=[cHeaders.join(','),...cFiltered.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(','))];
+  dlCSV(rows,'crusher-m-cost.csv');
+}
+function exportProgCSV(){
+  if(!progItems.length)return;
+  const head=['No','Description',...STEPS,'%'].join(',');
+  const rows=[head,...progItems.map(it=>{
+    const pct=Math.round(it.steps.filter(Boolean).length/STEPS.length*100);
+    return[`"${it.no}"`,`"${it.name.replace(/"/g,'""')}"`, ...it.steps.map(s=>s?1:0), pct].join(',');
+  })];
+  dlCSV(rows,'crusher-m-progress.csv');
+}
+function dlCSV(rows,filename){
   const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='crusher-m-cost.csv';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
 }
 
-function openShare(){
-  document.getElementById('shareUrl').value=window.location.href;
-  document.getElementById('shareModal').style.display='flex';
-  document.getElementById('copyMsg').textContent='';
-}
+// ═══════════════════════════════════════════════
+//  SHARE MODAL
+// ═══════════════════════════════════════════════
+function openShare(){document.getElementById('shareUrl').value=window.location.href;document.getElementById('shareModal').style.display='flex';document.getElementById('copyMsg').textContent='';}
 function closeShare(){document.getElementById('shareModal').style.display='none';}
 function copyLink(){
-  const inp=document.getElementById('shareUrl');
-  inp.select();inp.setSelectionRange(0,9999);
-  navigator.clipboard.writeText(inp.value).then(()=>{
-    document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';
-  }).catch(()=>{document.execCommand('copy');document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';});
+  const inp=document.getElementById('shareUrl');inp.select();inp.setSelectionRange(0,9999);
+  navigator.clipboard.writeText(inp.value).then(()=>{document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';}).catch(()=>{document.execCommand('copy');document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';});
 }
 
-loadData();
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+loadAll();
 </script>
 </body>
 </html>
