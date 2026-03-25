@@ -65,8 +65,7 @@
   /* ── STATUS BAR ── */
   .status-bar{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
-  .dot.live{background:var(--green);animation:pulse 2s infinite;}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .dot.live{background:var(--green);}
 
   /* ── TAB PANELS ── */
   .tab-panel{display:none;}
@@ -98,30 +97,75 @@
   .sec-title::before{content:'';width:4px;height:16px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
   .sec-right{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
 
-  /* BvA Chart */
-  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px 22px 18px;margin-bottom:24px;}
-  .chart-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:18px;}
-  .bva-row{margin-bottom:22px;}
-  .bva-cat-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px;}
-  .bva-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-  .bva-bar-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:52px;flex-shrink:0;text-align:right;}
-  .bva-bar-tag.budget{color:var(--blue);}
-  .bva-bar-tag.actual{color:var(--accent);}
-  .bva-track{flex:1;height:16px;background:var(--border);border-radius:4px;overflow:hidden;}
-  .bva-budget-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(59,130,246,.45),rgba(59,130,246,.75));transition:width .7s cubic-bezier(.4,0,.2,1);}
-  .bva-actual-fill{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1) .12s;}
-  .bva-actual-fill.under{background:linear-gradient(90deg,#27ae60,#16a34a);}
-  .bva-actual-fill.over{background:linear-gradient(90deg,var(--red),#b91c1c);}
-  .bva-bar-num{font-family:'IBM Plex Mono',monospace;font-size:11px;width:90px;flex-shrink:0;text-align:right;}
-  .bva-bar-num.b{color:var(--blue);}
-  .bva-bar-num.a.under{color:var(--green);}
-  .bva-bar-num.a.over{color:var(--red);}
-  .bva-diff{margin-left:60px;margin-top:2px;font-size:11px;font-family:'IBM Plex Mono',monospace;}
-  .bva-diff.over{color:var(--red);}
-  .bva-diff.under{color:var(--green);}
-  .bva-legend{display:flex;gap:16px;margin-top:18px;flex-wrap:wrap;}
-  .leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
-  .leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+  /* ── DONUT CHART BvA ── */
+  .bva-donut-wrap{
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    padding:28px 28px 24px;margin-bottom:24px;
+    display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;
+  }
+  .bva-donuts-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;flex:1;}
+  .bva-donut-item{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+    padding:16px 14px 12px;min-width:150px;
+  }
+  .bva-donut-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-align:center;}
+  .bva-donut-svg-wrap{position:relative;width:110px;height:110px;}
+  .bva-donut-svg-wrap svg{width:110px;height:110px;}
+  .bva-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;pointer-events:none;}
+  .bva-donut-pct{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;}
+  .bva-donut-label{font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;}
+  .bva-donut-nums{display:flex;flex-direction:column;gap:4px;width:100%;}
+  .bva-donut-num-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-family:'IBM Plex Mono',monospace;}
+  .bva-donut-num-row .lbl{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;}
+  .bva-donut-num-row .val{font-weight:600;}
+  .bva-donut-diff-tag{
+    width:100%;text-align:center;padding:4px 8px;border-radius:5px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;margin-top:4px;
+  }
+  .bva-donut-diff-tag.over{background:rgba(231,76,60,.15);color:var(--red);}
+  .bva-donut-diff-tag.under{background:rgba(39,174,96,.15);color:var(--green);}
+
+  /* right panel: category summary list */
+  .bva-cat-list{flex:1;min-width:220px;}
+  .bva-cat-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:14px;}
+  .bva-cat-row{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+  .bva-cat-head{display:flex;justify-content:space-between;align-items:center;}
+  .bva-cat-name{font-size:12px;color:var(--text);font-weight:500;}
+  .bva-cat-tag{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 6px;border-radius:3px;}
+  .bva-cat-tag.over{background:rgba(231,76,60,.15);color:var(--red);}
+  .bva-cat-tag.under{background:rgba(39,174,96,.15);color:var(--green);}
+  .bva-cat-bar-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative;margin-top:2px;}
+  .bva-cat-bar-b{position:absolute;top:0;left:0;height:100%;border-radius:3px;background:rgba(59,130,246,.4);}
+  .bva-cat-bar-a{position:absolute;top:0;left:0;height:100%;border-radius:3px;transition:width .6s ease;}
+  .bva-cat-bar-a.over{background:linear-gradient(90deg,var(--red),#b91c1c);}
+  .bva-cat-bar-a.under{background:linear-gradient(90deg,var(--green),#16a34a);}
+  .bva-cat-amts{display:flex;justify-content:space-between;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);margin-top:2px;}
+
+  /* ── SUMMARY PANEL ── */
+  .summary-section{
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    padding:24px 28px;margin-bottom:20px;
+  }
+  .summary-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .summary-section-title::before{content:'';width:3px;height:14px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+  .insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .insight-item{
+    background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+    padding:14px 16px;display:flex;gap:12px;align-items:flex-start;
+    transition:border-color .2s;
+  }
+  .insight-item:hover{border-color:rgba(245,166,35,.3);}
+  .insight-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+  .insight-content{}
+  .insight-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:4px;}
+  .insight-value{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1;margin-bottom:3px;}
+  .insight-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+  .insight-item.good .insight-value{color:var(--green);}
+  .insight-item.warn .insight-value{color:var(--accent);}
+  .insight-item.bad  .insight-value{color:var(--red);}
+  .insight-item.info .insight-value{color:var(--blue);}
+  .insight-item.purple .insight-value{color:var(--purple);}
 
   /* Filter + Table */
   .filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
@@ -180,7 +224,6 @@
   .ps-orange .prog-stat-value{color:var(--accent);}
   .ps-purple .prog-stat-value{color:var(--purple);}
 
-  /* Filter row */
   .prog-filter{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
   .prog-search{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 12px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;outline:none;transition:border-color .2s;}
   .prog-search:focus{border-color:var(--accent);}
@@ -190,12 +233,10 @@
   .prog-filter-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
   .prog-row-count{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;white-space:nowrap;margin-left:auto;}
 
-  /* Legend inline */
   .prog-legend{display:flex;gap:14px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
   .prog-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
   .prog-leg-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid transparent;flex-shrink:0;}
 
-  /* Compact table */
   .prog-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
   .prog-table-scroll{overflow-y:auto;max-height:520px;}
   .prog-table-scroll::-webkit-scrollbar{width:5px;}
@@ -227,7 +268,7 @@
   .td-pct{text-align:center;width:44px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
   .prog-empty{padding:40px;text-align:center;color:var(--muted);font-size:13px;}
 
-  /* ── DONUT OVERVIEW ── */
+  /* ── DONUT OVERVIEW (Progress) ── */
   .overview-wrap{display:flex;gap:16px;margin-bottom:18px;align-items:stretch;flex-wrap:wrap;}
   .donut-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;display:flex;align-items:center;gap:22px;flex-shrink:0;}
   .donut-svg-wrap{position:relative;width:130px;height:130px;flex-shrink:0;}
@@ -313,27 +354,42 @@
   ══════════════════════════════ -->
   <div class="tab-panel active" id="panel-cost">
 
+    <!-- KPI CARDS -->
     <div class="summary-grid">
       <div class="card c-blue"><div class="card-label">Total Budget</div><div class="card-value" id="cBudget">—</div><div class="card-sub">THB</div></div>
       <div class="card c-orange"><div class="card-label">Total Actual</div><div class="card-value" id="cActual">—</div><div class="card-sub">THB</div></div>
-      <div class="card c-red" id="cDiffCard"><div class="card-label" id="cDiffLabel">Budget vs Actual</div><div class="card-value" id="cDiff">—</div><div class="card-sub" id="cDiffSub">—</div></div>
+      <div class="card c-red" id="cDiffCard">
+        <div class="card-label" id="cDiffLabel">Budget vs Actual</div>
+        <div class="card-value" id="cDiff">—</div>
+        <div class="card-sub" id="cDiffSub">—</div>
+      </div>
       <div class="card c-purple"><div class="card-label">จำนวนรายการ</div><div class="card-value" id="cItems">—</div><div class="card-sub" id="cItemsSub" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;"></div></div>
       <div class="card c-green" id="cPctCard"><div class="card-label">% Budget Used</div><div class="card-value" id="cPct">—</div><div class="card-sub">of total budget</div></div>
     </div>
 
+    <!-- ── INSIGHT SUMMARY ── -->
+    <div id="summaryArea" style="display:none">
+      <div class="sec"><span class="sec-title">สรุปภาพรวม</span></div>
+      <div class="summary-section">
+        <div class="insight-grid" id="insightGrid"></div>
+      </div>
+    </div>
+
+    <!-- ── DONUT BvA CHART ── -->
     <div id="costChartArea" style="display:none">
-      <div class="sec"><span class="sec-title">Budget vs Actual Expense</span></div>
-      <div class="chart-card">
-        <div class="chart-label">เปรียบเทียบ Budget กับ Actual — ตามหมวดหมู่</div>
-        <div id="bvaChart"></div>
-        <div class="bva-legend">
-          <div class="leg"><div class="leg-dot" style="background:rgba(59,130,246,.6)"></div>Budget</div>
-          <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Actual ≤ Budget</div>
-          <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>Actual &gt; Budget</div>
+      <div class="sec"><span class="sec-title">Budget vs Actual — รายหมวดหมู่</span></div>
+      <div class="bva-donut-wrap">
+        <!-- Left: per-category donuts -->
+        <div class="bva-donuts-row" id="bvaDonutsRow"></div>
+        <!-- Right: category list -->
+        <div class="bva-cat-list">
+          <div class="bva-cat-title">สรุปรายหมวดหมู่</div>
+          <div id="bvaCatList"></div>
         </div>
       </div>
     </div>
 
+    <!-- TABLE -->
     <div class="sec">
       <span class="sec-title">รายละเอียดค่าใช้จ่าย</span>
       <span class="sec-right" id="costRowCount">—</span>
@@ -355,16 +411,13 @@
   ══════════════════════════════ -->
   <div class="tab-panel" id="panel-progress">
 
-    <!-- OVERVIEW ROW -->
     <div class="overview-wrap" style="margin-top:18px;">
-      <!-- Donut chart -->
       <div class="donut-card">
         <div class="donut-svg-wrap">
           <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
             <circle id="donut-bg"   cx="65" cy="65" r="52" fill="none" stroke="#252830" stroke-width="16"/>
             <circle id="donut-ring" cx="65" cy="65" r="52" fill="none" stroke="#f5a623" stroke-width="16"
-              stroke-linecap="round"
-              stroke-dasharray="0 327"
+              stroke-linecap="round" stroke-dasharray="0 327"
               transform="rotate(-90 65 65)"
               style="transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1);"/>
           </svg>
@@ -374,31 +427,11 @@
           </div>
         </div>
         <div class="donut-legend">
-          <div class="dleg">
-            <div class="dleg-dot" style="background:var(--green)"></div>
-            <div class="dleg-info">
-              <div class="dleg-label">PO Done</div>
-              <div class="dleg-val" id="dlegDone" style="color:var(--green)">—</div>
-            </div>
-          </div>
-          <div class="dleg">
-            <div class="dleg-dot" style="background:var(--accent)"></div>
-            <div class="dleg-info">
-              <div class="dleg-label">In Progress</div>
-              <div class="dleg-val" id="dlegWIP" style="color:var(--accent)">—</div>
-            </div>
-          </div>
-          <div class="dleg">
-            <div class="dleg-dot" style="background:var(--border)"></div>
-            <div class="dleg-info">
-              <div class="dleg-label">Not Started</div>
-              <div class="dleg-val" id="dlegNone" style="color:var(--muted)">—</div>
-            </div>
-          </div>
+          <div class="dleg"><div class="dleg-dot" style="background:var(--green)"></div><div class="dleg-info"><div class="dleg-label">PO Done</div><div class="dleg-val" id="dlegDone" style="color:var(--green)">—</div></div></div>
+          <div class="dleg"><div class="dleg-dot" style="background:var(--accent)"></div><div class="dleg-info"><div class="dleg-label">In Progress</div><div class="dleg-val" id="dlegWIP" style="color:var(--accent)">—</div></div></div>
+          <div class="dleg"><div class="dleg-dot" style="background:var(--border)"></div><div class="dleg-info"><div class="dleg-label">Not Started</div><div class="dleg-val" id="dlegNone" style="color:var(--muted)">—</div></div></div>
         </div>
       </div>
-
-      <!-- Step funnel -->
       <div class="funnel-card">
         <div class="funnel-title">รายการที่ผ่านแต่ละขั้นตอน</div>
         <div id="funnelBars"></div>
@@ -455,7 +488,7 @@
 
   <footer>
     <span>Crusher M · Project Dashboard</span>
-    <span id="footerNote">Data: Google Sheets · auto-refresh 60s</span>
+    <span id="footerNote">Data: Google Sheets</span>
   </footer>
 </div>
 
@@ -477,7 +510,7 @@
 // ═══════════════════════════════════════════════
 //  DATA SOURCES
 // ═══════════════════════════════════════════════
-const BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub';
+const BASE_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub';
 const COST_URL     = BASE_URL + '?gid=0&single=true&output=csv';
 const PROGRESS_URL = BASE_URL + '?gid=1861162286&single=true&output=csv';
 
@@ -491,28 +524,10 @@ let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1;
 // ═══════════════════════════════════════════════
 //  STATE — PROGRESS
 // ═══════════════════════════════════════════════
-const STEPS      = ['RO','QT','MEMO','PQ','BU','PO','DAP'];
-const STEP_COLS  = [2,3,4,5,6,7,8]; // C-I (0-indexed)
-let progItems    = [];
-let progFilter   = 'all';
-
-// ═══════════════════════════════════════════════
-//  AUTO REFRESH
-// ═══════════════════════════════════════════════
-const REFRESH_SEC = 60;
-let countdown = REFRESH_SEC;
-let countdownTimer = null;
-
-function startAutoRefresh(){
-  clearInterval(countdownTimer);
-  countdown = REFRESH_SEC;
-  countdownTimer = setInterval(()=>{
-    countdown--;
-    const now = new Date().toLocaleTimeString('th-TH');
-    document.getElementById('sTime').textContent = `· ${now} · รีเฟรชใน ${countdown}s`;
-    if(countdown<=0){ countdown=REFRESH_SEC; refreshAll(); }
-  },1000);
-}
+const STEPS     = ['RO','QT','MEMO','PQ','BU','PO','DAP'];
+const STEP_COLS = [2,3,4,5,6,7,8];
+let progItems   = [];
+let progFilter  = 'all';
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -533,7 +548,6 @@ function fmt(n){if(Math.abs(n)>=1e6)return(n/1e6).toFixed(2)+'M';return n.toLoca
 function fmtF(n){return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function isUrl(v){return typeof v==='string'&&/^https?:\/\//i.test(v.trim());}
 function isLinkCol(h){return/(link|url|href|เว็บ|ลิงก์)/i.test(h);}
-
 function setSt(state,text){
   document.getElementById('sDot').className='dot'+(state==='live'?' live':'');
   document.getElementById('sText').textContent=text;
@@ -542,9 +556,9 @@ function setSt(state,text){
 // ═══════════════════════════════════════════════
 //  TAB SWITCHING
 // ═══════════════════════════════════════════════
-let currentTab = 'cost';
+let currentTab='cost';
 function switchTab(tab){
-  currentTab = tab;
+  currentTab=tab;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
@@ -552,19 +566,18 @@ function switchTab(tab){
 }
 
 // ═══════════════════════════════════════════════
-//  LOAD ALL DATA
+//  LOAD ALL DATA (no auto-refresh)
 // ═══════════════════════════════════════════════
 async function loadAll(){
   setSt('','กำลังโหลดข้อมูล...');
   const [costOk, progOk] = await Promise.all([loadCost(), loadProgress()]);
+  const now = new Date().toLocaleTimeString('th-TH');
   if(costOk && progOk){
-    setSt('live','โหลดสำเร็จ ·  Cost '+cAllRows.length+' รายการ  |  Progress '+progItems.length+' รายการ');
+    setSt('live','โหลดสำเร็จ · Cost '+cAllRows.length+' รายการ  |  Progress '+progItems.length+' รายการ');
   } else {
     setSt('','โหลดบางส่วนไม่สำเร็จ');
   }
-  const now = new Date().toLocaleTimeString('th-TH');
-  document.getElementById('sTime').textContent = `· ${now} · รีเฟรชใน ${REFRESH_SEC}s`;
-  startAutoRefresh();
+  document.getElementById('sTime').textContent='· อัปเดตล่าสุด '+now;
 }
 
 function refreshAll(){
@@ -573,25 +586,28 @@ function refreshAll(){
   document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
   document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr>`;
   document.getElementById('costChartArea').style.display='none';
+  document.getElementById('summaryArea').style.display='none';
   loadAll();
 }
 
 // ─────────── COST ───────────
 async function loadCost(){
   try{
-    const res = await fetch(COST_URL+'&_='+Date.now());
+    const res=await fetch(COST_URL+'&_='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const txt = await res.text();
-    const rows = parseCSV(txt);
+    const txt=await res.text();
+    const rows=parseCSV(txt);
     if(rows.length<2) throw new Error('ไม่พบข้อมูล');
-    cHeaders = rows[0];
-    cAllRows = rows.slice(1).filter(r=>r.some(c=>c));
+    cHeaders=rows[0];
+    cAllRows=rows.slice(1).filter(r=>r.some(c=>c));
     detectCostCols(cHeaders);
     buildCatFilter();
     costApplyFilter();
     buildCostCards();
-    buildBvaChart();
+    buildSummaryInsights();
+    buildBvaDonutChart();
     document.getElementById('costChartArea').style.display='';
+    document.getElementById('summaryArea').style.display='';
     return true;
   }catch(e){
     document.getElementById('costTableWrap').innerHTML=`<div class="state-box"><div style="font-size:32px">⚠️</div><div>โหลด Cost ไม่สำเร็จ<br><small>${e.message}</small></div></div>`;
@@ -638,16 +654,121 @@ function buildCostCards(){
     <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#2ecc71;font-family:'IBM Plex Mono',monospace;">
       <span style="width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;"></span>Complete ${cntC}
     </span>`;
-  const diff=actual-budget,over=diff>0;
+
+  const diff=actual-budget;
+  const over=diff>0;
+  // Card: green if under, red if over — no +/- sign in value
   document.getElementById('cDiffCard').className='card '+(over?'c-red':'c-green');
-  document.getElementById('cDiff').textContent=(over?'+':'')+fmt(diff);
-  document.getElementById('cDiffSub').textContent=over?'⚠ เกิน Budget':'✓ อยู่ใน Budget';
+  document.getElementById('cDiff').textContent=fmt(Math.abs(diff));
+  document.getElementById('cDiffSub').textContent=over?'เกิน Budget':'อยู่ใน Budget';
+
   const pct=budget>0?(actual/budget*100).toFixed(1):'—';
   document.getElementById('cPctCard').className='card '+(parseFloat(pct)>100?'c-red':'c-green');
   document.getElementById('cPct').textContent=pct+'%';
 }
 
-function buildBvaChart(){
+// ── SUMMARY INSIGHTS ──
+function buildSummaryInsights(){
+  let budget=0,actual=0,cntW=0,cntA=0,cntC=0;
+  const cats={};
+  cAllRows.forEach(r=>{
+    const b=colB>=0?pn(r[colB]):0;
+    const a=colA>=0?pn(r[colA]):0;
+    budget+=b; actual+=a;
+    if(colAction>=0){
+      const s=(r[colAction]||'').trim().toLowerCase();
+      if(s==='wait')cntW++;
+      else if(s==='active')cntA++;
+      else if(s==='complete'||s==='completed')cntC++;
+    }
+    if(colCat>=0){
+      const cat=r[colCat]||'อื่นๆ';
+      if(!cats[cat])cats[cat]={b:0,a:0};
+      cats[cat].b+=b; cats[cat].a+=a;
+    }
+  });
+  const diff=actual-budget;
+  const over=diff>0;
+  const pct=budget>0?(actual/budget*100).toFixed(1):0;
+  const remaining=budget-actual;
+
+  // Most over-budget category
+  let worstCat='—',worstDiff=0;
+  Object.entries(cats).forEach(([cat,v])=>{
+    const d=v.a-v.b;
+    if(d>worstDiff){worstDiff=d;worstCat=cat;}
+  });
+  // Most savings category
+  let bestCat='—',bestSave=0;
+  Object.entries(cats).forEach(([cat,v])=>{
+    const d=v.b-v.a;
+    if(d>bestSave){bestSave=d;bestCat=cat;}
+  });
+
+  const completionRate=cAllRows.length>0?Math.round(cntC/cAllRows.length*100):0;
+
+  const insights=[
+    {
+      icon:'💰',
+      title:'งบประมาณคงเหลือ',
+      value: over ? fmt(Math.abs(diff)) : fmt(remaining),
+      desc: over
+        ? `ใช้เกินงบ ${fmt(Math.abs(diff))} บาท (${pct}% ของงบ)`
+        : `ยังเหลือ ${fmt(remaining)} บาท จาก ${fmt(budget)} บาท`,
+      cls: over ? 'bad' : 'good'
+    },
+    {
+      icon:'📊',
+      title:'อัตราการใช้งบ',
+      value: pct+'%',
+      desc: `ใช้ไปแล้ว ${fmt(actual)} บาท จากทั้งหมด ${fmt(budget)} บาท`,
+      cls: parseFloat(pct)>100?'bad':parseFloat(pct)>80?'warn':'good'
+    },
+    {
+      icon:'✅',
+      title:'รายการที่เสร็จสิ้น',
+      value: cntC+' / '+cAllRows.length,
+      desc: `Complete ${completionRate}% · Active ${cntA} · Wait ${cntW}`,
+      cls: completionRate===100?'good':completionRate>50?'warn':'info'
+    },
+    {
+      icon:'🔥',
+      title:'หมวดที่ใช้มากสุด',
+      value: worstCat,
+      desc: worstDiff>0
+        ? `เกิน Budget ${fmt(worstDiff)} บาท`
+        : 'ทุกหมวดอยู่ในงบ',
+      cls: worstDiff>0?'bad':'good'
+    },
+    {
+      icon:'💚',
+      title:'หมวดที่ประหยัดสุด',
+      value: bestCat,
+      desc: bestSave>0 ? `ประหยัดได้ ${fmt(bestSave)} บาท` : '—',
+      cls: 'good'
+    },
+    {
+      icon:'📦',
+      title:'จำนวนหมวดหมู่',
+      value: Object.keys(cats).length,
+      desc: `รวมทั้งหมด ${cAllRows.length} รายการ`,
+      cls: 'purple'
+    }
+  ];
+
+  document.getElementById('insightGrid').innerHTML=insights.map(it=>`
+    <div class="insight-item ${it.cls}">
+      <div class="insight-icon">${it.icon}</div>
+      <div class="insight-content">
+        <div class="insight-title">${it.title}</div>
+        <div class="insight-value">${it.value}</div>
+        <div class="insight-desc">${it.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── DONUT CHART PER CATEGORY ──
+function buildBvaDonutChart(){
   const cats={};
   cAllRows.forEach(r=>{
     const cat=(colCat>=0&&r[colCat])?r[colCat]:'อื่นๆ';
@@ -657,18 +778,65 @@ function buildBvaChart(){
   });
   const entries=Object.entries(cats).sort((x,y)=>y[1].b-x[1].b);
   const maxV=Math.max(...entries.flatMap(([,v])=>[v.b,v.a]),1);
-  document.getElementById('bvaChart').innerHTML=entries.map(([cat,v])=>{
-    const bp=(v.b/maxV*100).toFixed(1);
-    const ap=(v.a/maxV*100).toFixed(1);
+
+  // Donuts
+  document.getElementById('bvaDonutsRow').innerHTML=entries.map(([cat,v])=>{
     const over=v.a>v.b;
+    const pct=v.b>0?Math.min(Math.round(v.a/v.b*100),200):0;
+    const displayPct=v.b>0?Math.min(Math.round(v.a/v.b*100),100):0; // cap ring at 100
+    const C=2*Math.PI*40; // r=40
+    const filled=(displayPct/100)*C;
+    const strokeColor=over?'var(--red)':'var(--green)';
     const diff=v.a-v.b;
-    return`<div class="bva-row">
-      <div class="bva-cat-name">${cat}</div>
-      <div class="bva-bar-row"><span class="bva-bar-tag budget">Budget</span><div class="bva-track"><div class="bva-budget-fill" style="width:${bp}%"></div></div><span class="bva-bar-num b">${fmtF(v.b)}</span></div>
-      <div class="bva-bar-row"><span class="bva-bar-tag actual">Actual</span><div class="bva-track"><div class="bva-actual-fill ${over?'over':'under'}" style="width:${ap}%"></div></div><span class="bva-bar-num a ${over?'over':'under'}">${fmtF(v.a)}</span></div>
-      <div class="bva-diff ${over?'over':'under'}">${over?'▲ เกิน +':'✓ เหลือ '}${fmtF(Math.abs(diff))}</div>
+    const diffTag=over
+      ? `<div class="bva-donut-diff-tag over">เกิน ${fmt(Math.abs(diff))}</div>`
+      : `<div class="bva-donut-diff-tag under">เหลือ ${fmt(Math.abs(diff))}</div>`;
+    return`<div class="bva-donut-item">
+      <div class="bva-donut-title">${cat}</div>
+      <div class="bva-donut-svg-wrap">
+        <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="55" cy="55" r="40" fill="none" stroke="#252830" stroke-width="12"/>
+          <circle cx="55" cy="55" r="40" fill="none" stroke="${strokeColor}" stroke-width="12"
+            stroke-linecap="round"
+            stroke-dasharray="${filled.toFixed(1)} ${C.toFixed(1)}"
+            transform="rotate(-90 55 55)"
+            style="transition:stroke-dasharray .7s ease;"/>
+        </svg>
+        <div class="bva-donut-center">
+          <div class="bva-donut-pct" style="color:${strokeColor}">${pct}%</div>
+          <div class="bva-donut-label">used</div>
+        </div>
+      </div>
+      <div class="bva-donut-nums">
+        <div class="bva-donut-num-row"><span class="lbl">Budget</span><span class="val" style="color:var(--blue)">${fmt(v.b)}</span></div>
+        <div class="bva-donut-num-row"><span class="lbl">Actual</span><span class="val" style="color:${strokeColor}">${fmt(v.a)}</span></div>
+      </div>
+      ${diffTag}
     </div>`;
-  }).join('')||'<div style="color:var(--muted);font-size:13px">ไม่พบข้อมูลหมวดหมู่</div>';
+  }).join('');
+
+  // Category bar list (right side)
+  document.getElementById('bvaCatList').innerHTML=entries.map(([cat,v])=>{
+    const over=v.a>v.b;
+    const pctB=100;
+    const pctA=v.b>0?Math.min(v.a/v.b*100,200):0;
+    const displayA=Math.min(pctA,100);
+    const diff=Math.abs(v.a-v.b);
+    return`<div class="bva-cat-row">
+      <div class="bva-cat-head">
+        <span class="bva-cat-name">${cat}</span>
+        <span class="bva-cat-tag ${over?'over':'under'}">${over?'▲ +'+fmt(diff):'▼ -'+fmt(diff)}</span>
+      </div>
+      <div class="bva-cat-bar-track" style="height:8px">
+        <div class="bva-cat-bar-b" style="width:100%"></div>
+        <div class="bva-cat-bar-a ${over?'over':'under'}" style="width:${displayA.toFixed(1)}%"></div>
+      </div>
+      <div class="bva-cat-amts">
+        <span style="color:var(--blue)">${fmtF(v.b)}</span>
+        <span style="color:${over?'var(--red)':'var(--green)'}">${fmtF(v.a)}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function buildCatFilter(){
@@ -747,20 +915,18 @@ function costSortDiff(){
 // ─────────── PROGRESS ───────────
 async function loadProgress(){
   try{
-    const res = await fetch(PROGRESS_URL+'&_='+Date.now());
+    const res=await fetch(PROGRESS_URL+'&_='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const txt = await res.text();
-    const rows = parseCSV(txt);
+    const txt=await res.text();
+    const rows=parseCSV(txt);
     if(rows.length<2) throw new Error('ไม่พบข้อมูล');
-    // header row at index 0; data from index 1
-    // col A=0 (No), B=1 (Description), C-I = step cols 2-8
-    const dataRows = rows.slice(1).filter(r=>r[1]&&r[1].trim());
-    progItems = dataRows.map(r=>{
-      const steps = STEP_COLS.map(ci=>{
+    const dataRows=rows.slice(1).filter(r=>r[1]&&r[1].trim());
+    progItems=dataRows.map(r=>{
+      const steps=STEP_COLS.map(ci=>{
         const v=(r[ci]||'').trim();
         return v==='1'||v.toLowerCase()==='yes'||v==='✓'||v==='x'||v.toLowerCase()==='true'||parseFloat(v)>=1;
       });
-      return { no:r[0]||'', name:r[1]||'', steps };
+      return{no:r[0]||'',name:r[1]||'',steps};
     });
     updateProgStats();
     progRender();
@@ -784,34 +950,26 @@ function updateProgStats(){
 }
 
 function buildOverview(total,done,wip,none){
-  if(!total) return;
-
-  /* ── Donut ── */
-  const pct = Math.round(done/total*100);
-  const C = 2*Math.PI*52; // circumference ≈ 326.7
-  const filled = (pct/100)*C;
-  const ring = document.getElementById('donut-ring');
-  ring.setAttribute('stroke-dasharray', filled.toFixed(1)+' '+C.toFixed(1));
-  ring.setAttribute('stroke', pct===100 ? 'var(--green)' : 'var(--accent)');
-  document.getElementById('donutPct').textContent = pct+'%';
-  document.getElementById('donutPct').style.color = pct===100 ? 'var(--green)' : 'var(--accent)';
-  document.getElementById('dlegDone').textContent = done+' items';
-  document.getElementById('dlegWIP').textContent  = wip+' items';
-  document.getElementById('dlegNone').textContent = none+' items';
-
-  /* ── Funnel bars ── */
-  const stepCounts = STEPS.map((_,si)=>progItems.filter(it=>it.steps[si]).length);
-  const maxCount = total;
-  const isLast = si => si === 5; // PO = final meaningful step
-  document.getElementById('funnelBars').innerHTML = STEPS.map((name,si)=>{
-    const cnt = stepCounts[si];
-    const pctW = Math.round(cnt/maxCount*100);
-    const isDone = si===5;
+  if(!total)return;
+  const pct=Math.round(done/total*100);
+  const C=2*Math.PI*52;
+  const filled=(pct/100)*C;
+  const ring=document.getElementById('donut-ring');
+  ring.setAttribute('stroke-dasharray',filled.toFixed(1)+' '+C.toFixed(1));
+  ring.setAttribute('stroke',pct===100?'var(--green)':'var(--accent)');
+  document.getElementById('donutPct').textContent=pct+'%';
+  document.getElementById('donutPct').style.color=pct===100?'var(--green)':'var(--accent)';
+  document.getElementById('dlegDone').textContent=done+' items';
+  document.getElementById('dlegWIP').textContent=wip+' items';
+  document.getElementById('dlegNone').textContent=none+' items';
+  const stepCounts=STEPS.map((_,si)=>progItems.filter(it=>it.steps[si]).length);
+  document.getElementById('funnelBars').innerHTML=STEPS.map((name,si)=>{
+    const cnt=stepCounts[si];
+    const pctW=Math.round(cnt/total*100);
+    const isDone=si===5;
     return`<div class="funnel-row">
       <div class="funnel-step-name">${name}</div>
-      <div class="funnel-track">
-        <div class="funnel-fill${isDone?' c-done':''}" style="width:${pctW}%"></div>
-      </div>
+      <div class="funnel-track"><div class="funnel-fill${isDone?' c-done':''}" style="width:${pctW}%"></div></div>
       <div class="funnel-nums"><b class="${isDone?'done':''}">${cnt}</b>/${total}</div>
     </div>`;
   }).join('');
@@ -825,8 +983,8 @@ function progSetFilter(f){
 
 let progSortKey=null,progSortAsc=true;
 function progSort(key){
-  progSortAsc = progSortKey===key ? !progSortAsc : true;
-  progSortKey = key;
+  progSortAsc=progSortKey===key?!progSortAsc:true;
+  progSortKey=key;
   progRender();
 }
 
@@ -839,7 +997,6 @@ function progRender(){
     if(progFilter==='wip'&&(it.steps[5]||!it.steps.some(Boolean)))return false;
     return true;
   });
-
   if(progSortKey!==null){
     list.sort((a,b)=>{
       let av,bv;
@@ -849,18 +1006,14 @@ function progRender(){
       return progSortAsc?av-bv:bv-av;
     });
   }
-
   document.getElementById('progRowCount').textContent=list.length+' รายการ';
-
   const arrow=k=>progSortKey===k?(progSortAsc?'↑':'↓'):'';
   document.getElementById('ps-name').textContent=arrow('name');
   document.getElementById('ps-pct').textContent=arrow('pct');
-
   if(!list.length){
     document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty">🔍 ไม่พบรายการ</td></tr>`;
     return;
   }
-
   document.getElementById('progTbody').innerHTML=list.map(it=>{
     const doneCount=it.steps.filter(Boolean).length;
     const pct=Math.round(doneCount/STEPS.length*100);
@@ -886,7 +1039,7 @@ function progRender(){
 //  EXPORT
 // ═══════════════════════════════════════════════
 function doExport(){
-  if(currentTab==='cost') exportCostCSV();
+  if(currentTab==='cost')exportCostCSV();
   else exportProgCSV();
 }
 function exportCostCSV(){
