@@ -577,10 +577,18 @@
       <div class="rf-kpi-card"><div class="rf-kpi-label">Overall %</div><div class="rf-kpi-value" id="reconPct" style="color:var(--teal)">—</div></div>
     </div>
 
-    <!-- Weekly bar chart -->
+    <!-- Weekly line chart -->
     <div class="rf-chart-wrap">
-      <div class="rf-chart-title">จำนวนรายการที่เสร็จในแต่ละอาทิตย์ — Recondition</div>
-      <div class="rf-bars" id="reconBars"></div>
+      <div class="rf-chart-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>ความคืบหน้าสะสมรายอาทิตย์ — Recondition</span>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--teal);"><span style="width:24px;height:2px;background:var(--teal);display:inline-block;border-radius:1px;"></span>เสร็จสะสม (%)</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--accent);"><span style="width:24px;height:2px;background:var(--accent);display:inline-block;border-radius:1px;border-top:2px dashed var(--accent);"></span>เป้า (ตามแผน)</span>
+        </div>
+      </div>
+      <div style="position:relative;width:100%;overflow-x:auto;">
+        <svg id="reconLineChart" width="100%" style="display:block;min-width:300px;" viewBox="0 0 900 220" preserveAspectRatio="xMinYMid meet"></svg>
+      </div>
     </div>
 
     <!-- Weekly Gantt table -->
@@ -793,16 +801,39 @@ function actionBadge(val){
   return`<span style="color:var(--muted);font-size:12px">${val||'—'}</span>`;
 }
 
-/* ── สถานะการสั่งซื้อ badge ── */
-function orderStatusBadge(val){
-  if(!val||!val.trim()) return `<span class="order-badge none">—</span>`;
-  const v=val.trim().toLowerCase();
-  if(v==='ordered'||v==='สั่งแล้ว'||v==='สั่งซื้อแล้ว') return `<span class="order-badge ordered">📦 Ordered</span>`;
-  if(v==='pending'||v==='รอ'||v==='รอดำเนินการ'||v==='รอสั่ง') return `<span class="order-badge pending">⏳ Pending</span>`;
-  if(v==='delivered'||v==='รับแล้ว'||v==='ส่งแล้ว'||v==='จัดส่งแล้ว') return `<span class="order-badge delivered">✅ Delivered</span>`;
-  if(v==='cancelled'||v==='ยกเลิก') return `<span class="order-badge cancelled">✕ Cancelled</span>`;
-  // Any other non-empty value: show as-is with a neutral style
-  return `<span class="order-badge pending">${val}</span>`;
+/* ── PUR Progress: match cost item name → procurement step dots ── */
+function purProgressBadge(itemName){
+  if(!progItems.length) return `<span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">—</span>`;
+  // fuzzy match: find procurement item whose name most overlaps with cost item name
+  const needle = (itemName||'').toLowerCase().trim();
+  if(!needle) return `<span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">—</span>`;
+  let best=null, bestScore=0;
+  progItems.forEach(it=>{
+    const hay=it.name.toLowerCase().trim();
+    // score = longest common substring length / max(len)
+    let score=0;
+    if(hay===needle) score=1;
+    else if(hay.includes(needle)||needle.includes(hay)) score=0.8;
+    else {
+      // token overlap
+      const na=needle.split(/\s+/), ha=hay.split(/\s+/);
+      const common=na.filter(t=>ha.includes(t)&&t.length>1).length;
+      score=common/Math.max(na.length,ha.length,1);
+    }
+    if(score>bestScore){bestScore=score;best=it;}
+  });
+  if(!best||bestScore<0.3) return `<span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">—</span>`;
+  const steps=['RO','QT','MO','PQ','BU','PO','DA'];
+  const dots=steps.map((s,si)=>{
+    const done=best.steps[si];
+    const color=done?'var(--accent)':'var(--border)';
+    const txtColor=done?'#000':'var(--muted)';
+    return `<span title="${STEPS[si]}" style="display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:${color};color:${txtColor};font-size:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;border:1px solid ${done?'var(--accent)':'var(--border)'};flex-shrink:0;">${s}</span>`;
+  }).join('');
+  const doneCount=best.steps.filter(Boolean).length;
+  const pct=Math.round(doneCount/7*100);
+  const pctColor=pct===100?'var(--green)':pct>0?'var(--accent)':'var(--muted)';
+  return `<span style="display:inline-flex;align-items:center;gap:2px;">${dots}<span style="margin-left:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:${pctColor};font-weight:600;">${pct}%</span></span>`;
 }
 
 function diffPill(b,a){if(!b&&!a)return'—';const d=a-b;const cls=d>0?'over':'under';return`<span class="diff-pill ${cls}">${d>0?'+':''}${fmtF(d)}</span>`;}
@@ -825,9 +856,9 @@ function renderCostTable(){
   // Build TH row
   let thCells = visCols.map((i,vi)=>{
     const thHtml = `<th class="${cSortCol===i?'sorted':''}" onclick="costSortBy(${i})">${cHeaders[i]}${arrow(i)}</th>`;
-    // After STATUS column, inject ORDER STATUS header
+  // After STATUS column, inject PUR Progress header
     if(vi===statusColVisIdx){
-      return thHtml + `<th style="white-space:nowrap;color:var(--muted)">สถานะการสั่งซื้อ</th>`;
+      return thHtml + `<th style="white-space:nowrap;color:var(--muted);min-width:200px;">PUR Progress</th>`;
     }
     return thHtml;
   }).join('');
@@ -841,12 +872,12 @@ function renderCostTable(){
       let cellHtml;
       if(i===colAction){
         cellHtml=`<td>${actionBadge(v)}</td>`;
-        // Inject ORDER STATUS column right after STATUS
-        const orderVal = colOrderStatus>=0 ? (r[colOrderStatus]||'') : '';
-        cellHtml += `<td>${orderStatusBadge(orderVal)}</td>`;
+        // Inject PUR Progress column right after STATUS — match by cost item name
+        const costItemName = colName>=0 ? (r[colName]||'') : (r[1]||r[0]||'');
+        cellHtml += `<td style="padding:6px 10px;">${purProgressBadge(costItemName)}</td>`;
         return cellHtml;
       }
-      // Skip the order status column if it was auto-detected (already injected above)
+      // Skip the old order status column if present
       if(i===colOrderStatus && colAction>=0) return ``;
       if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
       if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
@@ -873,7 +904,10 @@ async function loadProgress(){
     if(rows.length<2) throw new Error('ไม่พบข้อมูล');
     const dataRows=rows.slice(1).filter(r=>r[1]&&r[1].trim());
     progItems=dataRows.map(r=>({no:r[0]||'',name:r[1]||'',steps:STEP_COLS.map(ci=>isChecked(r[ci]))}));
-    updateProgStats(); progRender(); return true;
+    updateProgStats(); progRender();
+    // Re-render cost table so PUR Progress column picks up procurement data
+    if(cFiltered.length) renderCostTable();
+    return true;
   }catch(e){
     document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty">⚠️ โหลดไม่สำเร็จ: ${e.message}</td></tr>`;
     return false;
@@ -1034,23 +1068,92 @@ function renderRFRecon(){
   document.getElementById('reconWIP').textContent=wip;
   document.getElementById('reconNone').textContent=none;
   document.getElementById('reconPct').textContent=overallPct+'%';
-  // Bar chart
-  const barEl=document.getElementById('reconBars');
-  const maxDone=Math.max(...weeks.map((_,wi)=>items.filter(it=>it.weekVals[wi]==='done').length),1);
-  const BAR_H=100;
-  barEl.innerHTML=weeks.map((w,wi)=>{
-    const cnt=items.filter(it=>it.weekVals[wi]==='done').length;
-    const h=Math.round((cnt/maxDone)*BAR_H);
-    const isCur=wi===currentWeekIdx;
-    return`<div class="rf-bar-col">
-      <div class="rf-bar-val" style="color:${isCur?'var(--accent)':'var(--muted)'}">${cnt}</div>
-      <div class="rf-bar-track" style="height:${BAR_H}px;flex:1;position:relative;">
-        <div class="rf-bar-fill" style="height:${h}px;background:${isCur?'linear-gradient(0deg,var(--accent),var(--accent2))':'linear-gradient(0deg,var(--teal),#0d9488)'}"></div>
-      </div>
-      <div class="rf-bar-label">${w}</div>
-    </div>`;
-  }).join('');
+  // ── Line Chart ──
+  drawReconLineChart(items, weeks, currentWeekIdx);
 }
+
+function drawReconLineChart(items, weeks, currentWeekIdx){
+  const svg = document.getElementById('reconLineChart');
+  if(!svg || !weeks.length) return;
+
+  const W=900, H=220, PL=48, PR=24, PT=20, PB=36;
+  const chartW=W-PL-PR, chartH=H-PT-PB;
+  const n=weeks.length;
+  const total=items.length||1;
+
+  // Cumulative done count per week (running total)
+  const cumDone=[];
+  let running=0;
+  for(let wi=0;wi<n;wi++){
+    running+=items.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length;
+    cumDone.push(running);
+  }
+  // Planned target: linear ramp from 0 to total over all weeks
+  const planned=weeks.map((_,wi)=>Math.round((wi+1)/n*total));
+
+  const xStep=chartW/(n>1?n-1:1);
+  const yScale=v=>(chartH-(v/total)*chartH);
+
+  const pt=(x,y)=>`${PL+x*xStep},${PT+yScale(y)}`;
+  const planPt=(x,y)=>`${PL+x*xStep},${PT+yScale(y)}`;
+
+  // Grid lines
+  const gridLines=[0,25,50,75,100].map(p=>{
+    const yv=p/100*total;
+    const y=PT+yScale(yv);
+    return `<line x1="${PL}" y1="${y}" x2="${PL+chartW}" y2="${y}" stroke="#252830" stroke-width="1"/>
+      <text x="${PL-6}" y="${y+4}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${p}%</text>`;
+  }).join('');
+
+  // Week X-axis ticks (every 2nd or 4th depending on count)
+  const tickEvery = n<=12?1:n<=24?2:4;
+  const xTicks=weeks.map((w,wi)=>{
+    if(wi%tickEvery!==0&&wi!==n-1) return '';
+    const x=PL+wi*xStep;
+    return `<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="${wi===currentWeekIdx?'#3b82f6':'#636776'}">${w}</text>`;
+  }).join('');
+
+  // Current week vertical line
+  const curX=PL+currentWeekIdx*xStep;
+  const curLine=`<line x1="${curX}" y1="${PT}" x2="${curX}" y2="${PT+chartH}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".7"/>`;
+
+  // Planned dashed line
+  const plannedPath=`M ${weeks.map((_,wi)=>planPt(wi,planned[wi])).join(' L ')}`;
+
+  // Actual area fill
+  const areaPath=`M ${pt(0,0)} L ${weeks.map((_,wi)=>pt(wi,cumDone[wi])).join(' L ')} L ${PL+(n-1)*xStep},${PT+chartH} L ${PL},${PT+chartH} Z`;
+
+  // Actual line
+  const linePath=`M ${weeks.map((_,wi)=>pt(wi,cumDone[wi])).join(' L ')}`;
+
+  // Data point dots
+  const dots=weeks.map((_,wi)=>{
+    const v=cumDone[wi];
+    const cx=PL+wi*xStep, cy=PT+yScale(v);
+    const isLast=wi===n-1, isCur=wi===currentWeekIdx;
+    const r=isCur||isLast?5:3;
+    const fill=isCur?'#3b82f6':v===total?'#27ae60':'#14b8a6';
+    const showLabel=isCur||isLast||wi===0||(v>0&&(wi===0||cumDone[wi-1]!==v));
+    const pct=Math.round(v/total*100);
+    const label=showLabel?`<text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="${fill}" font-weight="600">${pct}%</text>`:'';
+    return `${label}<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="var(--bg)" stroke-width="1.5"/>`;
+  }).join('');
+
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#14b8a6" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="#14b8a6" stop-opacity=".02"/>
+      </linearGradient>
+    </defs>
+    ${gridLines}
+    ${curLine}
+    <path d="${areaPath}" fill="url(#areaGrad)"/>
+    <path d="${plannedPath}" fill="none" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="6 4" opacity=".6"/>
+    <path d="${linePath}" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+    ${xTicks}
+  `;
 
 // ═══════════════════════════════════════════════
 //  OVERALL TAB
