@@ -577,18 +577,30 @@
       <div class="rf-kpi-card"><div class="rf-kpi-label">Overall %</div><div class="rf-kpi-value" id="reconPct" style="color:var(--teal)">—</div></div>
     </div>
 
-    <!-- Weekly line chart -->
+    <!-- Multi-series Progress Line Chart -->
     <div class="rf-chart-wrap">
-      <div class="rf-chart-title" style="display:flex;justify-content:space-between;align-items:center;">
-        <span>ความคืบหน้าสะสมรายอาทิตย์ — Recondition</span>
-        <div style="display:flex;gap:14px;align-items:center;">
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--teal);"><span style="width:24px;height:2px;background:var(--teal);display:inline-block;border-radius:1px;"></span>เสร็จสะสม (%)</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--accent);"><span style="width:24px;height:2px;background:var(--accent);display:inline-block;border-radius:1px;border-top:2px dashed var(--accent);"></span>เป้า (ตามแผน)</span>
+      <div class="rf-chart-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span>ความคืบหน้าสะสมรายสัปดาห์ — Recondition Progress</span>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#14b8a6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#14b8a6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#14b8a6"/></svg>Hopper Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#f5a623;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#f5a623" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#f5a623"/></svg>Sizer Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#8b5cf6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#8b5cf6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#8b5cf6"/></svg>Truck Bridge Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#636776" stroke-width="1.5" stroke-dasharray="5 3"/></svg>Plan</span>
         </div>
       </div>
-      <div style="position:relative;width:100%;overflow-x:auto;">
-        <svg id="reconLineChart" width="100%" style="display:block;min-width:300px;" viewBox="0 0 900 220" preserveAspectRatio="xMinYMid meet"></svg>
+      <!-- Toggle buttons for weekly/accumulated view -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;margin-top:4px;">
+        <button id="chartToggleAcc" onclick="setChartMode('acc')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Acc. Progress</button>
+        <button id="chartToggleWk" onclick="setChartMode('wk')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Weekly Progress</button>
       </div>
+      <div style="position:relative;width:100%;overflow-x:auto;">
+        <svg id="reconLineChart" width="100%" style="display:block;min-width:400px;" viewBox="0 0 960 260" preserveAspectRatio="xMinYMid meet"></svg>
+      </div>
+      <div id="reconChartTooltip" style="display:none;position:absolute;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;pointer-events:none;z-index:10;"></div>
     </div>
 
     <!-- Weekly Gantt table -->
@@ -646,6 +658,8 @@ let progSortKey =null, progSortAsc=true;
 let rfRawRows=[];
 let reconItems=[];
 let rfWeeks=[];
+let reconChartData=null;   // { weekLabels, series:[{name,weekly,acc,planAcc}] }
+let reconChartMode='acc';  // 'acc' | 'wk'
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -1005,6 +1019,39 @@ function parseRFData(rows){
       if(h){rfWeeks.push(h||'W'+(i-2));weekColIdxs.push(i);}
     }
   }
+
+  // ── Extract specific progress rows (1-indexed per user spec) ──
+  // Row 4  = Hopper weekly progress,  Row 5  = Hopper acc progress
+  // Row 16 = Sizer weekly progress,   Row 17 = Sizer acc progress
+  // Row 28 = TruckBridge weekly,      Row 29 = TruckBridge acc
+  function getRowVals(rowIdx1){
+    // rowIdx1 is 1-based (Excel/Sheets row number)
+    const r = rows[rowIdx1-1] || [];
+    return weekColIdxs.map(ci=>{
+      const v = String(r[ci]||'').trim().replace(/%/g,'');
+      const n = parseFloat(v);
+      return isNaN(n) ? null : n;
+    });
+  }
+
+  const SERIES_DEFS = [
+    { name:'Hopper',       color:'#14b8a6', wkRow:4,  accRow:5  },
+    { name:'Sizer',        color:'#f5a623', wkRow:16, accRow:17 },
+    { name:'Truck Bridge', color:'#8b5cf6', wkRow:28, accRow:29 },
+  ];
+
+  const series = SERIES_DEFS.map(def=>{
+    const weekly = getRowVals(def.wkRow);
+    const acc    = getRowVals(def.accRow);
+    // Build plan: linear ramp using last non-null acc value as target
+    const maxAcc = acc.reduce((m,v)=>v!=null?Math.max(m,v):m, 0) || 100;
+    const planAcc = rfWeeks.map((_,wi)=>parseFloat(((wi+1)/rfWeeks.length*maxAcc).toFixed(2)));
+    return { name:def.name, color:def.color, weekly, acc, planAcc };
+  });
+
+  reconChartData = { weekLabels: rfWeeks, series };
+
+  // ── Parse Gantt items (existing logic) ──
   reconItems=[];
   let itemNo=0;
   for(let ri=1;ri<rows.length;ri++){
@@ -1012,7 +1059,6 @@ function parseRFData(rows){
     const col0=String(r[0]||'').trim().toLowerCase();
     const col1=String(r[1]||'').trim();
     const col2=String(r[2]||r[1]||'').trim();
-    // Skip section headers
     if(col0.includes('recon')||col0.includes('fab')||col0.includes('ซ่อม')||col0.includes('ผลิต')) continue;
     const itemName=col2||(r.length>2?String(r[2]||'').trim():'')||(r.length>1?col1:'');
     if(!itemName) continue;
@@ -1076,89 +1122,181 @@ function renderRFRecon(){
   document.getElementById('reconNone').textContent=none;
   document.getElementById('reconPct').textContent=overallPct+'%';
   // ── Line Chart ──
-  drawReconLineChart(items, weeks, currentWeekIdx);
+  if(reconChartData) drawReconLineChart(reconChartData, reconChartMode);
 }
 
-function drawReconLineChart(items, weeks, currentWeekIdx){
-  const svg = document.getElementById('reconLineChart');
-  if(!svg || !weeks.length) return;
-
-  const W=900, H=220, PL=48, PR=24, PT=20, PB=36;
-  const chartW=W-PL-PR, chartH=H-PT-PB;
-  const n=weeks.length;
-  const total=items.length||1;
-
-  // Cumulative done count per week (running total)
-  const cumDone=[];
-  let running=0;
-  for(let wi=0;wi<n;wi++){
-    running+=items.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length;
-    cumDone.push(running);
+function setChartMode(mode){
+  reconChartMode = mode;
+  const btnAcc = document.getElementById('chartToggleAcc');
+  const btnWk  = document.getElementById('chartToggleWk');
+  if(btnAcc && btnWk){
+    if(mode==='acc'){
+      btnAcc.style.background='var(--accent)';btnAcc.style.color='#000';btnAcc.style.borderColor='var(--accent)';
+      btnWk.style.background='var(--surface2)';btnWk.style.color='var(--muted)';btnWk.style.borderColor='var(--border)';
+    } else {
+      btnWk.style.background='var(--accent)';btnWk.style.color='#000';btnWk.style.borderColor='var(--accent)';
+      btnAcc.style.background='var(--surface2)';btnAcc.style.color='var(--muted)';btnAcc.style.borderColor='var(--border)';
+    }
   }
-  // Planned target: linear ramp from 0 to total over all weeks
-  const planned=weeks.map((_,wi)=>Math.round((wi+1)/n*total));
+  if(reconChartData) drawReconLineChart(reconChartData, mode);
+}
 
-  const xStep=chartW/(n>1?n-1:1);
-  const yScale=v=>(chartH-(v/total)*chartH);
+function drawReconLineChart(chartData, mode){
+  const svg = document.getElementById('reconLineChart');
+  if(!svg || !chartData) return;
 
-  const pt=(x,y)=>`${PL+x*xStep},${PT+yScale(y)}`;
-  const planPt=(x,y)=>`${PL+x*xStep},${PT+yScale(y)}`;
+  const { weekLabels, series } = chartData;
+  const n = weekLabels.length;
+  if(!n) return;
 
-  // Grid lines
-  const gridLines=[0,25,50,75,100].map(p=>{
-    const yv=p/100*total;
-    const y=PT+yScale(yv);
-    return `<line x1="${PL}" y1="${y}" x2="${PL+chartW}" y2="${y}" stroke="#252830" stroke-width="1"/>
-      <text x="${PL-6}" y="${y+4}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${p}%</text>`;
-  }).join('');
+  const W=960, H=260, PL=52, PR=20, PT=24, PB=40;
+  const chartW=W-PL-PR, chartH=H-PT-PB;
 
-  // Week X-axis ticks (every 2nd or 4th depending on count)
-  const tickEvery = n<=12?1:n<=24?2:4;
-  const xTicks=weeks.map((w,wi)=>{
-    if(wi%tickEvery!==0&&wi!==n-1) return '';
-    const x=PL+wi*xStep;
-    return `<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="${wi===currentWeekIdx?'#3b82f6':'#636776'}">${w}</text>`;
+  // Determine Y domain
+  const isAcc = (mode !== 'wk');
+  let yMax = 0;
+  series.forEach(s=>{
+    const vals = isAcc ? s.acc : s.weekly;
+    vals.forEach(v=>{ if(v!=null && v>yMax) yMax=v; });
+    if(isAcc) s.planAcc.forEach(v=>{ if(v>yMax) yMax=v; });
+  });
+  if(yMax===0) yMax=100;
+  yMax = Math.ceil(yMax/10)*10; // round up to nearest 10
+
+  const xStep = chartW / (n>1 ? n-1 : 1);
+  const yScale = v => chartH - (v / yMax) * chartH;
+  const px = wi => PL + wi * xStep;
+  const py = v  => PT + yScale(v);
+
+  // Grid lines Y
+  const yTicks = [];
+  const step = yMax <= 20 ? 5 : yMax <= 50 ? 10 : yMax <= 100 ? 20 : 25;
+  for(let t=0; t<=yMax; t+=step) yTicks.push(t);
+
+  const gridLines = yTicks.map(t=>`
+    <line x1="${PL}" y1="${py(t)}" x2="${PL+chartW}" y2="${py(t)}"
+      stroke="#252830" stroke-width="${t===0?'1.5':'1'}"/>
+    <text x="${PL-6}" y="${py(t)+4}" text-anchor="end"
+      font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${t}${isAcc?'%':''}</text>
+  `).join('');
+
+  // X axis ticks
+  const tickEvery = n<=13?1:n<=26?2:n<=39?3:4;
+  // Detect current week: first week where ALL series have null acc values after a non-null run
+  let currentWi = n-1;
+  for(let wi=0;wi<n;wi++){
+    const allNull = series.every(s=>s.acc[wi]==null||s.acc[wi]===0);
+    const anyData = series.some(s=>s.acc[wi]!=null&&s.acc[wi]>0);
+    if(wi>0 && allNull && series.some(s=>s.acc[wi-1]!=null&&s.acc[wi-1]>0)){
+      currentWi = wi-1; break;
+    }
+  }
+
+  const xTicks = weekLabels.map((w,wi)=>{
+    if(wi%tickEvery!==0 && wi!==n-1 && wi!==currentWi) return '';
+    const isCur = wi===currentWi;
+    return `<text x="${px(wi)}" y="${H-8}" text-anchor="middle"
+      font-size="${isCur?'9.5':'8.5'}" font-family="IBM Plex Mono,monospace"
+      fill="${isCur?'#3b82f6':'#636776'}" font-weight="${isCur?'700':'400'}">${w}</text>`;
   }).join('');
 
   // Current week vertical line
-  const curX=PL+currentWeekIdx*xStep;
-  const curLine=`<line x1="${curX}" y1="${PT}" x2="${curX}" y2="${PT+chartH}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".7"/>`;
+  const curLine = `<line x1="${px(currentWi)}" y1="${PT}" x2="${px(currentWi)}" y2="${PT+chartH}"
+    stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".65"/>
+    <text x="${px(currentWi)+5}" y="${PT+12}" font-size="8.5" font-family="IBM Plex Mono,monospace"
+      fill="#3b82f6" opacity=".8">NOW</text>`;
 
-  // Planned dashed line
-  const plannedPath=`M ${weeks.map((_,wi)=>planPt(wi,planned[wi])).join(' L ')}`;
+  // Helper: build SVG path from data array (skip nulls with M/L gaps)
+  function buildPath(vals){
+    let d=''; let moved=false;
+    vals.forEach((v,wi)=>{
+      if(v==null){ moved=false; return; }
+      d += (moved?` L `:`M `) + `${px(wi)},${py(v)}`;
+      moved=true;
+    });
+    return d;
+  }
 
-  // Actual area fill
-  const areaPath=`M ${pt(0,0)} L ${weeks.map((_,wi)=>pt(wi,cumDone[wi])).join(' L ')} L ${PL+(n-1)*xStep},${PT+chartH} L ${PL},${PT+chartH} Z`;
+  // Helper: area under line
+  function buildArea(vals, color){
+    let segments=[];let seg=[];
+    vals.forEach((v,wi)=>{
+      if(v!=null) seg.push({wi,v});
+      else if(seg.length){ segments.push([...seg]); seg=[]; }
+    });
+    if(seg.length) segments.push(seg);
+    return segments.map(seg=>{
+      if(seg.length<2) return '';
+      const d=`M ${px(seg[0].wi)},${py(0)} L ${seg.map(p=>`${px(p.wi)},${py(p.v)}`).join(' L ')} L ${px(seg[seg.length-1].wi)},${py(0)} Z`;
+      return `<path d="${d}" fill="${color}" opacity=".07"/>`;
+    }).join('');
+  }
 
-  // Actual line
-  const linePath=`M ${weeks.map((_,wi)=>pt(wi,cumDone[wi])).join(' L ')}`;
+  // Plan lines (acc mode only)
+  let planLines='';
+  if(isAcc){
+    series.forEach(s=>{
+      const d=buildPath(s.planAcc);
+      if(d) planLines+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="1" stroke-dasharray="5 4" opacity=".35"/>`;
+    });
+  }
 
-  // Data point dots
-  const dots=weeks.map((_,wi)=>{
-    const v=cumDone[wi];
-    const cx=PL+wi*xStep, cy=PT+yScale(v);
-    const isLast=wi===n-1, isCur=wi===currentWeekIdx;
-    const r=isCur||isLast?5:3;
-    const fill=isCur?'#3b82f6':v===total?'#27ae60':'#14b8a6';
-    const showLabel=isCur||isLast||wi===0||(v>0&&(wi===0||cumDone[wi-1]!==v));
-    const pct=Math.round(v/total*100);
-    const label=showLabel?`<text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="${fill}" font-weight="600">${pct}%</text>`:'';
-    return `${label}<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="var(--bg)" stroke-width="1.5"/>`;
-  }).join('');
+  // Data lines + areas + dots
+  let linesHtml='';
+  series.forEach(s=>{
+    const vals = isAcc ? s.acc : s.weekly;
+    const area = isAcc ? buildArea(vals, s.color) : '';
+    const d = buildPath(vals);
+    if(!d) return;
+    linesHtml += area;
+    linesHtml += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round"/>`;
+    // Dots on data points
+    vals.forEach((v,wi)=>{
+      if(v==null) return;
+      const isCur=wi===currentWi, isLast=wi===n-1;
+      const r=isCur||isLast?5:2.5;
+      linesHtml+=`<circle cx="${px(wi)}" cy="${py(v)}" r="${r}"
+        fill="${s.color}" stroke="#0d0e12" stroke-width="1.5" opacity="${isCur||isLast?1:0.8}"/>`;
+      // Label on current week
+      if(isCur){
+        const labelY = py(v)-9;
+        linesHtml+=`<text x="${px(wi)}" y="${labelY}" text-anchor="middle"
+          font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="700">${v.toFixed(1)}%</text>`;
+      }
+    });
+  });
+
+  // Legend labels at end of each line (right side)
+  let endLabels='';
+  series.forEach(s=>{
+    const vals = isAcc ? s.acc : s.weekly;
+    // Find last non-null value
+    let lastWi=-1, lastV=null;
+    for(let wi=vals.length-1;wi>=0;wi--){
+      if(vals[wi]!=null){ lastWi=wi; lastV=vals[wi]; break; }
+    }
+    if(lastWi<0||lastV==null) return;
+    endLabels+=`<text x="${px(lastWi)+8}" y="${py(lastV)+4}"
+      font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="600"
+      opacity=".9">${s.name}</text>`;
+  });
+
+  // X axis line
+  const xAxis=`<line x1="${PL}" y1="${PT+chartH}" x2="${PL+chartW}" y2="${PT+chartH}" stroke="#363840" stroke-width="1.5"/>`;
 
   svg.innerHTML=`
     <defs>
-      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#14b8a6" stop-opacity=".35"/>
-        <stop offset="100%" stop-color="#14b8a6" stop-opacity=".02"/>
-      </linearGradient>
+      <clipPath id="chartClip"><rect x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"/></clipPath>
     </defs>
     ${gridLines}
+    ${xAxis}
+    <g clip-path="url(#chartClip)">
+      ${planLines}
+      ${linesHtml}
+    </g>
+    ${endLabels}
     ${curLine}
-    <path d="${areaPath}" fill="url(#areaGrad)"/>
-    <path d="${plannedPath}" fill="none" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="6 4" opacity=".6"/>
-    <path d="${linePath}" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    ${dots}
     ${xTicks}
   `;
 } // end drawReconLineChart
