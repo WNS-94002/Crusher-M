@@ -367,6 +367,88 @@
   .modal-close{margin-top:14px;width:100%;}
   .copy-msg{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
 
+  /* ── Chart Hover Tooltip ── */
+  #reconChartTooltip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.3);
+    backdrop-filter: blur(4px);
+    transition: opacity .12s ease;
+  }
+  .tt-week {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tt-week-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue); flex-shrink: 0;
+  }
+  .tt-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .tt-row:last-child { margin-bottom: 0; }
+  .tt-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  }
+  .tt-name {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tt-val {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    min-width: 46px;
+    text-align: right;
+  }
+  .tt-bar-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 3px;
+    margin-left: 17px;
+    margin-bottom: 2px;
+  }
+  .tt-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width .3s ease;
+  }
+  .tt-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 7px 0;
+  }
+  .tt-crosshair {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,.12);
+    pointer-events: none;
+  }
+
   footer{padding:24px 0;border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 
   @media(max-width:640px){
@@ -597,19 +679,9 @@
         <button id="chartToggleAcc" onclick="setChartMode('acc')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Acc. Progress</button>
         <button id="chartToggleWk" onclick="setChartMode('wk')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Weekly Progress</button>
       </div>
-      <div style="position:relative;width:100%;overflow-x:auto;">
-        <svg id="reconLineChart" width="100%" style="display:block;min-width:400px;" viewBox="0 0 960 260" preserveAspectRatio="xMinYMid meet"></svg>
+      <div style="position:relative;width:100%;overflow-x:auto;" id="reconChartOuter">
+        <svg id="reconLineChart" width="100%" style="display:block;min-width:400px;cursor:crosshair;" viewBox="0 0 960 260" preserveAspectRatio="xMinYMid meet"></svg>
       </div>
-      <div id="reconChartTooltip" style="display:none;position:absolute;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;pointer-events:none;z-index:10;"></div>
-    </div>
-
-    <!-- Weekly Gantt table -->
-    <div class="sec"><span class="sec-title">ตารางความก้าวหน้ารายอาทิตย์</span></div>
-    <div class="rf-table-wrap">
-      <table class="rf-table" id="reconTable">
-        <thead id="reconThead"></thead>
-        <tbody id="reconTbody"><tr><td colspan="20" style="padding:40px;text-align:center;color:var(--muted)"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr></tbody>
-      </table>
     </div>
   </div>
 
@@ -632,6 +704,16 @@
     <button class="btn btn-ghost modal-close" onclick="closeShare()">ปิด</button>
   </div>
 </div>
+
+<!-- Chart Hover Tooltip (global, fixed to viewport) -->
+<div id="reconChartTooltip" style="
+  display:none;
+  position:fixed;
+  z-index:9999;
+  pointer-events:none;
+  max-width:280px;
+  min-width:200px;
+"></div>
 
 <script>
 // ═══════════════════════════════════════════════
@@ -1126,29 +1208,7 @@ function rfCellValue(v){
 function renderRFRecon(){
   const items=reconItems;
   const weeks=rfWeeks;
-  let currentWeekIdx=weeks.length>0?weeks.length-1:0;
-  for(let i=0;i<weeks.length;i++){
-    if(items.some(it=>it.weekVals[i]==='current')){currentWeekIdx=i;break;}
-  }
-  // thead
-  document.getElementById('reconThead').innerHTML=`<tr>
-    <th style="width:36px;text-align:right;padding-left:10px">#</th>
-    <th class="th-item">รายการ</th>
-    ${weeks.map((w,wi)=>`<th class="th-week${wi===currentWeekIdx?' current-week':''}">${w}</th>`).join('')}
-    <th class="th-week" style="color:var(--accent)">%</th>
-  </tr>`;
-  // tbody
-  const tbodyEl=document.getElementById('reconTbody');
-  if(!items.length){tbodyEl.innerHTML=`<tr><td colspan="${weeks.length+3}" style="padding:40px;text-align:center;color:var(--muted)">ไม่พบข้อมูล</td></tr>`;return;}
-  tbodyEl.innerHTML=items.map(it=>{
-    const pctColor=it.pct===100?'var(--green)':it.pct>0?'var(--accent)':'var(--muted)';
-    return`<tr>
-      <td class="td-no">${it.no}</td>
-      <td class="td-item" title="${it.name}">${it.name}</td>
-      ${it.weekVals.map(v=>`<td class="td-week">${rfCellValue(v)}</td>`).join('')}
-      <td class="rf-item-pct" style="color:${pctColor}">${it.pct}%</td>
-    </tr>`;
-  }).join('');
+
   // KPIs
   const total=items.length;
   const done=items.filter(it=>it.pct===100).length;
@@ -1351,7 +1411,131 @@ function drawReconLineChart(chartData, mode){
     ${endLabels}
     ${curLine}
     ${xTicks}
+    <!-- crosshair lines (updated by JS) -->
+    <line id="ttCrossV" x1="0" y1="${PT}" x2="0" y2="${PT+chartH}"
+      stroke="rgba(255,255,255,.18)" stroke-width="1" display="none"/>
+    <!-- transparent hover overlay -->
+    <rect id="chartOverlay" x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"
+      fill="transparent" style="cursor:crosshair;"/>
+    <!-- hover dot indicators (one per series) -->
+    ${series.map((s,si)=>`<circle id="ttDot${si}" r="5" fill="${s.color}"
+      stroke="#0d0e12" stroke-width="2" display="none"/>`).join('')}
   `;
+
+  // ── Tooltip interaction ──
+  const tooltip  = document.getElementById('reconChartTooltip');
+  const crossV   = svg.getElementById('ttCrossV');
+  const overlay  = svg.getElementById('chartOverlay');
+  const dots     = series.map((_,si)=>svg.getElementById('ttDot'+si));
+  const isAcc2   = isAcc; // capture for closure
+
+  // Store data snapshot for mousemove
+  const _series  = series;
+  const _wl      = weekLabels;
+  const _n       = n;
+  const _px      = px;
+  const _py      = py;
+  const _PL=PL, _PR=PR, _PT=PT, _chartW=chartW, _W=W;
+  const _xStep   = xStep;
+  const _currentWi = currentWi;
+
+  function showTooltip(e){
+    const svgRect = svg.getBoundingClientRect();
+    const scaleX  = _W / svgRect.width;   // SVG viewBox → CSS pixels ratio
+    const mouseX  = (e.clientX - svgRect.left) * scaleX;  // in SVG coords
+
+    // Clamp to chart area
+    if(mouseX < _PL || mouseX > _PL + _chartW){ hideTooltip(); return; }
+
+    // Find nearest week index
+    const wiFloat = (mouseX - _PL) / (_xStep||1);
+    const wi = Math.max(0, Math.min(_n-1, Math.round(wiFloat)));
+    const weekLabel = _wl[wi] || ('W'+(wi+1));
+
+    // Move crosshair
+    const cx = _px(wi);
+    crossV.setAttribute('x1', cx); crossV.setAttribute('x2', cx);
+    crossV.setAttribute('display','');
+
+    // Move dots
+    _series.forEach((s,si)=>{
+      const vals = isAcc2 ? s.acc : s.weekly;
+      const v = vals[wi];
+      if(v!=null){
+        dots[si].setAttribute('cx', _px(wi));
+        dots[si].setAttribute('cy', _py(v));
+        dots[si].setAttribute('display','');
+      } else {
+        dots[si].setAttribute('display','none');
+      }
+    });
+
+    // Build tooltip content
+    const isCurWk = wi === _currentWi;
+    const wkBadge = isCurWk
+      ? `<span style="background:#3b82f6;color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:4px;">NOW</span>`
+      : '';
+
+    let html = `<div class="tt-week">
+      <span class="tt-week-dot" style="background:${isCurWk?'#3b82f6':'var(--muted)'}"></span>
+      ${weekLabel}${wkBadge}
+      <span style="margin-left:auto;color:var(--muted);font-size:9px;">${isAcc2?'Acc.':'Weekly'}</span>
+    </div>`;
+
+    _series.forEach(s=>{
+      const vals = isAcc2 ? s.acc : s.weekly;
+      const v    = vals[wi];
+      const plan = isAcc2 ? s.planAcc[wi] : null;
+      const vStr = v!=null ? v.toFixed(2)+'%' : '—';
+      const planStr = plan!=null ? plan.toFixed(1)+'%' : null;
+      const barW = v!=null ? Math.min(v, 100) : 0;
+      const diff = (v!=null && plan!=null) ? v - plan : null;
+      const diffStr = diff!=null
+        ? `<span style="color:${diff>=0?'var(--green)':'var(--red)'};font-size:9px;margin-left:6px;">${diff>=0?'▲':'▼'}${Math.abs(diff).toFixed(1)}%</span>`
+        : '';
+
+      html += `
+        <div class="tt-row">
+          <span class="tt-dot" style="background:${s.color};"></span>
+          <span class="tt-name">${s.name}</span>
+          <span class="tt-val" style="color:${s.color};">${vStr}</span>
+          ${diffStr}
+        </div>
+        <div class="tt-bar-track">
+          <div class="tt-bar-fill" style="width:${barW}%;background:${s.color};opacity:.7;"></div>
+        </div>`;
+      if(planStr){
+        html += `<div style="margin-left:17px;margin-bottom:4px;font-size:9px;color:var(--muted);">Plan: ${planStr}</div>`;
+      }
+    });
+
+    tooltip.innerHTML = html;
+
+    // Position tooltip — follow mouse, flip if near edge
+    const vpW = window.innerWidth, vpH = window.innerHeight;
+    const ttW = 260, ttH = 180;
+    let tx = e.clientX + 16;
+    let ty = e.clientY - 60;
+    if(tx + ttW > vpW - 10) tx = e.clientX - ttW - 16;
+    if(ty + ttH > vpH - 10) ty = vpH - ttH - 10;
+    if(ty < 10) ty = 10;
+
+    tooltip.style.left  = tx + 'px';
+    tooltip.style.top   = ty + 'px';
+    tooltip.style.display = 'block';
+  }
+
+  function hideTooltip(){
+    tooltip.style.display = 'none';
+    crossV.setAttribute('display','none');
+    dots.forEach(d=>d.setAttribute('display','none'));
+  }
+
+  // Remove old listeners by replacing overlay
+  const newOverlay = overlay.cloneNode(true);
+  overlay.parentNode.replaceChild(newOverlay, overlay);
+  newOverlay.addEventListener('mousemove', showTooltip);
+  newOverlay.addEventListener('mouseleave', hideTooltip);
 } // end drawReconLineChart
 
 // ═══════════════════════════════════════════════
