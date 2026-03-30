@@ -863,6 +863,8 @@ function renderCostTable(){
     return thHtml;
   }).join('');
   if(hasDiff) thCells += `<th onclick="costSortDiff()" title="Actual − Budget">Diff ↕</th>`;
+  // If STATUS col not found, still add PUR Progress header at the end
+  if(colAction<0) thCells += `<th style="white-space:nowrap;color:var(--muted);min-width:200px;">PUR Progress</th>`;
 
   const thead=`<thead><tr>${thCells}</tr></thead>`;
 
@@ -884,6 +886,11 @@ function renderCostTable(){
       if(isLinkCol(cHeaders[i])||isUrl(v)){if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;}
       return`<td>${v}</td>`;
     }).join('');
+    // If STATUS col was not found, append PUR Progress at the end
+    if(colAction<0){
+      const costItemName = colName>=0 ? (r[colName]||'') : (r[1]||r[0]||'');
+      cells += `<td style="padding:6px 10px;">${purProgressBadge(costItemName)}</td>`;
+    }
     const diffCell=hasDiff?`<td class="num">${diffPill(pn(r[colB]),pn(r[colA]))}</td>`:'';
     return`<tr>${cells}${diffCell}</tr>`;
   }).join('')}</tbody>`;
@@ -1154,6 +1161,7 @@ function drawReconLineChart(items, weeks, currentWeekIdx){
     ${dots}
     ${xTicks}
   `;
+} // end drawReconLineChart
 
 // ═══════════════════════════════════════════════
 //  OVERALL TAB
@@ -1335,7 +1343,7 @@ function buildYearlyTimeline(reconPct, procPct){
     const cellsHtml = row.cells.map((cell,wi)=>{
       const isMonth = monthStarts.includes(wi);
       const isCur = wi===currentWeekIdx;
-      let bg, border;
+      let bg, border, opacity;
       if(cell.cls==='done'){bg=row.color;border='none';opacity='.85';}
       else if(cell.cls==='active'){bg=row.color;border='none';opacity='.4';}
       else if(cell.cls==='planned'){bg='transparent';border=`1px solid ${row.color}`;opacity='.5';}
