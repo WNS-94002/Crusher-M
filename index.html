@@ -1004,35 +1004,58 @@ async function loadRF(){
 
 function parseRFData(rows){
   if(!rows.length) return;
-  const header = rows[0];
-  rfWeeks=[];
-  const weekColIdxs=[];
-  for(let i=0;i<header.length;i++){
-    const h=String(header[i]||'').trim();
-    if(/^(w|week|wk|อาทิตย์|สัปดาห์)\s*\d+$/i.test(h) || /^\d{1,2}\/\d{1,2}/.test(h) || /^W\d+$/i.test(h)){
-      rfWeeks.push(h);weekColIdxs.push(i);
+
+  // ── Step 1: Find the row that contains week labels (W1, W2 … or similar) ──
+  // Sheet has multiple header rows (month labels, "PROGRESS/WEEK", then W1 W2 …)
+  let headerRowIdx = 0;
+  let weekColIdxs = [];
+  rfWeeks = [];
+
+  for(let ri=0; ri<Math.min(rows.length,6); ri++){
+    const r = rows[ri];
+    const found = [];
+    for(let ci=0;ci<r.length;ci++){
+      const h = String(r[ci]||'').trim();
+      if(/^W\d+$/i.test(h) || /^(week|wk)\s*\d+$/i.test(h)){
+        found.push({ci, h});
+      }
     }
-  }
-  if(rfWeeks.length===0){
-    for(let i=3;i<header.length;i++){
-      const h=String(header[i]||'').trim();
-      if(h){rfWeeks.push(h||'W'+(i-2));weekColIdxs.push(i);}
+    if(found.length >= 3){   // found the week-label row
+      headerRowIdx = ri;
+      found.forEach(f=>{ rfWeeks.push(f.h); weekColIdxs.push(f.ci); });
+      break;
     }
   }
 
-  // ── Extract specific progress rows (1-indexed per user spec) ──
-  // Row 4  = Hopper weekly progress,  Row 5  = Hopper acc progress
-  // Row 16 = Sizer weekly progress,   Row 17 = Sizer acc progress
-  // Row 28 = TruckBridge weekly,      Row 29 = TruckBridge acc
-  function getRowVals(rowIdx1){
-    // rowIdx1 is 1-based (Excel/Sheets row number)
-    const r = rows[rowIdx1-1] || [];
+  // Fallback: if still no week cols, use col 4 onwards from row 0
+  if(rfWeeks.length === 0){
+    const r = rows[0];
+    for(let ci=4; ci<r.length; ci++){
+      const h = String(r[ci]||'').trim();
+      if(h){ rfWeeks.push(h); weekColIdxs.push(ci); }
+    }
+    headerRowIdx = 0;
+  }
+
+  console.log('[RF] headerRowIdx='+headerRowIdx+' weekCols='+rfWeeks.length+' first='+rfWeeks[0]+' last='+rfWeeks[rfWeeks.length-1]);
+
+  // ── Step 2: Map Excel row numbers → CSV row index ──
+  // Excel rows 1..N map to rows[0..N-1] in the CSV array.
+  // User spec is in Excel 1-based row numbers.
+  function getRowVals(excelRow){
+    const r = rows[excelRow - 1] || [];
     return weekColIdxs.map(ci=>{
       const v = String(r[ci]||'').trim().replace(/%/g,'');
       const n = parseFloat(v);
       return isNaN(n) ? null : n;
     });
   }
+
+  // Quick sanity: log what's in those rows
+  [4,5,16,17,28,29].forEach(er=>{
+    const r = rows[er-1]||[];
+    console.log(`[RF] Excel row ${er}: col0="${r[0]}" col1="${r[1]}" weekSample=[${weekColIdxs.slice(0,5).map(ci=>r[ci]).join(',')}]`);
+  });
 
   const SERIES_DEFS = [
     { name:'Hopper',       color:'#14b8a6', wkRow:4,  accRow:5  },
@@ -1043,18 +1066,32 @@ function parseRFData(rows){
   const series = SERIES_DEFS.map(def=>{
     const weekly = getRowVals(def.wkRow);
     const acc    = getRowVals(def.accRow);
-    // Build plan: linear ramp using last non-null acc value as target
-    const maxAcc = acc.reduce((m,v)=>v!=null?Math.max(m,v):m, 0) || 100;
-    const planAcc = rfWeeks.map((_,wi)=>parseFloat(((wi+1)/rfWeeks.length*maxAcc).toFixed(2)));
+
+    // Replace 0s at start with null so they don't show as flat zero line
+    // (0 before the work starts is meaningless)
+    let firstNonZeroWk = weekly.findIndex(v=>v!=null&&v>0);
+    let firstNonZeroAcc = acc.findIndex(v=>v!=null&&v>0);
+
+    // Build plan: linear ramp 0→100 over all weeks
+    const maxAcc = Math.max(acc.reduce((m,v)=>v!=null?Math.max(m,v):m, 0), 1);
+    const planAcc = rfWeeks.map((_,wi)=>
+      parseFloat(((wi+1)/rfWeeks.length*maxAcc).toFixed(2))
+    );
+
+    const nonNullAcc = acc.filter(v=>v!=null).length;
+    const nonNullWk  = weekly.filter(v=>v!=null).length;
+    console.log(`[RF] ${def.name}: acc nonNull=${nonNullAcc} maxAcc=${maxAcc} wk nonNull=${nonNullWk}`);
+
     return { name:def.name, color:def.color, weekly, acc, planAcc };
   });
 
   reconChartData = { weekLabels: rfWeeks, series };
 
-  // ── Parse Gantt items (existing logic) ──
+  // ── Step 3: Parse Gantt items (data rows after header) ──
   reconItems=[];
   let itemNo=0;
-  for(let ri=1;ri<rows.length;ri++){
+  const dataStartRow = headerRowIdx + 1;
+  for(let ri=dataStartRow; ri<rows.length; ri++){
     const r=rows[ri];
     const col0=String(r[0]||'').trim().toLowerCase();
     const col1=String(r[1]||'').trim();
@@ -1073,8 +1110,10 @@ function parseRFData(rows){
     const totalActive=weekVals.filter(v=>v!=='empty').length;
     const totalDone=weekVals.filter(v=>v==='done').length;
     const pct=totalActive>0?Math.round(totalDone/totalActive*100):0;
-    reconItems.push({no:col1||String(itemNo),name:itemName,weekVals,pct,status:totalDone===totalActive&&totalActive>0?'done':weekVals.some(v=>v==='current')?'wip':weekVals.some(v=>v!=='empty')?'wip':'none'});
+    reconItems.push({no:col1||String(itemNo),name:itemName,weekVals,pct,
+      status:totalDone===totalActive&&totalActive>0?'done':weekVals.some(v=>v==='current')?'wip':weekVals.some(v=>v!=='empty')?'wip':'none'});
   }
+  console.log('[RF] reconItems='+reconItems.length);
 }
 
 function rfCellValue(v){
@@ -1147,13 +1186,24 @@ function drawReconLineChart(chartData, mode){
 
   const { weekLabels, series } = chartData;
   const n = weekLabels.length;
-  if(!n) return;
+  if(!n){
+    svg.innerHTML=`<text x="480" y="130" text-anchor="middle" dominant-baseline="middle"
+      font-family="IBM Plex Mono,monospace" font-size="13" fill="#636776">ไม่พบข้อมูล Week columns ใน Sheet</text>`;
+    return;
+  }
 
   const W=960, H=260, PL=52, PR=20, PT=24, PB=40;
   const chartW=W-PL-PR, chartH=H-PT-PB;
 
   // Determine Y domain
   const isAcc = (mode !== 'wk');
+
+  // Check if any series has actual data
+  const hasAnyData = series.some(s=>(isAcc?s.acc:s.weekly).some(v=>v!=null&&v>0));
+  const noDataMsg = !hasAnyData
+    ? `<text x="${W/2}" y="${PT+8}" text-anchor="middle" font-family="IBM Plex Mono,monospace"
+        font-size="10" fill="#636776" opacity=".7">ยังไม่มีข้อมูล progress จริง — แสดงเฉพาะเส้นแผน (Plan)</text>`
+    : '';
   let yMax = 0;
   series.forEach(s=>{
     const vals = isAcc ? s.acc : s.weekly;
@@ -1182,15 +1232,17 @@ function drawReconLineChart(chartData, mode){
 
   // X axis ticks
   const tickEvery = n<=13?1:n<=26?2:n<=39?3:4;
-  // Detect current week: first week where ALL series have null acc values after a non-null run
-  let currentWi = n-1;
+  // Detect current week: last week where at least one series has non-null, non-zero data
+  let currentWi = 0;
   for(let wi=0;wi<n;wi++){
-    const allNull = series.every(s=>s.acc[wi]==null||s.acc[wi]===0);
-    const anyData = series.some(s=>s.acc[wi]!=null&&s.acc[wi]>0);
-    if(wi>0 && allNull && series.some(s=>s.acc[wi-1]!=null&&s.acc[wi-1]>0)){
-      currentWi = wi-1; break;
-    }
+    const hasData = series.some(s=>{
+      const v = isAcc ? s.acc[wi] : s.weekly[wi];
+      return v!=null && v>0;
+    });
+    if(hasData) currentWi = wi;
   }
+  // If no data at all, set to last defined week
+  if(!hasAnyData) currentWi = Math.max(0, n-1);
 
   const xTicks = weekLabels.map((w,wi)=>{
     if(wi%tickEvery!==0 && wi!==n-1 && wi!==currentWi) return '';
@@ -1289,6 +1341,7 @@ function drawReconLineChart(chartData, mode){
     <defs>
       <clipPath id="chartClip"><rect x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"/></clipPath>
     </defs>
+    ${noDataMsg}
     ${gridLines}
     ${xAxis}
     <g clip-path="url(#chartClip)">
