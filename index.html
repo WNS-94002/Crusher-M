@@ -124,19 +124,45 @@
   .mod-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;}
   .mod-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
 
-  /* timeline */
-  .ov-timeline{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:24px;}
+  /* ═══════════════════════════════════
+     YEARLY TIMELINE (Overall tab)
+  ═══════════════════════════════════ */
+  .ov-timeline{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:24px;overflow-x:auto;}
   .ov-timeline-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
   .ov-timeline-title::before{content:'';width:3px;height:14px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
-  .week-grid{display:grid;gap:8px;}
-  .wk-row{display:grid;grid-template-columns:90px 1fr 60px;gap:10px;align-items:center;}
-  .wk-label{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
-  .wk-track{height:18px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border);display:flex;}
-  .wk-seg{height:100%;transition:width .6s ease;position:relative;}
-  .wk-seg.done{background:linear-gradient(90deg,var(--green),#16a34a);}
-  .wk-seg.active{background:linear-gradient(90deg,var(--accent),var(--accent2));}
-  .wk-seg.wait{background:var(--border);}
-  .wk-pct-label{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-align:right;}
+
+  /* yearly gantt */
+  .yearly-gantt{min-width:600px;}
+  .yearly-gantt-header{display:flex;margin-bottom:6px;}
+  .yearly-gantt-row-label{width:120px;flex-shrink:0;}
+  .yearly-gantt-cols{display:flex;flex:1;gap:2px;}
+  .yearly-col-head{flex:1;text-align:center;font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;min-width:28px;}
+  .yearly-col-head.month-start{color:var(--accent);font-weight:600;}
+  .yearly-col-head.current-week{color:var(--blue);}
+
+  .yearly-gantt-body{display:flex;flex-direction:column;gap:6px;}
+  .yearly-gantt-row{display:flex;align-items:center;gap:0;}
+  .yearly-gantt-row-name{width:120px;flex-shrink:0;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding-right:10px;}
+  .yearly-gantt-cells{display:flex;flex:1;gap:2px;}
+  .yearly-cell{flex:1;height:18px;border-radius:2px;min-width:28px;transition:all .3s;position:relative;}
+  .yearly-cell.done{background:var(--green);opacity:.85;}
+  .yearly-cell.active{background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.9;}
+  .yearly-cell.planned{background:rgba(245,166,35,.18);border:1px solid rgba(245,166,35,.3);}
+  .yearly-cell.empty{background:var(--surface2);border:1px solid var(--border);}
+  .yearly-cell.current-week{ring:2px solid var(--blue)!important;outline:1.5px solid var(--blue);}
+
+  /* month separator line in header */
+  .yearly-col-head.month-sep{border-left:1px solid rgba(245,166,35,.25);}
+  .yearly-cell.month-sep{border-left:1px solid rgba(245,166,35,.15)!important;}
+
+  .yearly-month-labels{display:flex;margin-bottom:2px;}
+  .yearly-month-slot{font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;border-left:1px solid rgba(245,166,35,.2);padding-left:3px;overflow:hidden;white-space:nowrap;}
+
+  .yearly-pct-col{width:44px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;flex-shrink:0;padding-left:8px;}
+
+  .ov-timeline-legend{display:flex;gap:16px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  .tl-leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .tl-leg-box{width:14px;height:10px;border-radius:2px;}
 
   /* ════════════════════════════════
      COST SUMMARY TAB
@@ -171,19 +197,6 @@
   .bva-cat-bar-a.over{background:linear-gradient(90deg,var(--red),#b91c1c);}
   .bva-cat-bar-a.under{background:linear-gradient(90deg,var(--green),#16a34a);}
   .bva-cat-amts{display:flex;justify-content:space-between;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);margin-top:2px;}
-  .summary-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:20px;}
-  .insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
-  .insight-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s;}
-  .insight-item:hover{border-color:rgba(245,166,35,.3);}
-  .insight-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
-  .insight-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:4px;}
-  .insight-value{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1;margin-bottom:3px;}
-  .insight-desc{font-size:11px;color:var(--muted);line-height:1.5;}
-  .insight-item.good .insight-value{color:var(--green);}
-  .insight-item.warn .insight-value{color:var(--accent);}
-  .insight-item.bad  .insight-value{color:var(--red);}
-  .insight-item.info .insight-value{color:var(--blue);}
-  .insight-item.purple .insight-value{color:var(--purple);}
   .filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
   .search-box{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 13px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
   .search-box:focus{border-color:var(--accent);}
@@ -211,11 +224,20 @@
   .status-badge.active::before{background:#f5a623;animation:glowPulse 1.8s infinite;}
   .status-badge.complete{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3);}
   .status-badge.complete::before{background:#27ae60;}
+
+  /* ── ORDER STATUS badge (new) ── */
+  .order-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.4px;white-space:nowrap;border:1px solid transparent;}
+  .order-badge.ordered{background:rgba(59,130,246,.12);color:var(--blue);border-color:rgba(59,130,246,.3);}
+  .order-badge.pending{background:rgba(245,166,35,.12);color:var(--accent);border-color:rgba(245,166,35,.3);}
+  .order-badge.delivered{background:rgba(39,174,96,.12);color:var(--green);border-color:rgba(39,174,96,.3);}
+  .order-badge.cancelled{background:rgba(231,76,60,.12);color:var(--red);border-color:rgba(231,76,60,.3);}
+  .order-badge.none{color:var(--muted);font-size:12px;}
+
   .link-cell a{color:var(--blue);font-size:12px;font-family:'IBM Plex Mono',monospace;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);transition:all .15s;}
   .link-cell a:hover{background:rgba(59,130,246,.18);border-color:var(--blue);color:#fff;}
   .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;gap:12px;flex-wrap:wrap;}
   .page-btns{display:flex;gap:5px;}
-  .page-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'IBM Plex Mono',monospace;}
+  .page-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15px;font-family:'IBM Plex Mono',monospace;}
   .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
   .page-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
   .page-btn:disabled{opacity:.3;cursor:not-allowed;}
@@ -294,14 +316,9 @@
   .funnel-nums b.done{color:var(--green);}
 
   /* ════════════════════════════════
-     RECON/FAB PROGRESS TAB
+     RECONDITION TAB (renamed, no sub-tabs)
   ════════════════════════════════ */
-  .rf-tabs{display:flex;gap:8px;margin:18px 0 16px;}
-  .rf-tab-btn{padding:8px 20px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all .18s;}
-  .rf-tab-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
-  .rf-tab-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
-
-  .rf-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+  .rf-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;margin-top:18px;}
   .rf-kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 18px;}
   .rf-kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
   .rf-kpi-value{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
@@ -338,12 +355,6 @@
   .rf-bar-fill{position:absolute;bottom:0;left:0;right:0;border-radius:4px 4px 0 0;transition:height .6s ease;}
   .rf-bar-label{font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;}
   .rf-bar-val{font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;}
-
-  /* sub-tabs for recon/fab panels */
-  .rf-panel{display:none;}
-  .rf-panel.active{display:block;}
-
-  /* current week highlight */
   .rf-table th.th-week.current-week::after{content:'▼';display:block;font-size:8px;margin-top:2px;opacity:.7;}
 
   /* ── MODAL ── */
@@ -388,7 +399,7 @@
       <button class="tab-btn active" id="tab-overall" onclick="switchTab('overall')"><span class="tab-dot"></span> Overall</button>
       <button class="tab-btn" id="tab-cost" onclick="switchTab('cost')"><span class="tab-dot"></span> Cost Summary</button>
       <button class="tab-btn" id="tab-progress" onclick="switchTab('progress')"><span class="tab-dot"></span> Procurement</button>
-      <button class="tab-btn" id="tab-rf" onclick="switchTab('rf')"><span class="tab-dot"></span> Recon &amp; Fabrication</button>
+      <button class="tab-btn" id="tab-rf" onclick="switchTab('rf')"><span class="tab-dot"></span> Recondition</button>
     </div>
   </header>
 
@@ -409,7 +420,6 @@
       <div class="card c-orange"><div class="card-label">Total Actual</div><div class="card-value" id="ovActual">—</div><div class="card-sub">THB</div></div>
       <div class="card c-purple"><div class="card-label">Procurement</div><div class="card-value" id="ovProcPct">—</div><div class="card-sub" id="ovProcSub">—</div></div>
       <div class="card c-teal"><div class="card-label">Recon Progress</div><div class="card-value" id="ovReconPct">—</div><div class="card-sub">overall completion</div></div>
-      <div class="card c-green"><div class="card-label">Fab Progress</div><div class="card-value" id="ovFabPct">—</div><div class="card-sub">overall completion</div></div>
     </div>
 
     <!-- Big ring + modules -->
@@ -432,7 +442,6 @@
           <div class="rleg"><div class="rleg-dot" style="background:var(--blue)"></div><div><div class="rleg-label">Budget Used</div><div class="rleg-val" id="rlegBudget" style="color:var(--blue)">—</div></div></div>
           <div class="rleg"><div class="rleg-dot" style="background:var(--purple)"></div><div><div class="rleg-label">Procurement</div><div class="rleg-val" id="rlegProc" style="color:var(--purple)">—</div></div></div>
           <div class="rleg"><div class="rleg-dot" style="background:var(--teal)"></div><div><div class="rleg-label">Recon</div><div class="rleg-val" id="rlegRecon" style="color:var(--teal)">—</div></div></div>
-          <div class="rleg"><div class="rleg-dot" style="background:var(--green)"></div><div><div class="rleg-label">Fabrication</div><div class="rleg-val" id="rlegFab" style="color:var(--green)">—</div></div></div>
         </div>
       </div>
     </div>
@@ -440,17 +449,17 @@
     <!-- Module Cards -->
     <div class="sec"><span class="sec-title">สถานะแต่ละส่วนงาน</span></div>
     <div class="ov-modules" id="ovModules">
-      <!-- filled by JS -->
       <div class="state-box"><div class="spinner"></div></div>
     </div>
 
-    <!-- Weekly timeline for Recon+Fab -->
-    <div class="sec"><span class="sec-title">ความก้าวหน้ารายอาทิตย์</span></div>
+    <!-- Yearly Progress Timeline -->
+    <div class="sec"><span class="sec-title">ความก้าวหน้ารายอาทิตย์ตลอดปี</span></div>
     <div class="ov-timeline" id="ovTimeline">
-      <div class="ov-timeline-title">Weekly Progress Overview</div>
-      <div class="week-grid" id="ovWeekGrid">
+      <div class="ov-timeline-title">Yearly Progress Timeline</div>
+      <div id="ovWeekGrid">
         <div style="color:var(--muted);font-size:12px">กำลังโหลด...</div>
       </div>
+      <div class="ov-timeline-legend" id="ovTimelineLegend"></div>
     </div>
   </div>
 
@@ -469,10 +478,8 @@
       <div class="card c-purple"><div class="card-label">จำนวนรายการ</div><div class="card-value" id="cItems">—</div><div class="card-sub" id="cItemsSub" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;"></div></div>
       <div class="card c-green" id="cPctCard"><div class="card-label">% Budget Used</div><div class="card-value" id="cPct">—</div><div class="card-sub">of total budget</div></div>
     </div>
-    <div id="summaryArea" style="display:none">
-      <div class="sec"><span class="sec-title">สรุปภาพรวม</span></div>
-      <div class="summary-section"><div class="insight-grid" id="insightGrid"></div></div>
-    </div>
+
+    <!-- Budget vs Actual Chart (no สรุปภาพรวม section) -->
     <div id="costChartArea" style="display:none">
       <div class="sec"><span class="sec-title">Budget vs Actual — รายหมวดหมู่</span></div>
       <div class="bva-donut-wrap">
@@ -480,6 +487,7 @@
         <div class="bva-cat-list"><div class="bva-cat-title">สรุปรายหมวดหมู่</div><div id="bvaCatList"></div></div>
       </div>
     </div>
+
     <div class="sec"><span class="sec-title">รายละเอียดค่าใช้จ่าย</span><span class="sec-right" id="costRowCount">—</span></div>
     <div class="filter-bar">
       <input class="search-box" type="text" id="costSearch" placeholder="ค้นหารายการ..." oninput="costApplyFilter()">
@@ -558,58 +566,30 @@
   </div>
 
   <!-- ══════════════════════════════
-       TAB: RECON & FABRICATION
+       TAB: RECONDITION (renamed, single view)
   ══════════════════════════════ -->
   <div class="tab-panel" id="panel-rf">
-    <div class="rf-tabs">
-      <button class="rf-tab-btn active" id="rftab-recon" onclick="switchRFTab('recon')">🔧 Recondition</button>
-      <button class="rf-tab-btn" id="rftab-fab" onclick="switchRFTab('fab')">⚙️ Fabrication</button>
+    <div class="rf-kpi" id="reconKPI">
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Total Items</div><div class="rf-kpi-value" id="reconTotal" style="color:var(--blue)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Completed</div><div class="rf-kpi-value" id="reconDone" style="color:var(--green)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">In Progress</div><div class="rf-kpi-value" id="reconWIP" style="color:var(--accent)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Not Started</div><div class="rf-kpi-value" id="reconNone" style="color:var(--muted)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Overall %</div><div class="rf-kpi-value" id="reconPct" style="color:var(--teal)">—</div></div>
     </div>
 
-    <!-- RECON PANEL -->
-    <div class="rf-panel active" id="rfpanel-recon">
-      <div class="rf-kpi" id="reconKPI">
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Total Items</div><div class="rf-kpi-value" id="reconTotal" style="color:var(--blue)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Completed</div><div class="rf-kpi-value" id="reconDone" style="color:var(--green)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">In Progress</div><div class="rf-kpi-value" id="reconWIP" style="color:var(--accent)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Not Started</div><div class="rf-kpi-value" id="reconNone" style="color:var(--muted)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Overall %</div><div class="rf-kpi-value" id="reconPct" style="color:var(--teal)">—</div></div>
-      </div>
-      <!-- Weekly bar chart -->
-      <div class="rf-chart-wrap">
-        <div class="rf-chart-title">จำนวนรายการที่เสร็จในแต่ละอาทิตย์ — Recondition</div>
-        <div class="rf-bars" id="reconBars"></div>
-      </div>
-      <!-- Weekly Gantt table -->
-      <div class="sec"><span class="sec-title">ตารางความก้าวหน้ารายอาทิตย์</span></div>
-      <div class="rf-table-wrap">
-        <table class="rf-table" id="reconTable">
-          <thead id="reconThead"></thead>
-          <tbody id="reconTbody"><tr><td colspan="20" style="padding:40px;text-align:center;color:var(--muted)"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr></tbody>
-        </table>
-      </div>
+    <!-- Weekly bar chart -->
+    <div class="rf-chart-wrap">
+      <div class="rf-chart-title">จำนวนรายการที่เสร็จในแต่ละอาทิตย์ — Recondition</div>
+      <div class="rf-bars" id="reconBars"></div>
     </div>
 
-    <!-- FAB PANEL -->
-    <div class="rf-panel" id="rfpanel-fab">
-      <div class="rf-kpi">
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Total Items</div><div class="rf-kpi-value" id="fabTotal" style="color:var(--blue)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Completed</div><div class="rf-kpi-value" id="fabDone" style="color:var(--green)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">In Progress</div><div class="rf-kpi-value" id="fabWIP" style="color:var(--accent)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Not Started</div><div class="rf-kpi-value" id="fabNone" style="color:var(--muted)">—</div></div>
-        <div class="rf-kpi-card"><div class="rf-kpi-label">Overall %</div><div class="rf-kpi-value" id="fabPct" style="color:var(--green)">—</div></div>
-      </div>
-      <div class="rf-chart-wrap">
-        <div class="rf-chart-title">จำนวนรายการที่เสร็จในแต่ละอาทิตย์ — Fabrication</div>
-        <div class="rf-bars" id="fabBars"></div>
-      </div>
-      <div class="sec"><span class="sec-title">ตารางความก้าวหน้ารายอาทิตย์</span></div>
-      <div class="rf-table-wrap">
-        <table class="rf-table" id="fabTable">
-          <thead id="fabThead"></thead>
-          <tbody id="fabTbody"><tr><td colspan="20" style="padding:40px;text-align:center;color:var(--muted)"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr></tbody>
-        </table>
-      </div>
+    <!-- Weekly Gantt table -->
+    <div class="sec"><span class="sec-title">ตารางความก้าวหน้ารายอาทิตย์</span></div>
+    <div class="rf-table-wrap">
+      <table class="rf-table" id="reconTable">
+        <thead id="reconThead"></thead>
+        <tbody id="reconTbody"><tr><td colspan="20" style="padding:40px;text-align:center;color:var(--muted)"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr></tbody>
+      </table>
     </div>
   </div>
 
@@ -647,7 +627,7 @@ const RF_URL       = BASE_URL + '?gid=608131896&single=true&output=csv';
 // ═══════════════════════════════════════════════
 let cAllRows=[],cHeaders=[],cFiltered=[];
 let cSortCol=-1,cSortAsc=true,cPage=1,cPageSize=25;
-let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1;
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1,colOrderStatus=-1;
 
 const STEPS     = ['RO','QT','MEMO','PQ','BU','PO','DAP'];
 const STEP_COLS = [2,3,4,5,6,7,8];
@@ -655,11 +635,9 @@ let progItems   = [];
 let progFilter  = 'all';
 let progSortKey =null, progSortAsc=true;
 
-let rfRawRows=[];   // all rows from gid=608131896
-let reconItems=[];  // parsed recon items
-let fabItems=[];    // parsed fab items
-let rfWeeks=[];     // week column names
-let currentRFTab='recon';
+let rfRawRows=[];
+let reconItems=[];
+let rfWeeks=[];
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -697,13 +675,6 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('panel-'+tab).classList.add('active');
 }
-function switchRFTab(tab){
-  currentRFTab=tab;
-  ['recon','fab'].forEach(t=>{
-    document.getElementById('rftab-'+t).classList.toggle('active',t===tab);
-    document.getElementById('rfpanel-'+t).classList.toggle('active',t===tab);
-  });
-}
 
 // ═══════════════════════════════════════════════
 //  LOAD ALL
@@ -720,11 +691,10 @@ async function loadAll(){
 
 function refreshAll(){
   cAllRows=[];cHeaders=[];cFiltered=[];cSortCol=-1;cSortAsc=true;cPage=1;
-  progItems=[];rfRawRows=[];reconItems=[];fabItems=[];rfWeeks=[];
+  progItems=[];rfRawRows=[];reconItems=[];rfWeeks=[];
   document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
   document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr>`;
   document.getElementById('costChartArea').style.display='none';
-  document.getElementById('summaryArea').style.display='none';
   loadAll();
 }
 
@@ -738,15 +708,15 @@ async function loadCost(){
     cHeaders=rows[0]; cAllRows=rows.slice(1).filter(r=>r.some(c=>c));
     detectCostCols(cHeaders);
     buildCatFilter(); costApplyFilter(); buildCostCards();
-    buildSummaryInsights(); buildBvaDonutChart();
+    buildBvaDonutChart();
     document.getElementById('costChartArea').style.display='';
-    document.getElementById('summaryArea').style.display='';
     return true;
   }catch(e){
     document.getElementById('costTableWrap').innerHTML=`<div class="state-box"><div style="font-size:32px">⚠️</div><div>โหลด Cost ไม่สำเร็จ<br><small>${e.message}</small></div></div>`;
     return false;
   }
 }
+
 function detectCostCols(h){
   const hl=h.map(x=>x.toLowerCase().replace(/\s/g,''));
   const find=(kws,excl=[])=>hl.findIndex(x=>kws.some(k=>x.includes(k))&&!excl.some(k=>x.includes(k)));
@@ -757,9 +727,13 @@ function detectCostCols(h){
   colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
   if(colName===-1)colName=0;
   colAction=find(['action','สถานะ','status']);
+  // Detect order status column — looks for keywords like orderstatus, การสั่งซื้อ, สั่งซื้อ
+  colOrderStatus=find(['orderstatus','สถานะการสั่งซื้อ','สั่งซื้อ','orderstat','purchase','สั่ง'],['สถานะ']);
+  // Fallback: if no dedicated col, we'll inject a placeholder column
   colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ');
   if(colNo===-1&&/^#?no\.?$/i.test(cHeaders[0]))colNo=0;
 }
+
 function buildCostCards(){
   let budget=0,actual=0,cntW=0,cntA=0,cntC=0;
   cAllRows.forEach(r=>{
@@ -778,27 +752,7 @@ function buildCostCards(){
   document.getElementById('cPctCard').className='card '+(parseFloat(pct)>100?'c-red':'c-green');
   document.getElementById('cPct').textContent=pct+'%';
 }
-function buildSummaryInsights(){
-  let budget=0,actual=0,cntW=0,cntA=0,cntC=0;const cats={};
-  cAllRows.forEach(r=>{
-    const b=colB>=0?pn(r[colB]):0;const a=colA>=0?pn(r[colA]):0;budget+=b;actual+=a;
-    if(colAction>=0){const s=(r[colAction]||'').trim().toLowerCase();if(s==='wait')cntW++;else if(s==='active')cntA++;else if(s==='complete'||s==='completed')cntC++;}
-    if(colCat>=0){const cat=r[colCat]||'อื่นๆ';if(!cats[cat])cats[cat]={b:0,a:0};cats[cat].b+=b;cats[cat].a+=a;}
-  });
-  const diff=actual-budget;const over=diff>0;const pct=budget>0?(actual/budget*100).toFixed(1):0;const remaining=budget-actual;
-  let worstCat='—',worstDiff=0,bestCat='—',bestSave=0;
-  Object.entries(cats).forEach(([cat,v])=>{const d=v.a-v.b;if(d>worstDiff){worstDiff=d;worstCat=cat;}const s=v.b-v.a;if(s>bestSave){bestSave=s;bestCat=cat;}});
-  const completionRate=cAllRows.length>0?Math.round(cntC/cAllRows.length*100):0;
-  const insights=[
-    {icon:'💰',title:'งบประมาณคงเหลือ',value:over?fmt(Math.abs(diff)):fmt(remaining),desc:over?`ใช้เกินงบ ${fmt(Math.abs(diff))} บาท (${pct}%)`:`เหลือ ${fmt(remaining)} บาท จาก ${fmt(budget)} บาท`,cls:over?'bad':'good'},
-    {icon:'📊',title:'อัตราการใช้งบ',value:pct+'%',desc:`ใช้ไปแล้ว ${fmt(actual)} บาท จากทั้งหมด ${fmt(budget)} บาท`,cls:parseFloat(pct)>100?'bad':parseFloat(pct)>80?'warn':'good'},
-    {icon:'✅',title:'รายการที่เสร็จสิ้น',value:cntC+' / '+cAllRows.length,desc:`Complete ${completionRate}% · Active ${cntA} · Wait ${cntW}`,cls:completionRate===100?'good':completionRate>50?'warn':'info'},
-    {icon:'🔥',title:'หมวดที่ใช้มากสุด',value:worstCat,desc:worstDiff>0?`เกิน Budget ${fmt(worstDiff)} บาท`:'ทุกหมวดอยู่ในงบ',cls:worstDiff>0?'bad':'good'},
-    {icon:'💚',title:'หมวดที่ประหยัดสุด',value:bestCat,desc:bestSave>0?`ประหยัดได้ ${fmt(bestSave)} บาท`:'—',cls:'good'},
-    {icon:'📦',title:'จำนวนหมวดหมู่',value:Object.keys(cats).length,desc:`รวมทั้งหมด ${cAllRows.length} รายการ`,cls:'purple'}
-  ];
-  document.getElementById('insightGrid').innerHTML=insights.map(it=>`<div class="insight-item ${it.cls}"><div class="insight-icon">${it.icon}</div><div class="insight-content"><div class="insight-title">${it.title}</div><div class="insight-value">${it.value}</div><div class="insight-desc">${it.desc}</div></div></div>`).join('');
-}
+
 function buildBvaDonutChart(){
   const cats={};
   cAllRows.forEach(r=>{const cat=(colCat>=0&&r[colCat])?r[colCat]:'อื่นๆ';if(!cats[cat])cats[cat]={b:0,a:0};cats[cat].b+=colB>=0?pn(r[colB]):0;cats[cat].a+=colA>=0?pn(r[colA]):0;});
@@ -813,39 +767,100 @@ function buildBvaDonutChart(){
     return`<div class="bva-cat-row"><div class="bva-cat-head"><span class="bva-cat-name">${cat}</span><span class="bva-cat-tag ${over?'over':'under'}">${over?'▲ +'+fmt(diff):'▼ -'+fmt(diff)}</span></div><div class="bva-cat-bar-track" style="height:8px"><div class="bva-cat-bar-b" style="width:100%"></div><div class="bva-cat-bar-a ${over?'over':'under'}" style="width:${displayA.toFixed(1)}%"></div></div><div class="bva-cat-amts"><span style="color:var(--blue)">${fmtF(v.b)}</span><span style="color:${over?'var(--red)':'var(--green)'}">${fmtF(v.a)}</span></div></div>`;
   }).join('');
 }
+
 function buildCatFilter(){
   const sel=document.getElementById('catFilter');sel.innerHTML='<option value="">ทุกหมวดหมู่</option>';
   if(colCat<0)return;
   [...new Set(cAllRows.map(r=>r[colCat]).filter(Boolean))].sort().forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
 }
+
 function costApplyFilter(){
   const q=document.getElementById('costSearch').value.toLowerCase();const cat=document.getElementById('catFilter').value;
   cFiltered=cAllRows.filter(r=>(!q||r.some(c=>c.toLowerCase().includes(q)))&&(!cat||r[colCat]===cat));
   if(cSortCol>=0) cFiltered.sort((a,b)=>{const av=a[cSortCol]||'',bv=b[cSortCol]||'';const an=pn(av),bn=pn(bv);const cmp=(an||bn)?an-bn:String(av).localeCompare(String(bv),'th');return cSortAsc?cmp:-cmp;});
   cPage=1;renderCostTable();
 }
+
 function costSortBy(i){cSortAsc=cSortCol===i?!cSortAsc:true;cSortCol=i;costApplyFilter();}
 function costChangePageSize(){cPageSize=parseInt(document.getElementById('costPageSize').value);costApplyFilter();}
 function costGoPage(p){const ps=cPageSize||cFiltered.length;const tp=Math.ceil(cFiltered.length/(ps||1));if(p<1||p>tp)return;cPage=p;renderCostTable();}
-function actionBadge(val){const v=(val||'').trim().toLowerCase();if(v==='wait')return`<span class="status-badge wait">Wait</span>`;if(v==='active')return`<span class="status-badge active">Active</span>`;if(v==='complete'||v==='completed')return`<span class="status-badge complete">Complete</span>`;return`<span style="color:var(--muted);font-size:12px">${val||'—'}</span>`;}
+
+function actionBadge(val){
+  const v=(val||'').trim().toLowerCase();
+  if(v==='wait')return`<span class="status-badge wait">Wait</span>`;
+  if(v==='active')return`<span class="status-badge active">Active</span>`;
+  if(v==='complete'||v==='completed')return`<span class="status-badge complete">Complete</span>`;
+  return`<span style="color:var(--muted);font-size:12px">${val||'—'}</span>`;
+}
+
+/* ── สถานะการสั่งซื้อ badge ── */
+function orderStatusBadge(val){
+  if(!val||!val.trim()) return `<span class="order-badge none">—</span>`;
+  const v=val.trim().toLowerCase();
+  if(v==='ordered'||v==='สั่งแล้ว'||v==='สั่งซื้อแล้ว') return `<span class="order-badge ordered">📦 Ordered</span>`;
+  if(v==='pending'||v==='รอ'||v==='รอดำเนินการ'||v==='รอสั่ง') return `<span class="order-badge pending">⏳ Pending</span>`;
+  if(v==='delivered'||v==='รับแล้ว'||v==='ส่งแล้ว'||v==='จัดส่งแล้ว') return `<span class="order-badge delivered">✅ Delivered</span>`;
+  if(v==='cancelled'||v==='ยกเลิก') return `<span class="order-badge cancelled">✕ Cancelled</span>`;
+  // Any other non-empty value: show as-is with a neutral style
+  return `<span class="order-badge pending">${val}</span>`;
+}
+
 function diffPill(b,a){if(!b&&!a)return'—';const d=a-b;const cls=d>0?'over':'under';return`<span class="diff-pill ${cls}">${d>0?'+':''}${fmtF(d)}</span>`;}
 function pNums(cur,total){let lo=Math.max(1,cur-3),hi=Math.min(total,lo+6);if(hi-lo<6)lo=Math.max(1,hi-6);let r='';for(let p=lo;p<=hi;p++)r+=`<button class="page-btn ${p===cur?'active':''}" onclick="costGoPage(${p})">${p}</button>`;return r;}
+
 function renderCostTable(){
   const ps=cPageSize||cFiltered.length;const tp=Math.ceil(cFiltered.length/(ps||1));const s=(cPage-1)*ps;const page=cFiltered.slice(s,s+ps);
   document.getElementById('costRowCount').textContent=cFiltered.length+' รายการ';
   if(!cFiltered.length){document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div style="font-size:28px">🔍</div><div>ไม่พบรายการ</div></div>';return;}
   const arrow=i=>cSortCol===i?(cSortAsc?' ↑':' ↓'):' ↕';
-  const hasDiff=colB>=0&&colA>=0;const visCols=cHeaders.map((_,i)=>i).filter(i=>i!==colNo);
-  const extraTH=hasDiff?'<th onclick="costSortDiff()" title="Actual − Budget">Diff ↕</th>':'';
-  const thead=`<thead><tr>${visCols.map(i=>`<th class="${cSortCol===i?'sorted':''}" onclick="costSortBy(${i})">${cHeaders[i]}${arrow(i)}</th>`).join('')}${extraTH}</tr></thead>`;
+  const hasDiff=colB>=0&&colA>=0;
+
+  // Build visible columns: all cols except No col
+  const visCols=cHeaders.map((_,i)=>i).filter(i=>i!==colNo);
+
+  // We need to find the STATUS column index and insert ORDER STATUS after it
+  // STATUS = colAction. We'll inject the extra column right after colAction in rendering.
+  const statusColVisIdx = visCols.indexOf(colAction);
+
+  // Build TH row
+  let thCells = visCols.map((i,vi)=>{
+    const thHtml = `<th class="${cSortCol===i?'sorted':''}" onclick="costSortBy(${i})">${cHeaders[i]}${arrow(i)}</th>`;
+    // After STATUS column, inject ORDER STATUS header
+    if(vi===statusColVisIdx){
+      return thHtml + `<th style="white-space:nowrap;color:var(--muted)">สถานะการสั่งซื้อ</th>`;
+    }
+    return thHtml;
+  }).join('');
+  if(hasDiff) thCells += `<th onclick="costSortDiff()" title="Actual − Budget">Diff ↕</th>`;
+
+  const thead=`<thead><tr>${thCells}</tr></thead>`;
+
   const tbody=`<tbody>${page.map(r=>{
-    const cells=visCols.map(i=>{const v=r[i]||'';if(i===colAction)return`<td>${actionBadge(v)}</td>`;if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;if(isLinkCol(cHeaders[i])||isUrl(v)){if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;}return`<td>${v}</td>`;}).join('');
+    let cells = visCols.map((i,vi)=>{
+      const v=r[i]||'';
+      let cellHtml;
+      if(i===colAction){
+        cellHtml=`<td>${actionBadge(v)}</td>`;
+        // Inject ORDER STATUS column right after STATUS
+        const orderVal = colOrderStatus>=0 ? (r[colOrderStatus]||'') : '';
+        cellHtml += `<td>${orderStatusBadge(orderVal)}</td>`;
+        return cellHtml;
+      }
+      // Skip the order status column if it was auto-detected (already injected above)
+      if(i===colOrderStatus && colAction>=0) return ``;
+      if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
+      if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
+      if(isLinkCol(cHeaders[i])||isUrl(v)){if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;}
+      return`<td>${v}</td>`;
+    }).join('');
     const diffCell=hasDiff?`<td class="num">${diffPill(pn(r[colB]),pn(r[colA]))}</td>`:'';
     return`<tr>${cells}${diffCell}</tr>`;
   }).join('')}</tbody>`;
+
   const pg=tp>1?`<div class="pagination"><span>แสดง ${s+1}–${Math.min(s+ps,cFiltered.length)} จาก ${cFiltered.length} รายการ</span><div class="page-btns"><button class="page-btn" onclick="costGoPage(${cPage-1})" ${cPage<=1?'disabled':''}>‹</button>${pNums(cPage,tp)}<button class="page-btn" onclick="costGoPage(${cPage+1})" ${cPage>=tp?'disabled':''}>›</button></div></div>`:'';
   document.getElementById('costTableWrap').innerHTML=`<table>${thead}${tbody}</table>${pg}`;
 }
+
 let cDiffSortAsc=true;
 function costSortDiff(){cDiffSortAsc=cSortCol===-999?!cDiffSortAsc:true;cSortCol=-999;cFiltered.sort((a,b)=>((pn(a[colA])-pn(a[colB]))-(pn(b[colA])-pn(b[colB])))*(cDiffSortAsc?1:-1));cPage=1;renderCostTable();}
 
@@ -864,12 +879,14 @@ async function loadProgress(){
     return false;
   }
 }
+
 function updateProgStats(){
   const total=progItems.length;const done=progItems.filter(it=>it.steps[5]).length;
   const none=progItems.filter(it=>!it.steps.some(Boolean)).length;const wip=total-done-none;
   document.getElementById('psTotal').textContent=total;document.getElementById('psPO').textContent=done;document.getElementById('psWIP').textContent=wip;document.getElementById('psNone').textContent=none;
   buildProcurementOverview(total,done,wip,none);
 }
+
 function buildProcurementOverview(total,done,wip,none){
   if(!total)return;
   const pct=Math.round(done/total*100);const C=2*Math.PI*52;const filled=(pct/100)*C;
@@ -879,6 +896,7 @@ function buildProcurementOverview(total,done,wip,none){
   const stepCounts=STEPS.map((_,si)=>progItems.filter(it=>it.steps[si]).length);
   document.getElementById('funnelBars').innerHTML=STEPS.map((name,si)=>{const cnt=stepCounts[si];const pctW=Math.round(cnt/total*100);const isDone=si===5;return`<div class="funnel-row"><div class="funnel-step-name">${name}</div><div class="funnel-track"><div class="funnel-fill${isDone?' c-done':''}" style="width:${pctW}%"></div></div><div class="funnel-nums"><b class="${isDone?'done':''}">${cnt}</b>/${total}</div></div>`;}).join('');
 }
+
 function progSetFilter(f){progFilter=f;['all','wip','done','none'].forEach(x=>document.getElementById('pf-'+x).classList.toggle('active',f===x));progRender();}
 function progSort(key){progSortAsc=progSortKey===key?!progSortAsc:true;progSortKey=key;progRender();}
 function progRender(){
@@ -910,18 +928,8 @@ function progRender(){
 }
 
 // ═══════════════════════════════════════════════
-//  RECON & FABRICATION (gid=608131896)
+//  RECONDITION (single tab, no fabrication)
 // ═══════════════════════════════════════════════
-/*
-  Expected sheet structure (gid=608131896):
-  Row 0 (header): Col0=section/type (e.g. "Recondition"/"Fabrication"), Col1=No, Col2=Item/Description, Col3=Status(optional), Col4..N = Week columns (e.g. "W1","W2",... or "Week1","Week2",...)
-  Data rows: Col0 = group tag OR blank (inherit), Col2 = item name, Col4..N = done/planned/current markers
-  
-  We auto-detect:
-  - Section separator: rows where Col0 contains "recon" or "fab"
-  - Week columns: headers matching /w\d+|week\s*\d+/i
-  - Cell values: treat same as isChecked() for "done", or "plan"/"planned"/"p" for planned
-*/
 async function loadRF(){
   try{
     const res=await fetch(RF_URL+'&_='+Date.now());
@@ -931,12 +939,10 @@ async function loadRF(){
     rfRawRows=rows;
     parseRFData(rows);
     renderRFRecon();
-    renderRFFab();
     return true;
   }catch(e){
     console.warn('RF load error:',e);
     document.getElementById('reconTbody').innerHTML=`<tr><td colspan="20" style="padding:30px;text-align:center;color:var(--muted)">⚠️ โหลดข้อมูลไม่สำเร็จ: ${e.message}</td></tr>`;
-    document.getElementById('fabTbody').innerHTML=`<tr><td colspan="20" style="padding:30px;text-align:center;color:var(--muted)">⚠️ โหลดข้อมูลไม่สำเร็จ: ${e.message}</td></tr>`;
     return false;
   }
 }
@@ -944,9 +950,6 @@ async function loadRF(){
 function parseRFData(rows){
   if(!rows.length) return;
   const header = rows[0];
-
-  // Find week columns: headers like W1,W2,...  Week1,Week2,...  หรือ วันที่ / W01 ฯลฯ
-  // Also accept columns with short date-like patterns
   rfWeeks=[];
   const weekColIdxs=[];
   for(let i=0;i<header.length;i++){
@@ -955,34 +958,24 @@ function parseRFData(rows){
       rfWeeks.push(h);weekColIdxs.push(i);
     }
   }
-  // If no week columns detected, try col3 onwards as weeks
   if(rfWeeks.length===0){
     for(let i=3;i<header.length;i++){
       const h=String(header[i]||'').trim();
       if(h){rfWeeks.push(h||'W'+(i-2));weekColIdxs.push(i);}
     }
   }
-
-  reconItems=[];fabItems=[];
-  let currentSection='recon'; // default
+  reconItems=[];
   let itemNo=0;
-
   for(let ri=1;ri<rows.length;ri++){
     const r=rows[ri];
     const col0=String(r[0]||'').trim().toLowerCase();
     const col1=String(r[1]||'').trim();
     const col2=String(r[2]||r[1]||'').trim();
-
-    // Section detection
-    if(col0.includes('recon')||col0.includes('recondition')||col0.includes('ซ่อม')){currentSection='recon';continue;}
-    if(col0.includes('fab')||col0.includes('fabricat')||col0.includes('ผลิต')||col0.includes('manufacture')){currentSection='fab';continue;}
-    
-    // Skip empty rows
+    // Skip section headers
+    if(col0.includes('recon')||col0.includes('fab')||col0.includes('ซ่อม')||col0.includes('ผลิต')) continue;
     const itemName=col2||(r.length>2?String(r[2]||'').trim():'')||(r.length>1?col1:'');
     if(!itemName) continue;
-
     itemNo++;
-    // Get week values
     const weekVals=weekColIdxs.map(ci=>{
       const v=String(r[ci]||'').trim().toLowerCase();
       if(isChecked(v)||v==='done'||v==='complete'||v==='d') return 'done';
@@ -990,15 +983,10 @@ function parseRFData(rows){
       if(v==='wip'||v==='current'||v==='c'||v==='active') return 'current';
       return 'empty';
     });
-
-    // Calc percentage: done / total weeks that have any activity
     const totalActive=weekVals.filter(v=>v!=='empty').length;
     const totalDone=weekVals.filter(v=>v==='done').length;
-    const pct=totalActive>0?Math.round(totalDone/totalActive*100):(weekVals.every(v=>v==='empty')?0:0);
-
-    const item={no:col1||String(itemNo),name:itemName,weekVals,pct,status:totalDone===totalActive&&totalActive>0?'done':weekVals.some(v=>v==='current')?'wip':weekVals.some(v=>v!=='empty')?'wip':'none'};
-    if(currentSection==='fab') fabItems.push(item);
-    else reconItems.push(item);
+    const pct=totalActive>0?Math.round(totalDone/totalActive*100):0;
+    reconItems.push({no:col1||String(itemNo),name:itemName,weekVals,pct,status:totalDone===totalActive&&totalActive>0?'done':weekVals.some(v=>v==='current')?'wip':weekVals.some(v=>v!=='empty')?'wip':'none'});
   }
 }
 
@@ -1009,27 +997,23 @@ function rfCellValue(v){
   return `<span class="week-cell empty"></span>`;
 }
 
-function buildRFTable(items, theadId, tbodyId, barId, kpiIds){
+function renderRFRecon(){
+  const items=reconItems;
   const weeks=rfWeeks;
-  // Detect "current" week: latest week that has any current/wip marker
   let currentWeekIdx=weeks.length>0?weeks.length-1:0;
   for(let i=0;i<weeks.length;i++){
     if(items.some(it=>it.weekVals[i]==='current')){currentWeekIdx=i;break;}
   }
-
   // thead
-  const theadEl=document.getElementById(theadId);
-  theadEl.innerHTML=`<tr>
+  document.getElementById('reconThead').innerHTML=`<tr>
     <th style="width:36px;text-align:right;padding-left:10px">#</th>
     <th class="th-item">รายการ</th>
     ${weeks.map((w,wi)=>`<th class="th-week${wi===currentWeekIdx?' current-week':''}">${w}</th>`).join('')}
     <th class="th-week" style="color:var(--accent)">%</th>
   </tr>`;
-
   // tbody
-  const tbodyEl=document.getElementById(tbodyId);
+  const tbodyEl=document.getElementById('reconTbody');
   if(!items.length){tbodyEl.innerHTML=`<tr><td colspan="${weeks.length+3}" style="padding:40px;text-align:center;color:var(--muted)">ไม่พบข้อมูล</td></tr>`;return;}
-
   tbodyEl.innerHTML=items.map(it=>{
     const pctColor=it.pct===100?'var(--green)':it.pct>0?'var(--accent)':'var(--muted)';
     return`<tr>
@@ -1039,22 +1023,19 @@ function buildRFTable(items, theadId, tbodyId, barId, kpiIds){
       <td class="rf-item-pct" style="color:${pctColor}">${it.pct}%</td>
     </tr>`;
   }).join('');
-
-  // KPI
+  // KPIs
   const total=items.length;
   const done=items.filter(it=>it.pct===100).length;
   const none=items.filter(it=>it.pct===0).length;
   const wip=total-done-none;
   const overallPct=total>0?Math.round(done/total*100):0;
-  const [idTotal,idDone,idWIP,idNone,idPct]=kpiIds;
-  document.getElementById(idTotal).textContent=total;
-  document.getElementById(idDone).textContent=done;
-  document.getElementById(idWIP).textContent=wip;
-  document.getElementById(idNone).textContent=none;
-  document.getElementById(idPct).textContent=overallPct+'%';
-
-  // Bar chart: done count per week
-  const barEl=document.getElementById(barId);
+  document.getElementById('reconTotal').textContent=total;
+  document.getElementById('reconDone').textContent=done;
+  document.getElementById('reconWIP').textContent=wip;
+  document.getElementById('reconNone').textContent=none;
+  document.getElementById('reconPct').textContent=overallPct+'%';
+  // Bar chart
+  const barEl=document.getElementById('reconBars');
   const maxDone=Math.max(...weeks.map((_,wi)=>items.filter(it=>it.weekVals[wi]==='done').length),1);
   const BAR_H=100;
   barEl.innerHTML=weeks.map((w,wi)=>{
@@ -1069,29 +1050,18 @@ function buildRFTable(items, theadId, tbodyId, barId, kpiIds){
       <div class="rf-bar-label">${w}</div>
     </div>`;
   }).join('');
-
-  return {total,done,wip,none,overallPct};
-}
-
-function renderRFRecon(){
-  buildRFTable(reconItems,'reconThead','reconTbody','reconBars',['reconTotal','reconDone','reconWIP','reconNone','reconPct']);
-}
-function renderRFFab(){
-  buildRFTable(fabItems,'fabThead','fabTbody','fabBars',['fabTotal','fabDone','fabWIP','fabNone','fabPct']);
 }
 
 // ═══════════════════════════════════════════════
 //  OVERALL TAB
 // ═══════════════════════════════════════════════
 function buildOverallTab(){
-  // Budget/Actual from cost
   let budget=0,actual=0;
   cAllRows.forEach(r=>{budget+=colB>=0?pn(r[colB]):0;actual+=colA>=0?pn(r[colA]):0;});
   document.getElementById('ovBudget').textContent=fmt(budget);
   document.getElementById('ovActual').textContent=fmt(actual);
   document.getElementById('rlegBudget').textContent=budget>0?(actual/budget*100).toFixed(1)+'%':'—';
 
-  // Procurement
   const procTotal=progItems.length;
   const procDone=progItems.filter(it=>it.steps[5]).length;
   const procPct=procTotal>0?Math.round(procDone/procTotal*100):0;
@@ -1099,23 +1069,14 @@ function buildOverallTab(){
   document.getElementById('ovProcSub').textContent=`PO done ${procDone}/${procTotal}`;
   document.getElementById('rlegProc').textContent=procPct+'%';
 
-  // Recon
   const reconTotal=reconItems.length;
   const reconDone2=reconItems.filter(it=>it.pct===100).length;
   const reconPct2=reconTotal>0?Math.round(reconDone2/reconTotal*100):0;
   document.getElementById('ovReconPct').textContent=reconPct2+'%';
   document.getElementById('rlegRecon').textContent=reconPct2+'%';
 
-  // Fab
-  const fabTotal=fabItems.length;
-  const fabDone2=fabItems.filter(it=>it.pct===100).length;
-  const fabPct2=fabTotal>0?Math.round(fabDone2/fabTotal*100):0;
-  document.getElementById('ovFabPct').textContent=fabPct2+'%';
-  document.getElementById('rlegFab').textContent=fabPct2+'%';
-
-  // Overall ring: average of all 4 metrics
   const bPct=budget>0?Math.min((actual/budget*100),100):0;
-  const overall=Math.round((bPct+procPct+reconPct2+fabPct2)/4);
+  const overall=Math.round((bPct+procPct+reconPct2)/3);
   const C=2*Math.PI*62;
   const filled=(overall/100)*C;
   const ring=document.getElementById('ov-ring');
@@ -1130,7 +1091,6 @@ function buildOverallTab(){
     {name:'Cost & Budget',icon:'💰',pct:Math.round(bPct),total:fmt(budget),done:fmt(actual),unit:'THB',color:'var(--blue)',label:'Budget Used',status:bPct>100?'wait':bPct>80?'active':'done'},
     {name:'Procurement',icon:'📦',pct:procPct,total:procTotal,done:procDone,unit:'items PO done',color:'var(--purple)',label:'PO Complete',status:procPct===100?'done':procPct>0?'active':'wait'},
     {name:'Recondition',icon:'🔧',pct:reconPct2,total:reconTotal,done:reconDone2,unit:'items done',color:'var(--teal)',label:'Completed',status:reconPct2===100?'done':reconPct2>0?'active':'wait'},
-    {name:'Fabrication',icon:'⚙️',pct:fabPct2,total:fabTotal,done:fabDone2,unit:'items done',color:'var(--green)',label:'Completed',status:fabPct2===100?'done':fabPct2>0?'active':'wait'},
   ];
 
   document.getElementById('ovModules').innerHTML=modules.map(m=>{
@@ -1154,42 +1114,156 @@ function buildOverallTab(){
     </div>`;
   }).join('');
 
-  // Weekly timeline grid (Recon + Fab combined)
-  buildOverallWeekGrid(reconPct2,fabPct2,procPct);
+  buildYearlyTimeline(reconPct2,procPct);
 }
 
-function buildOverallWeekGrid(reconPct,fabPct,procPct){
-  const grid=document.getElementById('ovWeekGrid');
-  const weeks=rfWeeks.length>0?rfWeeks:['W1','W2','W3','W4','W5','W6','W7','W8'];
-  const maxW=weeks.length;
+// ═══════════════════════════════════════════════
+//  YEARLY PROGRESS TIMELINE
+//  Shows all 52 weeks of the year as a gantt-style
+//  horizontal band. Each row = one tracked metric.
+//  Cells are coloured by status derived from data.
+// ═══════════════════════════════════════════════
+function buildYearlyTimeline(reconPct, procPct){
+  const grid = document.getElementById('ovWeekGrid');
+  const legendEl = document.getElementById('ovTimelineLegend');
 
-  // Per-week completion for recon & fab
-  const reconWk=weeks.map((_,wi)=>reconItems.length>0?Math.round(reconItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length/reconItems.length*100):0);
-  const fabWk=weeks.map((_,wi)=>fabItems.length>0?Math.round(fabItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length/fabItems.length*100):0);
+  // Determine total weeks from data, min 52 for yearly view
+  const dataWeeks = rfWeeks.length > 0 ? rfWeeks : [];
+  const totalWeeks = Math.max(dataWeeks.length, 52);
 
-  const rows=[
-    {label:'Recondition',vals:reconWk,color:'var(--teal)'},
-    {label:'Fabrication',vals:fabWk,color:'var(--green)'},
+  // Build week labels W1..W52
+  const weekLabels = [];
+  for(let w=1; w<=totalWeeks; w++){
+    weekLabels.push(dataWeeks[w-1] || ('W'+w));
+  }
+
+  // Approximate month boundaries (4-weekly periods named by month)
+  const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  // Which week index (0-based) each month starts on (approx, 52-week year)
+  const monthStarts=[0,4,8,12,16,20,24,28,32,36,40,44];
+
+  // Per-week data from reconItems
+  function getReconWeekPct(wi){
+    if(reconItems.length===0 || wi >= rfWeeks.length) return null; // null = no data
+    const done = reconItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length;
+    const active = reconItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]!=='empty').length;
+    if(active===0) return null;
+    return Math.round(done/reconItems.length*100);
+  }
+
+  // For procurement: we don't have per-week data, so show overall fill up to current progress
+  // Use step completion counts per step as a proxy across 7 steps distributed over weeks
+  function getProcWeekState(wi){
+    if(progItems.length===0) return 'empty';
+    // spread 7 steps across the known weeks evenly
+    const stepFraction = Math.floor(wi / (totalWeeks / 7));
+    const stepIdx = Math.min(stepFraction, 6);
+    const cnt = progItems.filter(it=>it.steps[stepIdx]).length;
+    const pct = Math.round(cnt/progItems.length*100);
+    if(pct===100) return 'done';
+    if(pct>0) return 'active';
+    return 'empty';
+  }
+
+  // Row definitions
+  const rows = [
+    {
+      label:'Recondition',
+      color:'var(--teal)',
+      cells: weekLabels.map((_,wi)=>{
+        if(wi >= rfWeeks.length) return {cls:'empty',pct:null};
+        const pct = getReconWeekPct(wi);
+        if(pct===null) return {cls:'empty',pct:null};
+        if(pct===100) return {cls:'done',pct};
+        if(pct>0) return {cls:'active',pct};
+        // check if planned
+        const hasActivity = reconItems.some(it=>wi<it.weekVals.length&&it.weekVals[wi]!=='empty');
+        return hasActivity ? {cls:'planned',pct:0} : {cls:'empty',pct:null};
+      })
+    },
+    {
+      label:'Procurement',
+      color:'var(--purple)',
+      cells: weekLabels.map((_,wi)=>{
+        const s = getProcWeekState(wi);
+        return {cls:s, pct:null};
+      })
+    }
   ];
 
-  grid.innerHTML=`
-    <div style="display:grid;grid-template-columns:90px repeat(${maxW},1fr);gap:8px;align-items:center;margin-bottom:6px;">
-      <div></div>
-      ${weeks.map(w=>`<div style="font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.6px">${w}</div>`).join('')}
+  // Detect "current week" = latest week with any active recon data
+  let currentWeekIdx = rfWeeks.length > 0 ? rfWeeks.length - 1 : 0;
+  for(let i=0;i<rfWeeks.length;i++){
+    if(reconItems.some(it=>i<it.weekVals.length&&it.weekVals[i]==='current')){currentWeekIdx=i;break;}
+  }
+
+  // Build HTML
+  const cellW = 'flex:1;min-width:14px;max-width:28px;';
+
+  // Month label row
+  let monthHtml = `<div style="display:flex;margin-left:120px;margin-bottom:2px;">`;
+  monthStarts.forEach((start,mi)=>{
+    const end = mi+1 < monthStarts.length ? monthStarts[mi+1] : totalWeeks;
+    const span = end - start;
+    const widthStyle = `flex:${span};min-width:${span*14}px;`;
+    monthHtml += `<div style="${widthStyle};font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;border-left:1px solid rgba(245,166,35,.25);padding-left:3px;overflow:hidden;white-space:nowrap;">${MONTHS[mi]}</div>`;
+  });
+  monthHtml += `</div>`;
+
+  // Week header row
+  let headerHtml = `<div style="display:flex;align-items:center;margin-bottom:3px;">
+    <div style="width:120px;flex-shrink:0;"></div>
+    <div style="display:flex;flex:1;gap:1px;">
+    ${weekLabels.map((w,wi)=>{
+      const isMonth = monthStarts.includes(wi);
+      const isCur = wi===currentWeekIdx;
+      return `<div style="${cellW}height:12px;text-align:center;font-size:8px;font-family:'IBM Plex Mono',monospace;color:${isCur?'var(--blue)':isMonth?'rgba(245,166,35,.5)':'var(--border)'};border-left:${isMonth?'1px solid rgba(245,166,35,.2)':'none'};overflow:hidden;">${(wi%4===0||isCur)?w:''}</div>`;
+    }).join('')}
     </div>
-    ${rows.map(row=>`
-      <div style="display:grid;grid-template-columns:90px repeat(${maxW},1fr);gap:8px;align-items:center;">
-        <div class="wk-label">${row.label}</div>
-        ${row.vals.map((v,wi)=>{
-          const cls=v===100?'done':v>0?'active':'wait';
-          return`<div class="wk-track"><div class="wk-seg ${cls}" style="width:${v}%;${cls==='done'?'':'background:'+row.color+'40'}"></div></div>`;
-        }).join('')}
-      </div>
-      <div style="display:grid;grid-template-columns:90px repeat(${maxW},1fr);gap:8px;align-items:center;margin-bottom:10px;">
-        <div></div>
-        ${row.vals.map(v=>`<div class="wk-pct-label">${v>0?v+'%':''}</div>`).join('')}
-      </div>
-    `).join('')}`;
+    <div style="width:44px;flex-shrink:0;"></div>
+  </div>`;
+
+  // Data rows
+  let rowsHtml = rows.map(row=>{
+    const doneCount = row.cells.filter(c=>c.cls==='done').length;
+    const hasData = row.cells.filter(c=>c.cls!=='empty').length;
+    const pct = hasData > 0 ? Math.round(doneCount/Math.max(hasData,1)*100) : 0;
+
+    const cellsHtml = row.cells.map((cell,wi)=>{
+      const isMonth = monthStarts.includes(wi);
+      const isCur = wi===currentWeekIdx;
+      let bg, border;
+      if(cell.cls==='done'){bg=row.color;border='none';opacity='.85';}
+      else if(cell.cls==='active'){bg=row.color;border='none';opacity='.4';}
+      else if(cell.cls==='planned'){bg='transparent';border=`1px solid ${row.color}`;opacity='.5';}
+      else{bg='var(--surface2)';border='1px solid var(--border)';opacity='1';}
+
+      const curHighlight = isCur ? `outline:1.5px solid var(--blue);outline-offset:-1px;` : '';
+      const monthBorder = isMonth&&cell.cls==='empty' ? `border-left:1px solid rgba(245,166,35,.12)!important;` : '';
+
+      // Show pct text inside cell if it's active and non-zero
+      const label = (cell.cls==='active'&&cell.pct>0&&cell.pct<100) ? `<span style="font-size:7px;font-family:'IBM Plex Mono',monospace;color:#fff;line-height:1;">${cell.pct}</span>` : '';
+
+      return `<div style="${cellW}height:20px;border-radius:2px;background:${bg};border:${border};opacity:${opacity||1};${curHighlight}${monthBorder}display:flex;align-items:center;justify-content:center;">${label}</div>`;
+    }).join('');
+
+    return `<div style="display:flex;align-items:center;margin-bottom:4px;">
+      <div style="width:120px;flex-shrink:0;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding-right:10px;">${row.label}</div>
+      <div style="display:flex;flex:1;gap:1px;">${cellsHtml}</div>
+      <div style="width:44px;flex-shrink:0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding-left:8px;color:${pct===100?'var(--green)':pct>0?row.color:'var(--muted)'};">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML = monthHtml + headerHtml + rowsHtml;
+
+  // Legend
+  legendEl.innerHTML = `
+    <div class="tl-leg"><div class="tl-leg-box" style="background:var(--teal);opacity:.85;"></div>เสร็จแล้ว (Done)</div>
+    <div class="tl-leg"><div class="tl-leg-box" style="background:var(--teal);opacity:.4;"></div>กำลังดำเนินการ (Active)</div>
+    <div class="tl-leg"><div class="tl-leg-box" style="background:transparent;border:1px solid var(--teal);opacity:.6;"></div>วางแผนแล้ว (Planned)</div>
+    <div class="tl-leg"><div class="tl-leg-box" style="background:var(--surface2);border:1px solid var(--border);"></div>ยังไม่มีข้อมูล</div>
+    <div class="tl-leg" style="margin-left:8px;"><div class="tl-leg-box" style="background:transparent;outline:1.5px solid var(--blue);outline-offset:-1px;"></div>อาทิตย์ปัจจุบัน</div>
+  `;
 }
 
 // ═══════════════════════════════════════════════
@@ -1198,7 +1272,7 @@ function buildOverallWeekGrid(reconPct,fabPct,procPct){
 function doExport(){if(currentTab==='cost')exportCostCSV();else if(currentTab==='progress')exportProgCSV();else exportRFCSV();}
 function exportCostCSV(){if(!cFiltered.length)return;const rows=[cHeaders.join(','),...cFiltered.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(','))];dlCSV(rows,'crusher-m-cost.csv');}
 function exportProgCSV(){if(!progItems.length)return;const head=['No','Description',...STEPS,'%'].join(',');const rows=[head,...progItems.map(it=>{const pct=Math.round(it.steps.filter(Boolean).length/STEPS.length*100);return[`"${it.no}"`,`"${it.name.replace(/"/g,'""')}"`, ...it.steps.map(s=>s?1:0), pct].join(',');})];dlCSV(rows,'crusher-m-progress.csv');}
-function exportRFCSV(){const items=currentRFTab==='recon'?reconItems:fabItems;if(!items.length)return;const head=['No','Description',...rfWeeks,'%'].join(',');const rows=[head,...items.map(it=>[`"${it.no}"`,`"${it.name.replace(/"/g,'""')}"`, ...it.weekVals.map(v=>v==='done'?1:v==='planned'?'P':0), it.pct].join(','))];dlCSV(rows,`crusher-m-${currentRFTab}.csv`);}
+function exportRFCSV(){if(!reconItems.length)return;const head=['No','Description',...rfWeeks,'%'].join(',');const rows=[head,...reconItems.map(it=>[`"${it.no}"`,`"${it.name.replace(/"/g,'""')}"`, ...it.weekVals.map(v=>v==='done'?1:v==='planned'?'P':0), it.pct].join(','))];dlCSV(rows,'crusher-m-recon.csv');}
 function dlCSV(rows,filename){const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();}
 
 // ═══════════════════════════════════════════════
