@@ -863,23 +863,18 @@ function detectCostCols(h){
   console.log('[Cost] cols: name='+colName+' status='+colAction+' budget='+colB+' actual='+colA+' cat='+colCat+' linkPur='+colLinkPur);
 }
 
-// Build clickable PO link from a raw PO number (e.g. 11412)
-// Adjust the base URL to match your actual PO system
-const PO_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub?gid=0#gid=0';
+const PO_BASE_URL = 'https://hr.ith.co.th/admin/psl/';
+
 function renderPoLink(val){
   const v = String(val||'').trim();
-  if(!v || v==='-' || v==='—') return `<span style="color:var(--muted);">—</span>`;
-  // If it's already a URL, use as-is
+  if(!v || v==='-' || v==='—' || v==='0') return `<span style="color:var(--muted);">—</span>`;
+  // Already a full URL
   if(isUrl(v)) return `<a href="${v}" target="_blank" rel="noopener noreferrer" class="po-link-btn">🔗 PO</a>`;
-  // If it's a number (PO number from IMPORTRANGE), build link
+  // PO number (digits only) — build link
   const num = v.replace(/[^0-9]/g,'');
   if(num){
-    // Try to build a Google Sheets filter URL or a generic search URL
-    // You can replace this URL with your actual PO system URL
-    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub?gid=0&single=true&output=csv`;
-    // Since we can't know the exact PO system, show PO number as a styled badge
-    // that the user can click if they configure the URL
-    return `<span class="po-num-badge" title="PO #${num}">📋 ${num}</span>`;
+    const url = PO_BASE_URL + num;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="po-link-btn" title="เปิด PO #${num}">🔗 ${num}</a>`;
   }
   return `<span style="color:var(--muted);">—</span>`;
 }
