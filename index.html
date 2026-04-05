@@ -449,6 +449,24 @@
     pointer-events: none;
   }
 
+  /* ── PO Number Badge ── */
+  .po-num-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:3px 9px;border-radius:5px;
+    background:rgba(59,130,246,.1);color:var(--blue);
+    border:1px solid rgba(59,130,246,.3);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    cursor:default;white-space:nowrap;
+  }
+  .po-link-btn{
+    color:var(--blue);font-size:12px;font-family:'IBM Plex Mono',monospace;
+    text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+    padding:3px 8px;border-radius:4px;
+    border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);
+    transition:all .15s;
+  }
+  .po-link-btn:hover{background:rgba(59,130,246,.18);border-color:var(--blue);color:#fff;}
+
   footer{padding:24px 0;border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 
   @media(max-width:640px){
@@ -729,7 +747,7 @@ const RF_URL       = BASE_URL + '?gid=608131896&single=true&output=csv';
 // ═══════════════════════════════════════════════
 let cAllRows=[],cHeaders=[],cFiltered=[];
 let cSortCol=-1,cSortAsc=true,cPage=1,cPageSize=25;
-let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1,colOrderStatus=-1;
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1,colOrderStatus=-1,colLinkPur=-1;
 
 const STEPS     = ['RO','QT','MEMO','PQ','BU','PO','DAP'];
 const STEP_COLS = [2,3,4,5,6,7,8];
@@ -809,8 +827,14 @@ async function loadCost(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     const rows=parseCSV(await res.text());
     if(rows.length<2) throw new Error('ไม่พบข้อมูล');
-    cHeaders=rows[0]; cAllRows=rows.slice(1).filter(r=>r.some(c=>c));
+    cHeaders=rows[0]; 
     detectCostCols(cHeaders);
+    // Filter: keep rows that have at least some non-empty cell AND have a description
+    cAllRows=rows.slice(1).filter(r=>{
+      if(!r.some(c=>c.trim())) return false;       // completely empty row
+      if(colName>=0 && !String(r[colName]||'').trim()) return false; // no description
+      return true;
+    });
     buildCatFilter(); costApplyFilter(); buildCostCards();
     buildBvaDonutChart();
     document.getElementById('costChartArea').style.display='';
@@ -831,11 +855,33 @@ function detectCostCols(h){
   colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
   if(colName===-1)colName=0;
   colAction=find(['action','สถานะ','status']);
-  // Detect order status column — looks for keywords like orderstatus, การสั่งซื้อ, สั่งซื้อ
   colOrderStatus=find(['orderstatus','สถานะการสั่งซื้อ','สั่งซื้อ','orderstat','purchase','สั่ง'],['สถานะ']);
-  // Fallback: if no dedicated col, we'll inject a placeholder column
+  // Detect LINK PUR column — contains PO numbers from IMPORTRANGE
+  colLinkPur=find(['linkpur','link_pur','linkpo','link_po','pur','po_link','polink','linkpurchase']);
   colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ');
   if(colNo===-1&&/^#?no\.?$/i.test(cHeaders[0]))colNo=0;
+  console.log('[Cost] cols: name='+colName+' status='+colAction+' budget='+colB+' actual='+colA+' cat='+colCat+' linkPur='+colLinkPur);
+}
+
+// Build clickable PO link from a raw PO number (e.g. 11412)
+// Adjust the base URL to match your actual PO system
+const PO_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub?gid=0#gid=0';
+function renderPoLink(val){
+  const v = String(val||'').trim();
+  if(!v || v==='-' || v==='—') return `<span style="color:var(--muted);">—</span>`;
+  // If it's already a URL, use as-is
+  if(isUrl(v)) return `<a href="${v}" target="_blank" rel="noopener noreferrer" class="po-link-btn">🔗 PO</a>`;
+  // If it's a number (PO number from IMPORTRANGE), build link
+  const num = v.replace(/[^0-9]/g,'');
+  if(num){
+    // Try to build a Google Sheets filter URL or a generic search URL
+    // You can replace this URL with your actual PO system URL
+    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub?gid=0&single=true&output=csv`;
+    // Since we can't know the exact PO system, show PO number as a styled badge
+    // that the user can click if they configure the URL
+    return `<span class="po-num-badge" title="PO #${num}">📋 ${num}</span>`;
+  }
+  return `<span style="color:var(--muted);">—</span>`;
 }
 
 function buildCostCards(){
@@ -979,7 +1025,14 @@ function renderCostTable(){
       if(i===colOrderStatus && colAction>=0) return ``;
       if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
       if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
-      if(isLinkCol(cHeaders[i])||isUrl(v)){if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer">🔗 เปิดลิงก์</a></td>`;return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;}
+      // LINK PUR column: render as PO badge/link
+      if(i===colLinkPur) return `<td style="text-align:center;">${renderPoLink(v)}</td>`;
+      if(isLinkCol(cHeaders[i])||isUrl(v)){
+        if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer" class="po-link-btn">🔗 เปิดลิงก์</a></td>`;
+        // Not a URL — could be a PO number from IMPORTRANGE
+        if(v&&/^\d{4,}$/.test(v.trim())) return `<td style="text-align:center;">${renderPoLink(v)}</td>`;
+        return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;
+      }
       return`<td>${v}</td>`;
     }).join('');
     // If STATUS col was not found, append PUR Progress at the end
