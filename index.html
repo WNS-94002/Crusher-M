@@ -1197,81 +1197,94 @@ async function loadProcProgress(){
 }
 
 function parseProcProgressData(rows){
-  // Same header-finding logic as parseRFData
+  // ── Step 1: Find the week-label header row (same as parseRFData) ──
   let headerRowIdx=0, weekColIdxs=[], procWeeks=[];
-  for(let ri=0;ri<Math.min(rows.length,6);ri++){
+  for(let ri=0; ri<Math.min(rows.length,6); ri++){
     const r=rows[ri];
     const found=[];
-    for(let ci=0;ci<r.length;ci++){
+    for(let ci=0; ci<r.length; ci++){
       const h=String(r[ci]||'').trim();
-      if(/^W\d+$/i.test(h)||/^(week|wk)\s*\d+$/i.test(h)) found.push({ci,h});
+      if(/^W\d+$/i.test(h) || /^(week|wk)\s*\d+$/i.test(h)) found.push({ci,h});
     }
-    if(found.length>=3){ headerRowIdx=ri; found.forEach(f=>{procWeeks.push(f.h);weekColIdxs.push(f.ci);}); break; }
+    if(found.length>=3){
+      headerRowIdx=ri;
+      found.forEach(f=>{ procWeeks.push(f.h); weekColIdxs.push(f.ci); });
+      break;
+    }
   }
   if(procWeeks.length===0){
-    for(let ci=4;ci<(rows[0]||[]).length;ci++){
-      const h=String(rows[0][ci]||'').trim(); if(h){procWeeks.push(h);weekColIdxs.push(ci);}
+    for(let ci=4; ci<(rows[0]||[]).length; ci++){
+      const h=String(rows[0][ci]||'').trim();
+      if(h){ procWeeks.push(h); weekColIdxs.push(ci); }
     }
     headerRowIdx=0;
   }
-  console.log('[ProcProg] headerRow='+headerRowIdx+' weeks='+procWeeks.length);
+  console.log('[ProcProg] headerRow='+headerRowIdx+' weeks='+procWeeks.length+' first='+procWeeks[0]);
 
-  // Extract progress rows — scan for group headers (row where col B = group name, col C = total progress)
-  // From the screenshot: row 4 = "1 PURCHASING PROGRESS" group header, row 5 = acc progress
-  // row 53 = "2 DELIVERY PROGRESS", row 54 = acc progress
-  // We auto-detect group headers by looking for rows where col D has "PROGRESS" or has highlighted % in col C
-  function getRowNums(rows){
-    // Scan for rows where col1 contains "PROGRESS" (group header rows)
-    const groups=[];
-    for(let ri=headerRowIdx+1;ri<rows.length;ri++){
-      const r=rows[ri];
-      const b=String(r[1]||'').trim().toUpperCase();
-      if(b.includes('PROGRESS')&&b.length<40){
-        // Next row should be the acc progress
-        groups.push({name:b, wkRow:ri+1, accRow:ri+2});
-      }
-    }
-    return groups;
-  }
+  // ── Step 2: Auto-detect group header rows ──
+  // Group header: row where col[1] contains "PROGRESS" (e.g. "PURCHASING PROGRESS")
+  // Sheet structure per group:
+  //   Row G+0: group header (col0=number, col1=name, col2=total%)
+  //   Row G+1: Weekly progress per week  ← wkRow
+  //   Row G+2: Acc. (cumulative) progress per week  ← accRow
 
-  const groups=getRowNums(rows);
-  console.log('[ProcProg] groups found:',groups.map(g=>g.name).join(', '));
-
-  // Fallback to hardcoded if detection fails
-  const SERIES_DEFS = groups.length>=1 ? groups.map((g,i)=>({
-    name: g.name.replace(/^\d+\s*/,'').replace(' PROGRESS',''),
-    color: i===0?'#8b5cf6':'#14b8a6',
-    wkRowIdx:  g.wkRow,
-    accRowIdx: g.accRow,
-  })) : [
-    {name:'Purchasing', color:'#8b5cf6', wkRowIdx:4,  accRowIdx:5  },
-    {name:'Delivery',   color:'#14b8a6', wkRowIdx:53, accRowIdx:54 },
-  ];
-
-  function getVals(rowIdx){
-    const r=rows[rowIdx]||[];
+  // getVals reads 0-based row index directly from rows[]
+  function getVals(rowIdx0){
+    const r=rows[rowIdx0]||[];
     return weekColIdxs.map(ci=>{
       const v=String(r[ci]||'').trim().replace(/%/g,'');
-      const n=parseFloat(v); return isNaN(n)?null:n;
+      const n=parseFloat(v);
+      return isNaN(n) ? null : n;
     });
   }
 
+  // Scan all rows after header for group titles
+  const SERIES_DEFS=[];
+  for(let ri=headerRowIdx+1; ri<rows.length-2; ri++){
+    const r=rows[ri];
+    const c1=String(r[1]||'').trim().toUpperCase();
+    // Group header: col1 contains PROGRESS and is short, col0 is a digit
+    if(c1.includes('PROGRESS') && c1.length<50 && /^\d*$/.test(String(r[0]||'').trim())){
+      const colors=['#8b5cf6','#14b8a6','#f5a623','#3b82f6'];
+      const label=c1.replace(/^\d+\s*/,'').replace(/\s*PROGRESS\s*$/,'').trim()||c1;
+      SERIES_DEFS.push({
+        name: label,
+        color: colors[SERIES_DEFS.length % colors.length],
+        wkRowIdx:  ri+1,   // 0-based: row right after header = weekly
+        accRowIdx: ri+2,   // 0-based: 2 rows after header = accumulated
+      });
+      console.log(`[ProcProg] group "${label}" at row ${ri} (0-based), wkRow=${ri+1} accRow=${ri+2}`);
+    }
+  }
+
+  // Fallback: use hardcoded Excel rows if nothing detected
+  // Excel row → 0-based index (row 5 = index 4, row 6 = index 5, etc.)
+  if(SERIES_DEFS.length===0){
+    console.log('[ProcProg] falling back to hardcoded rows');
+    SERIES_DEFS.push(
+      {name:'Purchasing', color:'#8b5cf6', wkRowIdx:4,  accRowIdx:5 },
+      {name:'Delivery',   color:'#14b8a6', wkRowIdx:53, accRowIdx:54}
+    );
+  }
+
+  // ── Step 3: Build series ──
   const series=SERIES_DEFS.map(def=>{
-    const weekly=getVals(def.wkRowIdx);
-    const acc=getVals(def.accRowIdx);
-    const maxAcc=Math.max(acc.reduce((m,v)=>v!=null?Math.max(m,v):m,0),1);
+    const weekly = getVals(def.wkRowIdx);
+    const acc    = getVals(def.accRowIdx);
+
+    // Debug: log first 10 values
+    console.log(`[ProcProg] "${def.name}" wk[0..9]=[${weekly.slice(0,10).join(',')}]`);
+    console.log(`[ProcProg] "${def.name}" acc[0..9]=[${acc.slice(0,10).join(',')}]`);
+
+    // Plan: linear ramp to maxAcc
+    const maxAcc=Math.max(acc.reduce((m,v)=>v!=null?Math.max(m,v):m, 0), 1);
     const planAcc=procWeeks.map((_,wi)=>parseFloat(((wi+1)/procWeeks.length*maxAcc).toFixed(2)));
-    console.log(`[ProcProg] ${def.name}: accNonNull=${acc.filter(v=>v!=null).length} maxAcc=${maxAcc}`);
-    return {name:def.name,color:def.color,weekly,acc,planAcc};
+    return {name:def.name, color:def.color, weekly, acc, planAcc};
   });
 
-  procChartData={weekLabels:procWeeks,series};
+  procChartData = {weekLabels:procWeeks, series};
 
-  // Also parse item-level detail for recondition detail panel
-  // (items after headerRowIdx, col1=description, col2=total%, col3=weight, col4+=weekly%)
-  _parseProcItemDetails(rows, headerRowIdx, weekColIdxs);
-
-  // Render the chart (if SVG element exists)
+  // Render chart if SVG already in DOM
   const svg=document.getElementById('procLineChart');
   if(svg) drawLineChart(svg, procChartData, procChartMode, 'procChartTooltip');
 }
