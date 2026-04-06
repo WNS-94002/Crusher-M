@@ -368,7 +368,7 @@
   .copy-msg{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
 
   /* ── Chart Hover Tooltip ── */
-  #reconChartTooltip {
+  #reconChartTooltip, #procChartTooltip {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -448,6 +448,26 @@
     background: rgba(255,255,255,.12);
     pointer-events: none;
   }
+
+  /* ── Recondition Detail Panel ── */
+  .recon-group{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .recon-group-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .15s;}
+  .recon-group-header:hover{background:rgba(245,166,35,.07);}
+  .recon-group-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;display:flex;align-items:center;gap:10px;}
+  .recon-group-pct{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;}
+  .recon-group-ring{display:flex;align-items:center;gap:8px;}
+  .recon-group-body{padding:0 20px 16px;}
+  .recon-item-row{display:grid;grid-template-columns:1fr 200px 56px;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(37,40,48,.5);}
+  .recon-item-row:last-child{border-bottom:none;}
+  .recon-item-name{font-size:12px;color:var(--text);line-height:1.4;}
+  .recon-item-bar-wrap{position:relative;}
+  .recon-item-bar-track{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+  .recon-item-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+  .recon-item-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;text-align:right;}
+  .recon-group-chevron{font-size:12px;color:var(--muted);transition:transform .2s;}
+  .recon-group-chevron.open{transform:rotate(180deg);}
+  .recon-group-body{display:none;}
+  .recon-group-body.open{display:block;}
 
   /* ── PO Number Badge ── */
   .po-num-badge{
@@ -603,7 +623,30 @@
        TAB: PROCUREMENT PROGRESS
   ══════════════════════════════ -->
   <div class="tab-panel" id="panel-progress">
-    <div class="overview-wrap" style="margin-top:18px;">
+
+    <!-- Procurement Acc. Progress Line Chart -->
+    <div class="rf-chart-wrap" style="margin-top:18px;">
+      <div class="rf-chart-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span>ความคืบหน้าสะสมรายสัปดาห์ — Procurement Progress</span>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#8b5cf6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#8b5cf6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#8b5cf6"/></svg>Purchasing Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#14b8a6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#14b8a6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#14b8a6"/></svg>Delivery Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#636776" stroke-width="1.5" stroke-dasharray="5 3"/></svg>Plan</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;margin-top:4px;">
+        <button id="procToggleAcc" onclick="setProcChartMode('acc')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Acc. Progress</button>
+        <button id="procToggleWk" onclick="setProcChartMode('wk')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Weekly Progress</button>
+      </div>
+      <div style="position:relative;width:100%;overflow-x:auto;">
+        <svg id="procLineChart" width="100%" style="display:block;min-width:400px;cursor:crosshair;" viewBox="0 0 960 240" preserveAspectRatio="xMinYMid meet"></svg>
+      </div>
+    </div>
+
+    <div class="overview-wrap" style="margin-top:16px;">
       <div class="donut-card">
         <div class="donut-svg-wrap">
           <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
@@ -701,6 +744,12 @@
         <svg id="reconLineChart" width="100%" style="display:block;min-width:400px;cursor:crosshair;" viewBox="0 0 960 260" preserveAspectRatio="xMinYMid meet"></svg>
       </div>
     </div>
+
+    <!-- Recondition Detail Breakdown -->
+    <div class="sec"><span class="sec-title">รายละเอียด Progress แต่ละงาน</span></div>
+    <div id="reconDetailPanel" style="display:flex;flex-direction:column;gap:20px;margin-bottom:28px;">
+      <div style="color:var(--muted);font-size:12px;padding:20px 0;">กำลังโหลด...</div>
+    </div>
   </div>
 
   <footer>
@@ -724,23 +773,18 @@
 </div>
 
 <!-- Chart Hover Tooltip (global, fixed to viewport) -->
-<div id="reconChartTooltip" style="
-  display:none;
-  position:fixed;
-  z-index:9999;
-  pointer-events:none;
-  max-width:280px;
-  min-width:200px;
-"></div>
+<div id="reconChartTooltip" style="display:none;position:fixed;z-index:9999;pointer-events:none;max-width:280px;min-width:200px;"></div>
+<div id="procChartTooltip"  style="display:none;position:fixed;z-index:9999;pointer-events:none;max-width:280px;min-width:200px;"></div>
 
 <script>
 // ═══════════════════════════════════════════════
 //  DATA SOURCES
 // ═══════════════════════════════════════════════
 const BASE_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub';
-const COST_URL     = BASE_URL + '?gid=0&single=true&output=csv';
-const PROGRESS_URL = BASE_URL + '?gid=1861162286&single=true&output=csv';
-const RF_URL       = BASE_URL + '?gid=608131896&single=true&output=csv';
+const COST_URL      = BASE_URL + '?gid=0&single=true&output=csv';
+const PROGRESS_URL  = BASE_URL + '?gid=1861162286&single=true&output=csv';
+const RF_URL        = BASE_URL + '?gid=608131896&single=true&output=csv';
+const PROC_PROG_URL = BASE_URL + '?gid=125526876&single=true&output=csv';
 
 // ═══════════════════════════════════════════════
 //  STATE
@@ -760,6 +804,7 @@ let reconItems=[];
 let rfWeeks=[];
 let reconChartData=null;   // { weekLabels, series:[{name,weekly,acc,planAcc}] }
 let reconChartMode='acc';  // 'acc' | 'wk'
+let procChartData=null;    // { weekLabels, series:[{name,color,weekly,acc,planAcc}] }
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -803,7 +848,7 @@ function switchTab(tab){
 // ═══════════════════════════════════════════════
 async function loadAll(){
   setSt('','กำลังโหลดข้อมูล...');
-  const [costOk,progOk,rfOk]=await Promise.all([loadCost(),loadProgress(),loadRF()]);
+  const [costOk,progOk,rfOk,procProgOk]=await Promise.all([loadCost(),loadProgress(),loadRF(),loadProcProgress()]);
   buildOverallTab();
   const now=new Date().toLocaleTimeString('th-TH');
   if(costOk&&progOk&&rfOk) setSt('live','โหลดสำเร็จทุก Sheet');
@@ -813,7 +858,7 @@ async function loadAll(){
 
 function refreshAll(){
   cAllRows=[];cHeaders=[];cFiltered=[];cSortCol=-1;cSortAsc=true;cPage=1;
-  progItems=[];rfRawRows=[];reconItems=[];rfWeeks=[];
+  progItems=[];rfRawRows=[];reconItems=[];rfWeeks=[];procChartData=null;
   document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
   document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr>`;
   document.getElementById('costChartArea').style.display='none';
@@ -1132,6 +1177,363 @@ async function loadRF(){
   }
 }
 
+// ═══════════════════════════════════════════════
+//  PROCUREMENT PROGRESS CHART (gid=125526876)
+// ═══════════════════════════════════════════════
+let procChartMode='acc';
+
+async function loadProcProgress(){
+  try{
+    const res=await fetch(PROC_PROG_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows=parseCSV(await res.text());
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    parseProcProgressData(rows);
+    return true;
+  }catch(e){
+    console.warn('[ProcProg] load error:',e);
+    return false;
+  }
+}
+
+function parseProcProgressData(rows){
+  // Same header-finding logic as parseRFData
+  let headerRowIdx=0, weekColIdxs=[], procWeeks=[];
+  for(let ri=0;ri<Math.min(rows.length,6);ri++){
+    const r=rows[ri];
+    const found=[];
+    for(let ci=0;ci<r.length;ci++){
+      const h=String(r[ci]||'').trim();
+      if(/^W\d+$/i.test(h)||/^(week|wk)\s*\d+$/i.test(h)) found.push({ci,h});
+    }
+    if(found.length>=3){ headerRowIdx=ri; found.forEach(f=>{procWeeks.push(f.h);weekColIdxs.push(f.ci);}); break; }
+  }
+  if(procWeeks.length===0){
+    for(let ci=4;ci<(rows[0]||[]).length;ci++){
+      const h=String(rows[0][ci]||'').trim(); if(h){procWeeks.push(h);weekColIdxs.push(ci);}
+    }
+    headerRowIdx=0;
+  }
+  console.log('[ProcProg] headerRow='+headerRowIdx+' weeks='+procWeeks.length);
+
+  // Extract progress rows — scan for group headers (row where col B = group name, col C = total progress)
+  // From the screenshot: row 4 = "1 PURCHASING PROGRESS" group header, row 5 = acc progress
+  // row 53 = "2 DELIVERY PROGRESS", row 54 = acc progress
+  // We auto-detect group headers by looking for rows where col D has "PROGRESS" or has highlighted % in col C
+  function getRowNums(rows){
+    // Scan for rows where col1 contains "PROGRESS" (group header rows)
+    const groups=[];
+    for(let ri=headerRowIdx+1;ri<rows.length;ri++){
+      const r=rows[ri];
+      const b=String(r[1]||'').trim().toUpperCase();
+      if(b.includes('PROGRESS')&&b.length<40){
+        // Next row should be the acc progress
+        groups.push({name:b, wkRow:ri+1, accRow:ri+2});
+      }
+    }
+    return groups;
+  }
+
+  const groups=getRowNums(rows);
+  console.log('[ProcProg] groups found:',groups.map(g=>g.name).join(', '));
+
+  // Fallback to hardcoded if detection fails
+  const SERIES_DEFS = groups.length>=1 ? groups.map((g,i)=>({
+    name: g.name.replace(/^\d+\s*/,'').replace(' PROGRESS',''),
+    color: i===0?'#8b5cf6':'#14b8a6',
+    wkRowIdx:  g.wkRow,
+    accRowIdx: g.accRow,
+  })) : [
+    {name:'Purchasing', color:'#8b5cf6', wkRowIdx:4,  accRowIdx:5  },
+    {name:'Delivery',   color:'#14b8a6', wkRowIdx:53, accRowIdx:54 },
+  ];
+
+  function getVals(rowIdx){
+    const r=rows[rowIdx]||[];
+    return weekColIdxs.map(ci=>{
+      const v=String(r[ci]||'').trim().replace(/%/g,'');
+      const n=parseFloat(v); return isNaN(n)?null:n;
+    });
+  }
+
+  const series=SERIES_DEFS.map(def=>{
+    const weekly=getVals(def.wkRowIdx);
+    const acc=getVals(def.accRowIdx);
+    const maxAcc=Math.max(acc.reduce((m,v)=>v!=null?Math.max(m,v):m,0),1);
+    const planAcc=procWeeks.map((_,wi)=>parseFloat(((wi+1)/procWeeks.length*maxAcc).toFixed(2)));
+    console.log(`[ProcProg] ${def.name}: accNonNull=${acc.filter(v=>v!=null).length} maxAcc=${maxAcc}`);
+    return {name:def.name,color:def.color,weekly,acc,planAcc};
+  });
+
+  procChartData={weekLabels:procWeeks,series};
+
+  // Also parse item-level detail for recondition detail panel
+  // (items after headerRowIdx, col1=description, col2=total%, col3=weight, col4+=weekly%)
+  _parseProcItemDetails(rows, headerRowIdx, weekColIdxs);
+
+  // Render the chart (if SVG element exists)
+  const svg=document.getElementById('procLineChart');
+  if(svg) drawLineChart(svg, procChartData, procChartMode, 'procChartTooltip');
+}
+
+// ── Parse item-level detail for Recondition breakdown ──
+let reconDetailGroups=[];
+function _parseProcItemDetails(rows, headerRowIdx, weekColIdxs){
+  // We actually read from the RF sheet for recondition items (already in reconItems)
+  // But we need group info — items belong to groups based on section headers in col0/col1
+  // reconItems already stores items; we need group labels from the RF sheet
+  // Group detection: rows where r[0] is a number (1,2,3) and r[1] is a group title
+  // This is done from rfRawRows in renderReconDetail()
+}
+
+function setProcChartMode(mode){
+  procChartMode=mode;
+  const ba=document.getElementById('procToggleAcc');
+  const bw=document.getElementById('procToggleWk');
+  if(ba&&bw){
+    if(mode==='acc'){ba.style.cssText+='background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;';bw.style.cssText+='background:var(--surface2);color:var(--muted);border-color:var(--border);font-weight:400;';}
+    else{bw.style.cssText+='background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;';ba.style.cssText+='background:var(--surface2);color:var(--muted);border-color:var(--border);font-weight:400;';}
+  }
+  if(procChartData){
+    const svg=document.getElementById('procLineChart');
+    if(svg) drawLineChart(svg,procChartData,mode,'procChartTooltip');
+  }
+}
+
+// ── Generic line chart renderer (shared by Recon + Procurement) ──
+// tooltipId: id of the global tooltip div to use
+function drawLineChart(svg, chartData, mode, tooltipId){
+  const {weekLabels,series}=chartData;
+  const n=weekLabels.length;
+  if(!n){svg.innerHTML=`<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Mono,monospace" font-size="13" fill="#636776">ไม่พบข้อมูล Week columns</text>`;return;}
+
+  const W=960,H=svg.id==='procLineChart'?240:260,PL=52,PR=20,PT=24,PB=40;
+  const chartW=W-PL-PR,chartH=H-PT-PB;
+  const isAcc=(mode!=='wk');
+
+  const hasAnyData=series.some(s=>(isAcc?s.acc:s.weekly).some(v=>v!=null&&v>0));
+  const noDataMsg=!hasAnyData?`<text x="${W/2}" y="${PT+10}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#636776" opacity=".7">ยังไม่มีข้อมูล progress — แสดงเฉพาะเส้นแผน</text>`:'';
+
+  let yMax=0;
+  series.forEach(s=>{
+    (isAcc?s.acc:s.weekly).forEach(v=>{if(v!=null&&v>yMax)yMax=v;});
+    if(isAcc) s.planAcc.forEach(v=>{if(v>yMax)yMax=v;});
+  });
+  if(yMax===0)yMax=100;
+  yMax=Math.ceil(yMax/10)*10;
+
+  const xStep=chartW/(n>1?n-1:1);
+  const yScale=v=>chartH-(v/yMax)*chartH;
+  const px=wi=>PL+wi*xStep;
+  const py=v=>PT+yScale(v);
+
+  const yTicks=[];const step=yMax<=20?5:yMax<=50?10:yMax<=100?20:25;
+  for(let t=0;t<=yMax;t+=step)yTicks.push(t);
+  const gridLines=yTicks.map(t=>`<line x1="${PL}" y1="${py(t)}" x2="${PL+chartW}" y2="${py(t)}" stroke="#252830" stroke-width="${t===0?'1.5':'1'}"/>
+    <text x="${PL-6}" y="${py(t)+4}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${t}${isAcc?'%':''}</text>`).join('');
+
+  const tickEvery=n<=13?1:n<=26?2:n<=39?3:4;
+  let currentWi=0;
+  series.forEach(s=>{
+    (isAcc?s.acc:s.weekly).forEach((v,wi)=>{if(v!=null&&v>0)currentWi=Math.max(currentWi,wi);});
+  });
+  if(!hasAnyData) currentWi=n-1;
+
+  const xTicks=weekLabels.map((w,wi)=>{
+    if(wi%tickEvery!==0&&wi!==n-1&&wi!==currentWi)return'';
+    return`<text x="${px(wi)}" y="${H-8}" text-anchor="middle" font-size="${wi===currentWi?'9.5':'8.5'}" font-family="IBM Plex Mono,monospace" fill="${wi===currentWi?'#3b82f6':'#636776'}" font-weight="${wi===currentWi?'700':'400'}">${w}</text>`;
+  }).join('');
+
+  const curLine=`<line x1="${px(currentWi)}" y1="${PT}" x2="${px(currentWi)}" y2="${PT+chartH}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".65"/>
+    <text x="${px(currentWi)+5}" y="${PT+12}" font-size="8.5" font-family="IBM Plex Mono,monospace" fill="#3b82f6" opacity=".8">NOW</text>`;
+
+  function buildPath(vals){let d='';let moved=false;vals.forEach((v,wi)=>{if(v==null){moved=false;return;}d+=(moved?` L `:`M `)+`${px(wi)},${py(v)}`;moved=true;});return d;}
+  function buildArea(vals,color){let segs=[],seg=[];vals.forEach((v,wi)=>{if(v!=null)seg.push({wi,v});else if(seg.length){segs.push([...seg]);seg=[];}});if(seg.length)segs.push(seg);return segs.map(s=>{if(s.length<2)return'';const d=`M ${px(s[0].wi)},${py(0)} L ${s.map(p=>`${px(p.wi)},${py(p.v)}`).join(' L ')} L ${px(s[s.length-1].wi)},${py(0)} Z`;return`<path d="${d}" fill="${color}" opacity=".06"/>`;}).join('');}
+
+  let planLines='';
+  if(isAcc) series.forEach(s=>{const d=buildPath(s.planAcc);if(d)planLines+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="1" stroke-dasharray="5 4" opacity=".35"/>`;});
+
+  let linesHtml='';
+  series.forEach(s=>{
+    const vals=isAcc?s.acc:s.weekly;
+    if(isAcc) linesHtml+=buildArea(vals,s.color);
+    const d=buildPath(vals); if(!d)return;
+    linesHtml+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    vals.forEach((v,wi)=>{
+      if(v==null)return;
+      const isCur=wi===currentWi,isLast=wi===n-1;
+      linesHtml+=`<circle cx="${px(wi)}" cy="${py(v)}" r="${isCur||isLast?5:2.5}" fill="${s.color}" stroke="#0d0e12" stroke-width="1.5" opacity="${isCur||isLast?1:0.8}"/>`;
+      if(isCur) linesHtml+=`<text x="${px(wi)}" y="${py(v)-9}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="700">${v.toFixed(1)}%</text>`;
+    });
+  });
+
+  let endLabels='';
+  series.forEach(s=>{
+    const vals=isAcc?s.acc:s.weekly;
+    let li=-1,lv=null;
+    for(let wi=vals.length-1;wi>=0;wi--){if(vals[wi]!=null){li=wi;lv=vals[wi];break;}}
+    if(li<0||lv==null)return;
+    endLabels+=`<text x="${px(li)+8}" y="${py(lv)+4}" font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="600" opacity=".9">${s.name}</text>`;
+  });
+
+  const xAxis=`<line x1="${PL}" y1="${PT+chartH}" x2="${PL+chartW}" y2="${PT+chartH}" stroke="#363840" stroke-width="1.5"/>`;
+
+  svg.innerHTML=`
+    <defs><clipPath id="${svg.id}Clip"><rect x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"/></clipPath></defs>
+    ${noDataMsg}${gridLines}${xAxis}
+    <g clip-path="url(#${svg.id}Clip)">${planLines}${linesHtml}</g>
+    ${endLabels}${curLine}${xTicks}
+    <line id="${svg.id}CrossV" x1="0" y1="${PT}" x2="0" y2="${PT+chartH}" stroke="rgba(255,255,255,.18)" stroke-width="1" display="none"/>
+    <rect id="${svg.id}Overlay" x="${PL}" y="${PT}" width="${chartW}" height="${chartH}" fill="transparent" style="cursor:crosshair;"/>
+    ${series.map((s,si)=>`<circle id="${svg.id}Dot${si}" r="5" fill="${s.color}" stroke="#0d0e12" stroke-width="2" display="none"/>`).join('')}
+  `;
+
+  // Hover tooltip
+  const tooltip=document.getElementById(tooltipId)||document.getElementById('reconChartTooltip');
+  const crossV=svg.getElementById(svg.id+'CrossV');
+  const ovEl=svg.getElementById(svg.id+'Overlay');
+  const dots=series.map((_,si)=>svg.getElementById(svg.id+'Dot'+si));
+  const _series=series,_wl=weekLabels,_n=n,_px=px,_py=py,_PL=PL,_chartW=chartW,_W=W,_xStep=xStep,_cwi=currentWi,_isAcc=isAcc;
+
+  function showTip(e){
+    const rect=svg.getBoundingClientRect();
+    const scaleX=_W/rect.width;
+    const mouseX=(e.clientX-rect.left)*scaleX;
+    if(mouseX<_PL||mouseX>_PL+_chartW){hideTip();return;}
+    const wi=Math.max(0,Math.min(_n-1,Math.round((mouseX-_PL)/(_xStep||1))));
+    crossV.setAttribute('x1',_px(wi));crossV.setAttribute('x2',_px(wi));crossV.setAttribute('display','');
+    _series.forEach((s,si)=>{
+      const v=(_isAcc?s.acc:s.weekly)[wi];
+      if(v!=null){dots[si].setAttribute('cx',_px(wi));dots[si].setAttribute('cy',_py(v));dots[si].setAttribute('display','');}
+      else dots[si].setAttribute('display','none');
+    });
+    const isCurWk=wi===_cwi;
+    let html=`<div class="tt-week"><span class="tt-week-dot" style="background:${isCurWk?'#3b82f6':'var(--muted)'}"></span>${_wl[wi]}${isCurWk?'<span style="background:#3b82f6;color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:4px;">NOW</span>':''}<span style="margin-left:auto;color:var(--muted);font-size:9px;">${_isAcc?'Acc.':'Weekly'}</span></div>`;
+    _series.forEach(s=>{
+      const v=(_isAcc?s.acc:s.weekly)[wi];
+      const plan=_isAcc?s.planAcc[wi]:null;
+      const vStr=v!=null?v.toFixed(2)+'%':'—';
+      const diff=(v!=null&&plan!=null)?v-plan:null;
+      const diffStr=diff!=null?`<span style="color:${diff>=0?'var(--green)':'var(--red)'};font-size:9px;margin-left:6px;">${diff>=0?'▲':'▼'}${Math.abs(diff).toFixed(1)}%</span>`:'';
+      html+=`<div class="tt-row"><span class="tt-dot" style="background:${s.color};"></span><span class="tt-name">${s.name}</span><span class="tt-val" style="color:${s.color};">${vStr}</span>${diffStr}</div><div class="tt-bar-track"><div class="tt-bar-fill" style="width:${v!=null?Math.min(v,100):0}%;background:${s.color};opacity:.7;"></div></div>${plan!=null?`<div style="margin-left:17px;margin-bottom:4px;font-size:9px;color:var(--muted);">Plan: ${plan.toFixed(1)}%</div>`:''}`;
+    });
+    tooltip.innerHTML=html;
+    const vpW=window.innerWidth,vpH=window.innerHeight,ttW=260,ttH=180;
+    let tx=e.clientX+16,ty=e.clientY-60;
+    if(tx+ttW>vpW-10)tx=e.clientX-ttW-16;
+    if(ty+ttH>vpH-10)ty=vpH-ttH-10;
+    if(ty<10)ty=10;
+    tooltip.style.left=tx+'px';tooltip.style.top=ty+'px';tooltip.style.display='block';
+  }
+  function hideTip(){tooltip.style.display='none';crossV.setAttribute('display','none');dots.forEach(d=>d.setAttribute('display','none'));}
+  const newOv=ovEl.cloneNode(true);ovEl.parentNode.replaceChild(newOv,ovEl);
+  newOv.addEventListener('mousemove',showTip);newOv.addEventListener('mouseleave',hideTip);
+}
+
+// ═══════════════════════════════════════════════
+//  RECONDITION DETAIL BREAKDOWN PANEL
+// ═══════════════════════════════════════════════
+function renderReconDetail(){
+  const panel=document.getElementById('reconDetailPanel');
+  if(!panel) return;
+  if(!rfRawRows.length){panel.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:20px 0;">ไม่พบข้อมูล</div>`;return;}
+
+  // Re-parse groups from rfRawRows
+  // Group header: rows where r[0] is a digit (1,2,3...) and r[1] is a title
+  // Items: rows where r[1] starts with '-' or r[0] is empty and r[1] has content
+  const rows=rfRawRows;
+
+  // Find week col indexes again (reuse rfWeeks logic)
+  let weekColIdxs=[];
+  for(let ri=0;ri<Math.min(rows.length,6);ri++){
+    const r=rows[ri];const found=[];
+    for(let ci=0;ci<r.length;ci++){const h=String(r[ci]||'').trim();if(/^W\d+$/i.test(h)||/^(week|wk)\s*\d+$/i.test(h))found.push(ci);}
+    if(found.length>=3){weekColIdxs=found;break;}
+  }
+
+  // Col2 = TOTAL PROGRESS (0-100 as decimal 0.5 = 50%)
+  const colTotalProg=2;
+  const colDesc=1;
+
+  const groups=[];
+  let curGroup=null;
+  for(let ri=0;ri<rows.length;ri++){
+    const r=rows[ri];
+    const c0=String(r[0]||'').trim();
+    const c1=String(r[1]||'').trim();
+    const c2=String(r[2]||'').trim().replace(/%/g,'');
+    const progVal=parseFloat(c2);
+
+    // Group header: col0 is a number, col1 is uppercase title
+    if(/^\d+$/.test(c0)&&c1&&c1===c1.toUpperCase()&&c1.length>3){
+      curGroup={title:c1,pct:isNaN(progVal)?0:Math.round(progVal*(progVal<=1?100:1)),items:[]};
+      groups.push(curGroup);
+      continue;
+    }
+    // Item row: col0 empty, col1 has content
+    if(curGroup&&!c0&&c1){
+      const itemPct=isNaN(progVal)?0:Math.round(progVal*(progVal<=1?100:1));
+      curGroup.items.push({name:c1.replace(/^[-–]\s*/,''),pct:itemPct});
+    }
+  }
+
+  if(!groups.length){panel.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:20px 0;">ไม่พบข้อมูล group ใน Sheet — ตรวจสอบโครงสร้างข้อมูล</div>`;return;}
+
+  // Color palette for groups
+  const GROUP_COLORS=['#14b8a6','#f5a623','#8b5cf6','#3b82f6','#27ae60','#e74c3c','#ec4899'];
+
+  panel.innerHTML=groups.map((g,gi)=>{
+    const color=GROUP_COLORS[gi%GROUP_COLORS.length];
+    const gPct=g.pct;
+    const barColor=gPct===100?'var(--green)':gPct>50?color:gPct>0?color:'var(--border)';
+    const groupId=`reconGrp${gi}`;
+    const itemsHtml=g.items.map(it=>{
+      const iPct=it.pct;
+      const iColor=iPct===100?'#27ae60':iPct>0?color:'var(--border)';
+      // Progress bar chars style
+      return `<div class="recon-item-row">
+        <div class="recon-item-name">${it.name}</div>
+        <div class="recon-item-bar-wrap">
+          <div class="recon-item-bar-track">
+            <div class="recon-item-bar-fill" style="width:${iPct}%;background:${iColor};"></div>
+          </div>
+        </div>
+        <div class="recon-item-pct" style="color:${iColor};">${iPct}%</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="recon-group">
+      <div class="recon-group-header" onclick="toggleReconGroup('${groupId}')">
+        <div class="recon-group-title" style="color:${color};">
+          <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span>
+          ${g.title}
+          <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-weight:400;letter-spacing:.5px;">(${g.items.length} รายการ)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:120px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+              <div style="width:${gPct}%;height:100%;background:${barColor};border-radius:3px;transition:width .6s ease;"></div>
+            </div>
+            <div class="recon-group-pct" style="color:${barColor};">${gPct}%</div>
+          </div>
+          <span class="recon-group-chevron" id="${groupId}chev">▼</span>
+        </div>
+      </div>
+      <div class="recon-group-body open" id="${groupId}body">
+        ${itemsHtml||'<div style="color:var(--muted);font-size:12px;padding:12px 0;">ไม่พบรายการ</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleReconGroup(id){
+  const body=document.getElementById(id+'body');
+  const chev=document.getElementById(id+'chev');
+  if(!body)return;
+  const isOpen=body.classList.toggle('open');
+  if(chev)chev.style.transform=isOpen?'':'rotate(-90deg)';
+}
+
 function parseRFData(rows){
   if(!rows.length) return;
 
@@ -1269,7 +1671,12 @@ function renderRFRecon(){
   document.getElementById('reconNone').textContent=none;
   document.getElementById('reconPct').textContent=overallPct+'%';
   // ── Line Chart ──
-  if(reconChartData) drawReconLineChart(reconChartData, reconChartMode);
+  if(reconChartData){
+    const svg=document.getElementById('reconLineChart');
+    if(svg) drawLineChart(svg, reconChartData, reconChartMode, 'reconChartTooltip');
+  }
+  // ── Detail breakdown ──
+  renderReconDetail();
 }
 
 function setChartMode(mode){
@@ -1285,7 +1692,10 @@ function setChartMode(mode){
       btnAcc.style.background='var(--surface2)';btnAcc.style.color='var(--muted)';btnAcc.style.borderColor='var(--border)';
     }
   }
-  if(reconChartData) drawReconLineChart(reconChartData, mode);
+  if(reconChartData){
+    const svg=document.getElementById('reconLineChart');
+    if(svg) drawLineChart(svg, reconChartData, mode, 'reconChartTooltip');
+  }
 }
 
 function drawReconLineChart(chartData, mode){
