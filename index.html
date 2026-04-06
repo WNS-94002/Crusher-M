@@ -1221,14 +1221,14 @@ function parseProcProgressData(rows){
   }
   console.log('[ProcProg] headerRow='+headerRowIdx+' weeks='+procWeeks.length+' first='+procWeeks[0]);
 
-  // ── Step 2: Auto-detect group header rows ──
-  // Group header: row where col[1] contains "PROGRESS" (e.g. "PURCHASING PROGRESS")
-  // Sheet structure per group:
-  //   Row G+0: group header (col0=number, col1=name, col2=total%)
-  //   Row G+1: Weekly progress per week  ← wkRow
-  //   Row G+2: Acc. (cumulative) progress per week  ← accRow
+  // ── Step 2: Detect group header rows & map data rows ──
+  // Sheet structure (from screenshot):
+  //   Row G   : group header (col0=number, col1="X PURCHASING PROGRESS", col2=total%)
+  //             → Weekly progress values (E:AI) are ON THIS SAME ROW
+  //   Row G+1 : Acc. cumulative progress values (E:AI)
+  //
+  // So: wkRowIdx = ri (the header row itself), accRowIdx = ri+1
 
-  // getVals reads 0-based row index directly from rows[]
   function getVals(rowIdx0){
     const r=rows[rowIdx0]||[];
     return weekColIdxs.map(ci=>{
@@ -1238,32 +1238,36 @@ function parseProcProgressData(rows){
     });
   }
 
-  // Scan all rows after header for group titles
+  // Scan all rows for group headers
   const SERIES_DEFS=[];
-  for(let ri=headerRowIdx+1; ri<rows.length-2; ri++){
+  const colors=['#8b5cf6','#14b8a6','#f5a623','#3b82f6'];
+  for(let ri=headerRowIdx+1; ri<rows.length-1; ri++){
     const r=rows[ri];
+    const c0=String(r[0]||'').trim();
     const c1=String(r[1]||'').trim().toUpperCase();
-    // Group header: col1 contains PROGRESS and is short, col0 is a digit
-    if(c1.includes('PROGRESS') && c1.length<50 && /^\d*$/.test(String(r[0]||'').trim())){
-      const colors=['#8b5cf6','#14b8a6','#f5a623','#3b82f6'];
+    // Group header: col0 is a digit number, col1 contains "PROGRESS"
+    if(/^\d+$/.test(c0) && c1.includes('PROGRESS') && c1.length<60){
       const label=c1.replace(/^\d+\s*/,'').replace(/\s*PROGRESS\s*$/,'').trim()||c1;
       SERIES_DEFS.push({
-        name: label,
-        color: colors[SERIES_DEFS.length % colors.length],
-        wkRowIdx:  ri+1,   // 0-based: row right after header = weekly
-        accRowIdx: ri+2,   // 0-based: 2 rows after header = accumulated
+        name:     label,
+        color:    colors[SERIES_DEFS.length % colors.length],
+        wkRowIdx: ri,      // weekly values are ON the group header row
+        accRowIdx: ri+1,   // acc values are the row immediately after
       });
-      console.log(`[ProcProg] group "${label}" at row ${ri} (0-based), wkRow=${ri+1} accRow=${ri+2}`);
+      console.log(`[ProcProg] group "${label}" header at 0-based row ${ri}, wk=row${ri} acc=row${ri+1}`);
     }
   }
 
-  // Fallback: use hardcoded Excel rows if nothing detected
-  // Excel row → 0-based index (row 5 = index 4, row 6 = index 5, etc.)
+  // Fallback: hardcoded 0-based row indexes from screenshot
+  // Row 4  (Excel) = index 3 = PURCHASING PROGRESS header (weekly values here)
+  // Row 5  (Excel) = index 4 = Purchasing Acc.
+  // Row 53 (Excel) = index 52 = DELIVERY PROGRESS header (weekly values here)
+  // Row 54 (Excel) = index 53 = Delivery Acc.
   if(SERIES_DEFS.length===0){
-    console.log('[ProcProg] falling back to hardcoded rows');
+    console.log('[ProcProg] using hardcoded row indexes');
     SERIES_DEFS.push(
-      {name:'Purchasing', color:'#8b5cf6', wkRowIdx:4,  accRowIdx:5 },
-      {name:'Delivery',   color:'#14b8a6', wkRowIdx:53, accRowIdx:54}
+      {name:'Purchasing', color:colors[0], wkRowIdx:3,  accRowIdx:4 },
+      {name:'Delivery',   color:colors[1], wkRowIdx:52, accRowIdx:53}
     );
   }
 
@@ -1272,14 +1276,26 @@ function parseProcProgressData(rows){
     const weekly = getVals(def.wkRowIdx);
     const acc    = getVals(def.accRowIdx);
 
-    // Debug: log first 10 values
-    console.log(`[ProcProg] "${def.name}" wk[0..9]=[${weekly.slice(0,10).join(',')}]`);
-    console.log(`[ProcProg] "${def.name}" acc[0..9]=[${acc.slice(0,10).join(',')}]`);
+    // For weekly: treat null as 0 so the line connects continuously
+    // (Sheet has 0.00% for weeks with no activity, which parses as 0, not null)
+    const weeklyFilled = weekly.map(v => v != null ? v : 0);
 
-    // Plan: linear ramp to maxAcc
-    const maxAcc=Math.max(acc.reduce((m,v)=>v!=null?Math.max(m,v):m, 0), 1);
-    const planAcc=procWeeks.map((_,wi)=>parseFloat(((wi+1)/procWeeks.length*maxAcc).toFixed(2)));
-    return {name:def.name, color:def.color, weekly, acc, planAcc};
+    // For acc: keep nulls as null (gaps = no data yet beyond current week)
+    // But convert 0s that are after the last non-zero to null (trailing zeros = future)
+    let lastNonZeroAcc = -1;
+    acc.forEach((v,i) => { if(v != null && v > 0) lastNonZeroAcc = i; });
+    const accClean = acc.map((v,i) => {
+      if(v == null) return null;
+      if(i > lastNonZeroAcc && v === 0) return null; // trailing zeros = no data
+      return v;
+    });
+
+    console.log(`[ProcProg] "${def.name}" wk[0..9]=[${weeklyFilled.slice(0,10)}]`);
+    console.log(`[ProcProg] "${def.name}" acc[0..9]=[${accClean.slice(0,10)}]`);
+
+    const maxAcc = Math.max(accClean.reduce((m,v)=>v!=null?Math.max(m,v):m, 0), 1);
+    const planAcc = procWeeks.map((_,wi) => parseFloat(((wi+1)/procWeeks.length*maxAcc).toFixed(2)));
+    return {name:def.name, color:def.color, weekly:weeklyFilled, acc:accClean, planAcc};
   });
 
   procChartData = {weekLabels:procWeeks, series};
@@ -1324,7 +1340,11 @@ function drawLineChart(svg, chartData, mode, tooltipId){
   const chartW=W-PL-PR,chartH=H-PT-PB;
   const isAcc=(mode!=='wk');
 
-  const hasAnyData=series.some(s=>(isAcc?s.acc:s.weekly).some(v=>v!=null&&v>0));
+  // For weekly mode: any non-null value counts as data (including 0%)
+  const hasAnyData = isAcc
+    ? series.some(s=>s.acc.some(v=>v!=null&&v>0))
+    : series.some(s=>s.weekly.some(v=>v!=null));
+
   const noDataMsg=!hasAnyData?`<text x="${W/2}" y="${PT+10}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#636776" opacity=".7">ยังไม่มีข้อมูล progress — แสดงเฉพาะเส้นแผน</text>`:'';
 
   let yMax=0;
@@ -1332,25 +1352,39 @@ function drawLineChart(svg, chartData, mode, tooltipId){
     (isAcc?s.acc:s.weekly).forEach(v=>{if(v!=null&&v>yMax)yMax=v;});
     if(isAcc) s.planAcc.forEach(v=>{if(v>yMax)yMax=v;});
   });
-  if(yMax===0)yMax=100;
-  yMax=Math.ceil(yMax/10)*10;
+  if(yMax===0)yMax=20; // weekly values are small (per-week %) so use 20 as floor
+  yMax=Math.ceil(yMax/5)*5; // round to nearest 5 for weekly, 10 for acc
 
   const xStep=chartW/(n>1?n-1:1);
   const yScale=v=>chartH-(v/yMax)*chartH;
   const px=wi=>PL+wi*xStep;
   const py=v=>PT+yScale(v);
 
-  const yTicks=[];const step=yMax<=20?5:yMax<=50?10:yMax<=100?20:25;
+  const yTicks=[];
+  const step=yMax<=10?1:yMax<=20?2:yMax<=50?5:yMax<=100?10:20;
   for(let t=0;t<=yMax;t+=step)yTicks.push(t);
   const gridLines=yTicks.map(t=>`<line x1="${PL}" y1="${py(t)}" x2="${PL+chartW}" y2="${py(t)}" stroke="#252830" stroke-width="${t===0?'1.5':'1'}"/>
     <text x="${PL-6}" y="${py(t)+4}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${t}${isAcc?'%':''}</text>`).join('');
 
   const tickEvery=n<=13?1:n<=26?2:n<=39?3:4;
+  // currentWi: for acc = last week with value >0; for weekly = last week with value >0
   let currentWi=0;
   series.forEach(s=>{
-    (isAcc?s.acc:s.weekly).forEach((v,wi)=>{if(v!=null&&v>0)currentWi=Math.max(currentWi,wi);});
+    const vals=isAcc?s.acc:s.weekly;
+    vals.forEach((v,wi)=>{ if(v!=null&&v>0) currentWi=Math.max(currentWi,wi); });
   });
   if(!hasAnyData) currentWi=n-1;
+
+  // buildPath: skip only null values — connect through zeros
+  function buildPath(vals){
+    let d='';let moved=false;
+    vals.forEach((v,wi)=>{
+      if(v==null){moved=false;return;}
+      d+=(moved?` L `:`M `)+`${px(wi)},${py(v)}`;
+      moved=true;
+    });
+    return d;
+  }
 
   const xTicks=weekLabels.map((w,wi)=>{
     if(wi%tickEvery!==0&&wi!==n-1&&wi!==currentWi)return'';
@@ -1359,8 +1393,6 @@ function drawLineChart(svg, chartData, mode, tooltipId){
 
   const curLine=`<line x1="${px(currentWi)}" y1="${PT}" x2="${px(currentWi)}" y2="${PT+chartH}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".65"/>
     <text x="${px(currentWi)+5}" y="${PT+12}" font-size="8.5" font-family="IBM Plex Mono,monospace" fill="#3b82f6" opacity=".8">NOW</text>`;
-
-  function buildPath(vals){let d='';let moved=false;vals.forEach((v,wi)=>{if(v==null){moved=false;return;}d+=(moved?` L `:`M `)+`${px(wi)},${py(v)}`;moved=true;});return d;}
   function buildArea(vals,color){let segs=[],seg=[];vals.forEach((v,wi)=>{if(v!=null)seg.push({wi,v});else if(seg.length){segs.push([...seg]);seg=[];}});if(seg.length)segs.push(seg);return segs.map(s=>{if(s.length<2)return'';const d=`M ${px(s[0].wi)},${py(0)} L ${s.map(p=>`${px(p.wi)},${py(p.v)}`).join(' L ')} L ${px(s[s.length-1].wi)},${py(0)} Z`;return`<path d="${d}" fill="${color}" opacity=".06"/>`;}).join('');}
 
   let planLines='';
