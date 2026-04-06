@@ -2160,22 +2160,9 @@ function buildYearlyTimeline(){
   const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const monthStarts=[0,4,8,12,16,20,24,28,32,36,40,44];
 
-  // acc values → cell states
-  function accToCells(accVals){
-    let lastDataWi=-1;
-    (accVals||[]).forEach((v,wi)=>{ if(v!=null&&v>0) lastDataWi=wi; });
-    return weekLabels.map((_,wi)=>{
-      const v=(accVals||[])[wi];
-      if(v==null||v<=0){
-        if(wi<=lastDataWi) return {cls:'planned',pct:null};
-        return {cls:'empty',pct:null};
-      }
-      if(wi===lastDataWi) return {cls:'active',pct:Math.round(v)};
-      return {cls:'done',pct:Math.round(v)};
-    });
-  }
+  // ── Row definitions ──────────────────────────────
 
-  // Recondition row
+  // Row 1: Recondition — weekly % from weekVals
   function getReconWeekPct(wi){
     if(!reconItems.length||wi>=rfWeeks.length) return null;
     const done=reconItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length;
@@ -2183,37 +2170,69 @@ function buildYearlyTimeline(){
     if(active===0) return null;
     return Math.round(done/reconItems.length*100);
   }
-  const reconCells=weekLabels.map((_,wi)=>{
-    if(wi>=rfWeeks.length) return {cls:'empty',pct:null};
-    const pct=getReconWeekPct(wi);
-    if(pct===null) return {cls:'empty',pct:null};
-    if(pct===100) return {cls:'done',pct};
-    if(pct>0) return {cls:'active',pct};
-    const hasAct=reconItems.some(it=>wi<it.weekVals.length&&it.weekVals[wi]!=='empty');
-    return hasAct?{cls:'planned',pct:0}:{cls:'empty',pct:null};
-  });
+  // Overall cumulative pct for Recondition (for end-label)
+  const reconDoneTotal=reconItems.filter(it=>it.pct===100).length;
+  const reconAccPct=reconItems.length>0?Math.round(reconDoneTotal/reconItems.length*100):0;
 
-  // Procurement rows from procChartData
+  const reconRow={
+    label:'Recondition', color:'#14b8a6',
+    accPct: reconAccPct,
+    cells: weekLabels.map((_,wi)=>{
+      if(wi>=rfWeeks.length) return {pct:null, isPlanned:false};
+      const pct=getReconWeekPct(wi);
+      const hasAct=reconItems.some(it=>wi<it.weekVals.length&&it.weekVals[wi]!=='empty');
+      return {pct, isPlanned: pct===null && hasAct};
+    })
+  };
+
+  // Rows 2+3: Purchasing + Delivery — weekly % from procChartData.series[i].weekly
   const procRows=[];
   if(procChartData&&procChartData.series.length){
+    // Find max weekly value across all proc series for relative scaling
+    let maxWk=0;
     procChartData.series.forEach(s=>{
-      procRows.push({label:s.name,color:s.color,cells:accToCells(s.acc)});
+      (s.weekly||[]).forEach(v=>{ if(v!=null&&v>maxWk) maxWk=v; });
+    });
+    maxWk=Math.max(maxWk,1);
+
+    procChartData.series.forEach(s=>{
+      // Acc pct = last non-null acc value
+      let accPct=0;
+      (s.acc||[]).forEach(v=>{ if(v!=null&&v>0) accPct=Math.round(v); });
+      const weekly=s.weekly||[];
+      // Last week with any weekly data > 0
+      let lastDataWi=-1;
+      weekly.forEach((v,wi)=>{ if(v!=null&&v>0) lastDataWi=wi; });
+
+      procRows.push({
+        label: s.name, color: s.color,
+        accPct,
+        maxWk,
+        cells: weekLabels.map((_,wi)=>{
+          const wv=weekly[wi];
+          // Mark as planned if before lastDataWi but value is 0/null
+          if(wi>lastDataWi) return {pct:null, isPlanned:false, wkVal:null};
+          if(wv==null||wv===0) return {pct:null, isPlanned:wi<=lastDataWi, wkVal:0};
+          return {pct:Math.round(wv/maxWk*100), isPlanned:false, wkVal:wv};
+        })
+      });
     });
   } else {
-    procRows.push({label:'Purchasing',color:'#8b5cf6',cells:weekLabels.map(()=>({cls:'empty',pct:null}))});
-    procRows.push({label:'Delivery',  color:'#14b8a6',cells:weekLabels.map(()=>({cls:'empty',pct:null}))});
+    procRows.push({label:'Purchasing',color:'#8b5cf6',accPct:0,maxWk:1,cells:weekLabels.map(()=>({pct:null,isPlanned:false,wkVal:null}))});
+    procRows.push({label:'Delivery',  color:'#14b8a6',accPct:0,maxWk:1,cells:weekLabels.map(()=>({pct:null,isPlanned:false,wkVal:null}))});
   }
 
-  // Current week
+  // Current week = last week with any data
   let currentWeekIdx=0;
-  reconCells.forEach((c,wi)=>{ if(c.cls==='active'||c.cls==='done') currentWeekIdx=wi; });
-  if(procChartData) procChartData.series.forEach(s=>{
-    s.acc.forEach((v,wi)=>{ if(v!=null&&v>0) currentWeekIdx=Math.max(currentWeekIdx,wi); });
-  });
+  reconRow.cells.forEach((c,wi)=>{ if(c.pct!=null&&c.pct>0) currentWeekIdx=wi; });
+  procRows.forEach(r=>r.cells.forEach((c,wi)=>{ if(c.wkVal!=null&&c.wkVal>0) currentWeekIdx=Math.max(currentWeekIdx,wi); }));
 
-  const allRows=[{label:'Recondition',color:'var(--teal)',cells:reconCells},...procRows];
+  const allRows=[reconRow, ...procRows];
   const cellW='flex:1;min-width:14px;max-width:28px;';
 
+  // ── Build HTML ───────────────────────────────────
+
+  // Month labels
   let monthHtml=`<div style="display:flex;margin-left:130px;margin-bottom:2px;">`;
   monthStarts.forEach((start,mi)=>{
     const end=mi+1<monthStarts.length?monthStarts[mi+1]:totalWeeks;
@@ -2222,6 +2241,7 @@ function buildYearlyTimeline(){
   });
   monthHtml+=`</div>`;
 
+  // Week header
   let headerHtml=`<div style="display:flex;align-items:center;margin-bottom:3px;">
     <div style="width:130px;flex-shrink:0;"></div>
     <div style="display:flex;flex:1;gap:1px;">${weekLabels.map((w,wi)=>{
@@ -2231,39 +2251,81 @@ function buildYearlyTimeline(){
     <div style="width:44px;flex-shrink:0;"></div>
   </div>`;
 
-  const rowsHtml=allRows.map(row=>{
-    const doneC=row.cells.filter(c=>c.cls==='done').length;
-    const hasD=row.cells.filter(c=>c.cls!=='empty').length;
-    const pct=hasD>0?Math.round(doneC/Math.max(hasD,1)*100):0;
+  // Rows — cells use opacity/intensity based on weekly %
+  const rowsHtml=allRows.map((row,ri)=>{
     const col=row.color;
+    const accPct=row.accPct||0;
+
     const cellsHtml=row.cells.map((cell,wi)=>{
-      const isMonth=monthStarts.includes(wi),isCur=wi===currentWeekIdx;
-      let bg,border,opacity;
-      if(cell.cls==='done'){bg=col;border='none';opacity='.85';}
-      else if(cell.cls==='active'){bg=col;border='none';opacity='.55';}
-      else if(cell.cls==='planned'){bg='transparent';border=`1px solid ${col}`;opacity='.45';}
-      else{bg='var(--surface2)';border='1px solid var(--border)';opacity='1';}
+      const isMonth=monthStarts.includes(wi), isCur=wi===currentWeekIdx;
+      const mB=isMonth?'border-left:1px solid rgba(245,166,35,.15);':'';
       const curHL=isCur?'outline:1.5px solid var(--blue);outline-offset:-1px;':'';
-      const mB=isMonth&&cell.cls==='empty'?'border-left:1px solid rgba(245,166,35,.12)!important;':'';
-      const lbl=cell.cls==='active'&&cell.pct>0&&cell.pct<100?`<span style="font-size:7px;font-family:'IBM Plex Mono',monospace;color:#fff;line-height:1;">${cell.pct}</span>`:'';
-      return `<div style="${cellW}height:20px;border-radius:2px;background:${bg};border:${border};opacity:${opacity};${curHL}${mB}display:flex;align-items:center;justify-content:center;">${lbl}</div>`;
+
+      let bg, border, opacity, label='';
+
+      if(cell.pct==null && !cell.isPlanned){
+        // No data
+        bg='var(--surface2)'; border='1px solid var(--border)'; opacity='1';
+      } else if(cell.isPlanned && (cell.pct==null||cell.pct===0)){
+        // Planned / zero during active period
+        bg='transparent'; border=`1px solid ${col}`; opacity='.35';
+      } else {
+        // Has data — intensity from pct (0-100)
+        const intensity=Math.max(cell.pct||0, 8); // min 8% so it's visible
+        opacity=String((0.15 + (intensity/100)*0.85).toFixed(2));
+        bg=col; border='none';
+        // Show % if current week or significant
+        if(isCur && cell.pct!=null && cell.pct>0){
+          label=`<span style="font-size:7px;font-family:'IBM Plex Mono',monospace;color:#fff;font-weight:700;line-height:1;">${cell.pct}</span>`;
+        }
+      }
+
+      // Build tooltip data attributes
+      const wkLabel=weekLabels[wi]||('W'+(wi+1));
+      const valStr=cell.wkVal!=null ? cell.wkVal.toFixed(2)+'%' : (cell.pct!=null ? cell.pct+'%' : '—');
+      const tipAttr=`data-tip="${wkLabel}: ${row.label} ${valStr}${isCur?' (NOW)':''}"`;
+
+      return `<div ${tipAttr} style="${cellW}height:20px;border-radius:2px;background:${bg};border:${border};opacity:${opacity};${curHL}${mB}display:flex;align-items:center;justify-content:center;cursor:default;" 
+        onmouseenter="showTimelineTip(event,'${wkLabel}','${row.label}','${valStr}','${col}',${isCur?1:0})"
+        onmouseleave="hideTimelineTip()">${label}</div>`;
     }).join('');
+
     return `<div style="display:flex;align-items:center;margin-bottom:5px;">
       <div style="width:130px;flex-shrink:0;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding-right:8px;display:flex;align-items:center;gap:5px;">
         <span style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;display:inline-block;opacity:.9;"></span>${row.label}</div>
       <div style="display:flex;flex:1;gap:1px;">${cellsHtml}</div>
-      <div style="width:44px;flex-shrink:0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding-left:8px;color:${pct===100?'var(--green)':pct>0?col:'var(--muted)'};">${pct}%</div>
+      <div style="width:44px;flex-shrink:0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding-left:8px;color:${accPct===100?'var(--green)':accPct>0?col:'var(--muted)'};">${accPct}%</div>
     </div>`;
   }).join('');
 
   grid.innerHTML=monthHtml+headerHtml+rowsHtml;
+
   legendEl.innerHTML=`
-    <div class="tl-leg"><div class="tl-leg-box" style="background:var(--teal);opacity:.85;"></div>เสร็จแล้ว (Done)</div>
-    <div class="tl-leg"><div class="tl-leg-box" style="background:var(--teal);opacity:.55;"></div>กำลังดำเนินการ (Active)</div>
-    <div class="tl-leg"><div class="tl-leg-box" style="background:transparent;border:1px solid var(--teal);opacity:.5;"></div>วางแผนแล้ว (Planned)</div>
-    <div class="tl-leg"><div class="tl-leg-box" style="background:var(--surface2);border:1px solid var(--border);"></div>ยังไม่มีข้อมูล</div>
-    <div class="tl-leg" style="margin-left:8px;"><div class="tl-leg-box" style="background:transparent;outline:1.5px solid var(--blue);outline-offset:-1px;"></div>อาทิตย์ปัจจุบัน</div>
+    <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;margin-right:4px;">Progress / Week:</div>
+    <div class="tl-leg"><div style="width:14px;height:10px;border-radius:2px;background:var(--teal);opacity:.2;"></div>น้อย</div>
+    <div class="tl-leg"><div style="width:14px;height:10px;border-radius:2px;background:var(--teal);opacity:.55;"></div>ปานกลาง</div>
+    <div class="tl-leg"><div style="width:14px;height:10px;border-radius:2px;background:var(--teal);opacity:1;"></div>มาก</div>
+    <div class="tl-leg" style="margin-left:8px;"><div style="width:14px;height:10px;border-radius:2px;background:transparent;border:1px solid var(--teal);opacity:.4;"></div>แผน/ไม่มีข้อมูล</div>
+    <div class="tl-leg" style="margin-left:4px;"><div style="width:14px;height:10px;border-radius:2px;background:transparent;outline:1.5px solid var(--blue);outline-offset:-1px;"></div>NOW</div>
   `;
+}
+
+// ── Timeline cell tooltip ──
+function showTimelineTip(e, week, rowName, val, color, isCur){
+  const tip=document.getElementById('reconChartTooltip');
+  if(!tip) return;
+  tip.innerHTML=`<div class="tt-week"><span class="tt-week-dot" style="background:${isCur?'#3b82f6':color};"></span>${week}${isCur?'<span style="background:#3b82f6;color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:4px;">NOW</span>':''}</div>
+    <div class="tt-row"><span class="tt-dot" style="background:${color};"></span><span class="tt-name">${rowName}</span><span class="tt-val" style="color:${color};">${val}</span></div>`;
+  const vpW=window.innerWidth, vpH=window.innerHeight;
+  let tx=e.clientX+14, ty=e.clientY-60;
+  if(tx+200>vpW-10) tx=e.clientX-214;
+  if(ty<10) ty=10;
+  if(ty+100>vpH-10) ty=vpH-110;
+  tip.style.left=tx+'px'; tip.style.top=ty+'px'; tip.style.display='block';
+}
+function hideTimelineTip(){
+  const tip=document.getElementById('reconChartTooltip');
+  if(tip) tip.style.display='none';
 }
 
 
