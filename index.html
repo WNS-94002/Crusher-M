@@ -545,43 +545,54 @@
     <!-- Big rings + modules -->
     <div class="sec"><span class="sec-title">ภาพรวมโครงการ</span></div>
     <div class="ov-ring-section">
-      <div class="ov-ring-card">
-        <!-- Dual concentric rings: outer=Budget, inner=Progress -->
-        <div class="ring-wrap" style="width:180px;height:180px;flex-shrink:0;">
-          <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" width="180" height="180">
-            <!-- outer track (Budget) -->
-            <circle cx="90" cy="90" r="76" fill="none" stroke="#252830" stroke-width="14"/>
-            <circle id="ov-ring-budget" cx="90" cy="90" r="76" fill="none" stroke="var(--blue)" stroke-width="14"
-              stroke-linecap="round" stroke-dasharray="0 478" transform="rotate(-90 90 90)"
-              style="transition:stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1)"/>
-            <!-- inner track (Overall Progress) -->
-            <circle cx="90" cy="90" r="56" fill="none" stroke="#1d1f28" stroke-width="14"/>
-            <circle id="ov-ring-progress" cx="90" cy="90" r="56" fill="none" stroke="var(--teal)" stroke-width="14"
-              stroke-linecap="round" stroke-dasharray="0 352" transform="rotate(-90 90 90)"
+
+      <!-- Ring 1: Budget Used -->
+      <div class="ov-ring-card" style="flex:1;min-width:220px;">
+        <div class="ring-wrap" style="flex-shrink:0;">
+          <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="80" cy="80" r="62" fill="none" stroke="#252830" stroke-width="18"/>
+            <circle id="ov-ring-budget" cx="80" cy="80" r="62" fill="none" stroke="var(--blue)" stroke-width="18"
+              stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 80 80)"
               style="transition:stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1)"/>
           </svg>
-          <div class="ring-center" style="flex-direction:column;gap:0;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--blue);line-height:1;" id="ovRingBudgetPct">—</div>
-            <div style="font-size:8px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.8px;text-transform:uppercase;">budget</div>
-            <div style="width:1px;height:10px;background:var(--border);margin:4px auto;"></div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--teal);line-height:1;" id="ovRingPct">—</div>
-            <div style="font-size:8px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.8px;text-transform:uppercase;">progress</div>
+          <div class="ring-center">
+            <div class="ring-pct" id="ovRingBudgetPct" style="color:var(--blue)">—</div>
+            <div class="ring-sub">budget used</div>
           </div>
         </div>
         <div class="ring-legend">
-          <!-- Outer ring legend -->
-          <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⬤ วงนอก — Budget</div>
+          <div style="font-size:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--blue);margin-bottom:10px;">💰 Budget</div>
           <div class="rleg"><div class="rleg-dot" style="background:var(--blue)"></div><div><div class="rleg-label">Budget Used</div><div class="rleg-val" id="rlegBudget" style="color:var(--blue)">—</div></div></div>
-          <!-- Inner ring legend -->
-          <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px;">⬤ วงใน — Progress</div>
+          <div class="rleg" style="margin-top:6px;"><div class="rleg-dot" style="background:var(--orange,#f5a623)"></div><div><div class="rleg-label">Total Actual</div><div class="rleg-val" id="rlegActual" style="color:var(--accent)">—</div></div></div>
+          <div class="rleg" style="margin-top:6px;"><div class="rleg-dot" style="background:var(--muted)"></div><div><div class="rleg-label">Total Budget</div><div class="rleg-val" id="rlegBudgetAmt" style="color:var(--muted)">—</div></div></div>
+        </div>
+      </div>
+
+      <!-- Ring 2: Overall Progress -->
+      <div class="ov-ring-card" style="flex:1;min-width:220px;">
+        <div class="ring-wrap" style="flex-shrink:0;">
+          <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="80" cy="80" r="62" fill="none" stroke="#252830" stroke-width="18"/>
+            <circle id="ov-ring-progress" cx="80" cy="80" r="62" fill="none" stroke="var(--teal)" stroke-width="18"
+              stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 80 80)"
+              style="transition:stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1)"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ovRingPct" style="color:var(--teal)">—</div>
+            <div class="ring-sub">overall</div>
+          </div>
+        </div>
+        <div class="ring-legend">
+          <div style="font-size:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--teal);margin-bottom:10px;">📊 Progress</div>
           <div class="rleg"><div class="rleg-dot" style="background:var(--purple)"></div><div><div class="rleg-label">Procurement</div><div class="rleg-val" id="rlegProc" style="color:var(--purple)">—</div></div></div>
-          <div class="rleg"><div class="rleg-dot" style="background:var(--teal)"></div><div><div class="rleg-label">Recondition</div><div class="rleg-val" id="rlegRecon" style="color:var(--teal)">—</div></div></div>
-          <div class="rleg" style="margin-top:4px;padding-top:8px;border-top:1px solid var(--border);">
+          <div class="rleg" style="margin-top:6px;"><div class="rleg-dot" style="background:var(--teal)"></div><div><div class="rleg-label">Recondition</div><div class="rleg-val" id="rlegRecon" style="color:var(--teal)">—</div></div></div>
+          <div class="rleg" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
             <div class="rleg-dot" style="background:var(--teal)"></div>
             <div><div class="rleg-label">Overall Avg</div><div class="rleg-val" id="rlegOverall" style="color:var(--teal)">—</div></div>
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Module Cards -->
@@ -2081,34 +2092,38 @@ function buildOverallTab(){
 
   const bPct=budget>0?Math.min((actual/budget*100),100):0;
   const overallProgress=Math.round((procPct+reconPct2)/2); // avg of proc + recon
+  const C=2*Math.PI*62; // r=62 for both rings
 
-  // ── Outer ring: Budget Used (blue) ──
+  // ── Ring 1: Budget Used (blue) ──
   const ringBudget=document.getElementById('ov-ring-budget');
   if(ringBudget){
-    const CB=2*Math.PI*76;
-    ringBudget.setAttribute('stroke-dasharray',(bPct/100*CB).toFixed(1)+' '+CB.toFixed(1));
     const budgetColor=bPct>100?'var(--red)':bPct>80?'var(--accent)':'var(--blue)';
+    ringBudget.setAttribute('stroke-dasharray',(Math.min(bPct,100)/100*C).toFixed(1)+' '+C.toFixed(1));
     ringBudget.setAttribute('stroke', budgetColor);
-    document.getElementById('ovRingBudgetPct').textContent=bPct.toFixed(1)+'%';
-    document.getElementById('ovRingBudgetPct').style.color=budgetColor;
+    const bPctEl=document.getElementById('ovRingBudgetPct');
+    if(bPctEl){bPctEl.textContent=bPct.toFixed(1)+'%';bPctEl.style.color=budgetColor;}
   }
 
-  // ── Inner ring: Overall Progress (teal/green) ──
+  // ── Ring 2: Overall Progress (teal/green) ──
   const ringProg=document.getElementById('ov-ring-progress');
   if(ringProg){
-    const CP=2*Math.PI*56;
-    ringProg.setAttribute('stroke-dasharray',(overallProgress/100*CP).toFixed(1)+' '+CP.toFixed(1));
     const progColor=overallProgress===100?'var(--green)':overallProgress>66?'var(--teal)':'var(--accent)';
+    ringProg.setAttribute('stroke-dasharray',(overallProgress/100*C).toFixed(1)+' '+C.toFixed(1));
     ringProg.setAttribute('stroke', progColor);
-    document.getElementById('ovRingPct').textContent=overallProgress+'%';
-    document.getElementById('ovRingPct').style.color=progColor;
-    if(document.getElementById('rlegOverall')) document.getElementById('rlegOverall').textContent=overallProgress+'%';
+    const progEl=document.getElementById('ovRingPct');
+    if(progEl){progEl.textContent=overallProgress+'%';progEl.style.color=progColor;}
+    const overallEl=document.getElementById('rlegOverall');
+    if(overallEl) overallEl.textContent=overallProgress+'%';
   }
 
   // Legend values
   document.getElementById('rlegBudget').textContent=bPct.toFixed(1)+'%';
   document.getElementById('rlegProc').textContent=procPct+'%';
   document.getElementById('rlegRecon').textContent=reconPct2+'%';
+  const rlegActualEl=document.getElementById('rlegActual');
+  if(rlegActualEl) rlegActualEl.textContent=fmt(actual)+' ฿';
+  const rlegBudgetAmtEl=document.getElementById('rlegBudgetAmt');
+  if(rlegBudgetAmtEl) rlegBudgetAmtEl.textContent=fmt(budget)+' ฿';
 
   // Module cards
   const modules=[
