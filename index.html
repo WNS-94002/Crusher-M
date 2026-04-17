@@ -3,617 +3,2367 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conveyor Belt Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<title>Crusher M — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg-base:#0d0f14; --bg-panel:#13161e; --bg-card:#181c27; --bg-hover:#1e2333;
-  --accent:#f07c1f; --accent-dim:rgba(240,124,31,0.15); --accent2:#3b9ede;
-  --success:#2ecc71; --danger:#e74c3c; --purple:#9b59b6;
-  --border:rgba(255,255,255,0.07); --border-acc:rgba(240,124,31,0.4);
-  --text-1:#eef0f5; --text-2:#8b90a0; --text-3:#545968;
-  --r:10px; --rl:14px;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg-base);color:var(--text-1);font-family:'Sarabun',sans-serif;font-size:14px;min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);
-  background-size:40px 40px;}
-.app{position:relative;z-index:1;max-width:1460px;margin:0 auto;padding:24px 28px 56px;}
+  :root {
+    --bg:#0d0e12; --surface:#15171e; --surface2:#1d1f28;
+    --border:#252830; --accent:#f5a623; --accent2:#e8441a;
+    --text:#e8e9ef; --muted:#636776;
+    --green:#27ae60; --red:#e74c3c; --blue:#3b82f6; --purple:#8b5cf6;
+    --teal:#14b8a6; --pink:#ec4899;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;min-height:100vh;}
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:linear-gradient(rgba(245,166,35,.025)1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.025)1px,transparent 1px);
+    background-size:44px 44px;pointer-events:none;z-index:0;
+  }
+  .container{max-width:1440px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
 
-/* HEADER */
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:14px;}
-.hleft{display:flex;align-items:center;gap:16px;}
-.htitle h1{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;letter-spacing:2px;color:var(--text-1);text-transform:uppercase;line-height:1.1;}
-.htitle h1 span{color:var(--accent);}
-.htitle p{font-size:11px;color:var(--text-2);margin-top:3px;letter-spacing:0.5px;}
-.hright{display:flex;align-items:center;gap:12px;}
-.sinfo .sl{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;}
-.sinfo .sv{font-size:12px;color:var(--text-2);margin-top:2px;text-align:right;}
-.rbtn{display:flex;align-items:center;gap:7px;background:var(--accent-dim);border:1px solid var(--border-acc);color:var(--accent);padding:9px 18px;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
-.rbtn:hover{background:rgba(240,124,31,0.28);}
-.rbtn.spinning .rico{animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
+  /* ── HEADER ── */
+  header{padding:32px 0 0;border-bottom:1px solid var(--border);}
+  .header-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-bottom:20px;}
+  .brand{display:flex;align-items:center;gap:16px;}
+  .logo-mark{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:#000;clip-path:polygon(10% 0%,90% 0%,100% 10%,100% 90%,90% 100%,10% 100%,0% 90%,0% 10%);flex-shrink:0;}
+  .title-group h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:3px;background:linear-gradient(90deg,var(--accent) 30%,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+  .title-group p{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+  .header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{padding:9px 16px;border-radius:6px;font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .18s;display:flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;}
+  .btn-primary{background:var(--accent);color:#000;}
+  .btn-primary:hover{background:#ffb83d;transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-share{background:var(--surface2);color:var(--blue);border:1px solid var(--blue);}
+  .btn-share:hover{background:var(--blue);color:#fff;}
 
-/* STATUS */
-.statusbar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-3);margin-bottom:22px;letter-spacing:0.3px;}
-.sdot{width:6px;height:6px;border-radius:50%;background:var(--text-3);}
-.sdot.live{background:var(--success);box-shadow:0 0 5px var(--success);animation:pulse 2s infinite;}
-.sdot.err{background:var(--danger);}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  /* ── TABS ── */
+  .tab-bar{display:flex;gap:0;margin-top:0;overflow-x:auto;}
+  .tab-bar::-webkit-scrollbar{height:0;}
+  .tab-btn{padding:12px 22px;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+  .tab-btn.active .tab-dot{background:var(--accent);}
 
-/* LOADING / ERROR */
-.lscreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:16px;}
-.loader{width:38px;height:38px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
-.lscreen p{color:var(--text-2);font-size:13px;}
-.errscreen{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.3);border-radius:var(--rl);padding:24px;display:none;}
-.errscreen h3{color:#e74c3c;font-family:'Rajdhani',sans-serif;font-size:18px;margin-bottom:10px;}
-.errscreen pre{color:var(--text-2);font-size:12px;line-height:1.7;white-space:pre-wrap;font-family:'Sarabun',sans-serif;}
+  /* ── STATUS BAR ── */
+  .status-bar{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+  .dot.live{background:var(--green);}
 
-/* METRICS — 3 cards */
-.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px;}
-.mc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s;}
-.mc:hover{border-color:rgba(255,255,255,.13);}
-.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.a1::before{background:var(--accent);}
-.a2::before{background:var(--accent2);}
-.a3::before{background:var(--success);}
-.mico{font-size:18px;margin-bottom:10px;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;}
-.a1 .mico{background:var(--accent-dim);}
-.a2 .mico{background:rgba(59,158,222,.12);}
-.a3 .mico{background:rgba(46,204,113,.12);}
-.mlbl{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
-.mval{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;line-height:1;}
-.a1 .mval{color:var(--accent);}
-.a2 .mval{color:var(--accent2);}
-.a3 .mval{color:var(--success);}
-.munit{font-size:10px;color:var(--text-3);margin-top:5px;}
+  /* ── TAB PANELS ── */
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
 
-/* CHART PANELS */
-.panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;margin-bottom:16px;}
-.panel.half-l{flex:1.3;}
-.panel.half-r{flex:1;}
-.row2{display:flex;gap:14px;margin-bottom:16px;}
-.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px;}
-.ph-left{display:flex;flex-direction:column;gap:3px;}
-.ptitle{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:1px;}
-.psub{font-size:11px;color:var(--text-3);}
-.pbadge{font-size:9px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--border-acc);border-radius:4px;padding:2px 8px;font-family:'Rajdhani',sans-serif;white-space:nowrap;margin-top:2px;}
-.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-.legend span{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-2);}
-.lsq{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+  /* ════ SHARED ════ */
+  .sec{margin:28px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--accent);display:flex;align-items:center;gap:10px;}
+  .sec-title::before{content:'';width:4px;height:16px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+  .sec-right{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
+  .card:hover{border-color:rgba(245,166,35,.4);transform:translateY(-2px);}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .card.c-orange::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+  .card.c-green::before{background:var(--green);}
+  .card.c-red::before{background:var(--red);}
+  .card.c-blue::before{background:var(--blue);}
+  .card.c-purple::before{background:var(--purple);}
+  .card.c-teal::before{background:var(--teal);}
+  .card-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
+  .card-value{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;line-height:1;}
+  .card.c-orange .card-value{color:var(--accent);}
+  .card.c-green  .card-value{color:var(--green);}
+  .card.c-red    .card-value{color:var(--red);}
+  .card.c-blue   .card-value{color:var(--blue);}
+  .card.c-purple .card-value{color:var(--purple);}
+  .card.c-teal   .card-value{color:var(--teal);}
+  .card-sub{font-size:11px;color:var(--muted);margin-top:5px;}
+  .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+  .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;color:var(--muted);gap:12px;text-align:center;line-height:1.7;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes glowPulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* FILTER */
-.fsect{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--rl);padding:13px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.flbl{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
-.fdiv{width:1px;height:20px;background:var(--border);flex-shrink:0;}
-.fg{display:flex;align-items:center;gap:6px;}
-.ftag{font-size:10px;color:var(--text-3);}
-select{background:var(--bg-card);border:1px solid var(--border);color:var(--text-1);font-family:'Sarabun',sans-serif;font-size:12px;padding:5px 9px;border-radius:6px;cursor:pointer;outline:none;transition:border-color .2s;}
-select:hover,select:focus{border-color:rgba(240,124,31,.4);}
-.rcount{margin-left:auto;font-size:11px;color:var(--text-3);font-family:'Rajdhani',sans-serif;letter-spacing:.5px;white-space:nowrap;}
-.rcount strong{color:var(--accent);}
+  /* ════════════════════════════════
+     OVERALL TAB
+  ════════════════════════════════ */
+  .ov-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;padding:28px 0 20px;}
+  
+  /* big progress ring */
+  .ov-ring-section{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;}
+  .ov-ring-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;display:flex;gap:32px;align-items:center;flex-wrap:wrap;flex:1;min-width:300px;}
+  .ring-wrap{position:relative;width:160px;height:160px;flex-shrink:0;}
+  .ring-wrap svg{width:160px;height:160px;}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ring-pct{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:1px;line-height:1;}
+  .ring-sub{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
+  .ring-legend{display:flex;flex-direction:column;gap:12px;}
+  .rleg{display:flex;align-items:center;gap:10px;}
+  .rleg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .rleg-label{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;}
+  .rleg-val{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1.1;}
 
-/* TABLE */
-.twrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;}
-.tscroll{overflow-x:auto;max-height:400px;overflow-y:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{background:var(--bg-panel);color:var(--text-3);font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2;cursor:pointer;white-space:nowrap;user-select:none;transition:color .15s;}
-thead th:hover,thead th.sa{color:var(--accent);}
-.si{font-size:8px;margin-left:3px;opacity:.4;}
-.si.on{opacity:1;color:var(--accent);}
-tbody tr:hover td{background:var(--bg-hover);}
-tbody td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text-1);white-space:nowrap;vertical-align:middle;}
-tbody tr:last-child td{border-bottom:none;}
-.num{text-align:right;font-family:'Rajdhani',sans-serif;font-size:12px;}
-.tdim{color:var(--text-2);}
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
-.bst{background:rgba(59,158,222,.15);color:#3b9ede;border:1px solid rgba(59,158,222,.3);}
-.bfa{background:rgba(46,204,113,.12);color:#2ecc71;border:1px solid rgba(46,204,113,.25);}
-.byr{background:var(--accent-dim);color:var(--accent);border:1px solid var(--border-acc);font-size:10px;padding:2px 8px;}
-a.lpdf{display:inline-flex;align-items:center;gap:3px;color:var(--accent2);font-size:10px;text-decoration:none;opacity:.8;transition:opacity .15s;}
-a.lpdf:hover{opacity:1;}
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.15);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.fi{animation:fadeUp .35s ease both;}
-.fi:nth-child(1){animation-delay:0s}.fi:nth-child(2){animation-delay:.06s}.fi:nth-child(3){animation-delay:.12s}
-.section-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 12px;display:flex;align-items:center;gap:10px;}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-@media(max-width:900px){.mgrid{grid-template-columns:1fr 1fr;}.row2{flex-direction:column;}}
-@media(max-width:600px){.app{padding:16px;}.mgrid{grid-template-columns:1fr;}}
+  /* module cards */
+  .ov-modules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px;}
+  .mod-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;transition:border-color .2s,transform .15s;cursor:default;}
+  .mod-card:hover{border-color:rgba(245,166,35,.35);transform:translateY(-2px);}
+  .mod-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .mod-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;}
+  .mod-badge{font-size:11px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:12px;font-weight:600;}
+  .mod-badge.done{background:rgba(39,174,96,.18);color:var(--green);}
+  .mod-badge.active{background:rgba(245,166,35,.18);color:var(--accent);}
+  .mod-badge.wait{background:rgba(231,76,60,.12);color:#ff6b6b;}
+  .mod-ring-row{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+  .mod-mini-ring{position:relative;width:64px;height:64px;flex-shrink:0;}
+  .mod-mini-ring svg{width:64px;height:64px;}
+  .mod-mini-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+  .mod-mini-pct{font-family:'Bebas Neue',sans-serif;font-size:16px;}
+  .mod-stats{display:flex;flex-direction:column;gap:4px;flex:1;}
+  .mod-stat-row{display:flex;justify-content:space-between;font-size:11px;font-family:'IBM Plex Mono',monospace;}
+  .mod-stat-label{color:var(--muted);text-transform:uppercase;letter-spacing:.6px;}
+  .mod-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;}
+  .mod-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+
+  /* ═══════════════════════════════════
+     YEARLY TIMELINE (Overall tab)
+  ═══════════════════════════════════ */
+  .ov-timeline{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:24px;overflow-x:auto;}
+  .ov-timeline-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .ov-timeline-title::before{content:'';width:3px;height:14px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+
+  /* yearly gantt */
+  .yearly-gantt{min-width:600px;}
+  .yearly-gantt-header{display:flex;margin-bottom:6px;}
+  .yearly-gantt-row-label{width:120px;flex-shrink:0;}
+  .yearly-gantt-cols{display:flex;flex:1;gap:2px;}
+  .yearly-col-head{flex:1;text-align:center;font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;min-width:28px;}
+  .yearly-col-head.month-start{color:var(--accent);font-weight:600;}
+  .yearly-col-head.current-week{color:var(--blue);}
+
+  .yearly-gantt-body{display:flex;flex-direction:column;gap:6px;}
+  .yearly-gantt-row{display:flex;align-items:center;gap:0;}
+  .yearly-gantt-row-name{width:120px;flex-shrink:0;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding-right:10px;}
+  .yearly-gantt-cells{display:flex;flex:1;gap:2px;}
+  .yearly-cell{flex:1;height:18px;border-radius:2px;min-width:28px;transition:all .3s;position:relative;}
+  .yearly-cell.done{background:var(--green);opacity:.85;}
+  .yearly-cell.active{background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.9;}
+  .yearly-cell.planned{background:rgba(245,166,35,.18);border:1px solid rgba(245,166,35,.3);}
+  .yearly-cell.empty{background:var(--surface2);border:1px solid var(--border);}
+  .yearly-cell.current-week{ring:2px solid var(--blue)!important;outline:1.5px solid var(--blue);}
+
+  /* month separator line in header */
+  .yearly-col-head.month-sep{border-left:1px solid rgba(245,166,35,.25);}
+  .yearly-cell.month-sep{border-left:1px solid rgba(245,166,35,.15)!important;}
+
+  .yearly-month-labels{display:flex;margin-bottom:2px;}
+  .yearly-month-slot{font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;border-left:1px solid rgba(245,166,35,.2);padding-left:3px;overflow:hidden;white-space:nowrap;}
+
+  .yearly-pct-col{width:44px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;flex-shrink:0;padding-left:8px;}
+
+  .ov-timeline-legend{display:flex;gap:16px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  .tl-leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .tl-leg-box{width:14px;height:10px;border-radius:2px;}
+
+  /* ════════════════════════════════
+     COST SUMMARY TAB
+  ════════════════════════════════ */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding:28px 0 20px;}
+  .bva-donut-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 28px 24px;margin-bottom:24px;display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;}
+  .bva-donuts-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;flex:1;}
+  .bva-donut-item{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px 14px 12px;min-width:150px;}
+  .bva-donut-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-align:center;}
+  .bva-donut-svg-wrap{position:relative;width:110px;height:110px;}
+  .bva-donut-svg-wrap svg{width:110px;height:110px;}
+  .bva-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;pointer-events:none;}
+  .bva-donut-pct{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;}
+  .bva-donut-label{font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;}
+  .bva-donut-nums{display:flex;flex-direction:column;gap:4px;width:100%;}
+  .bva-donut-num-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-family:'IBM Plex Mono',monospace;}
+  .bva-donut-num-row .lbl{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;}
+  .bva-donut-diff-tag{width:100%;text-align:center;padding:4px 8px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;margin-top:4px;}
+  .bva-donut-diff-tag.over{background:rgba(231,76,60,.15);color:var(--red);}
+  .bva-donut-diff-tag.under{background:rgba(39,174,96,.15);color:var(--green);}
+  .bva-cat-list{flex:1;min-width:220px;}
+  .bva-cat-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:14px;}
+  .bva-cat-row{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+  .bva-cat-head{display:flex;justify-content:space-between;align-items:center;}
+  .bva-cat-name{font-size:12px;color:var(--text);font-weight:500;}
+  .bva-cat-tag{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 6px;border-radius:3px;}
+  .bva-cat-tag.over{background:rgba(231,76,60,.15);color:var(--red);}
+  .bva-cat-tag.under{background:rgba(39,174,96,.15);color:var(--green);}
+  .bva-cat-bar-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative;margin-top:2px;}
+  .bva-cat-bar-b{position:absolute;top:0;left:0;height:100%;border-radius:3px;background:rgba(59,130,246,.4);}
+  .bva-cat-bar-a{position:absolute;top:0;left:0;height:100%;border-radius:3px;transition:width .6s ease;}
+  .bva-cat-bar-a.over{background:linear-gradient(90deg,var(--red),#b91c1c);}
+  .bva-cat-bar-a.under{background:linear-gradient(90deg,var(--green),#16a34a);}
+  .bva-cat-amts{display:flex;justify-content:space-between;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);margin-top:2px;}
+  .filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .search-box{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 13px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+  .search-box:focus{border-color:var(--accent);}
+  .search-box::placeholder{color:var(--muted);}
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 13px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;outline:none;cursor:pointer;}
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead{background:var(--surface2);position:sticky;top:0;z-index:2;}
+  th{padding:13px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s;}
+  th:hover,th.sorted{color:var(--accent);}
+  td{padding:11px 14px;border-bottom:1px solid rgba(37,40,48,.7);vertical-align:middle;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(245,166,35,.035);}
+  .num{text-align:right;font-family:'IBM Plex Mono',monospace;}
+  .amt-budget{color:var(--blue);}
+  .amt-actual{color:var(--accent);}
+  .diff-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;}
+  .diff-pill.over{background:rgba(231,76,60,.15);color:var(--red);}
+  .diff-pill.under{background:rgba(39,174,96,.15);color:var(--green);}
+  .status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+  .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .status-badge.wait{background:rgba(231,76,60,.12);color:#ff6b6b;border:1px solid rgba(231,76,60,.3);}
+  .status-badge.wait::before{background:#e74c3c;}
+  .status-badge.active{background:rgba(245,166,35,.12);color:#f5a623;border:1px solid rgba(245,166,35,.3);}
+  .status-badge.active::before{background:#f5a623;animation:glowPulse 1.8s infinite;}
+  .status-badge.complete{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3);}
+  .status-badge.complete::before{background:#27ae60;}
+
+  /* ── ORDER STATUS badge (new) ── */
+  .order-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.4px;white-space:nowrap;border:1px solid transparent;}
+  .order-badge.ordered{background:rgba(59,130,246,.12);color:var(--blue);border-color:rgba(59,130,246,.3);}
+  .order-badge.pending{background:rgba(245,166,35,.12);color:var(--accent);border-color:rgba(245,166,35,.3);}
+  .order-badge.delivered{background:rgba(39,174,96,.12);color:var(--green);border-color:rgba(39,174,96,.3);}
+  .order-badge.cancelled{background:rgba(231,76,60,.12);color:var(--red);border-color:rgba(231,76,60,.3);}
+  .order-badge.none{color:var(--muted);font-size:12px;}
+
+  .link-cell a{color:var(--blue);font-size:12px;font-family:'IBM Plex Mono',monospace;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);transition:all .15s;}
+  .link-cell a:hover{background:rgba(59,130,246,.18);border-color:var(--blue);color:#fff;}
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;gap:12px;flex-wrap:wrap;}
+  .page-btns{display:flex;gap:5px;}
+  .page-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15px;font-family:'IBM Plex Mono',monospace;}
+  .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .page-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+  .page-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+  /* ════════════════════════════════
+     PROGRESS TAB (Procurement)
+  ════════════════════════════════ */
+  .prog-stats{display:flex;gap:10px;margin:18px 0 14px;flex-wrap:wrap;}
+  .prog-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;flex:1;min-width:110px;}
+  .prog-stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;}
+  .prog-stat-value{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;}
+  .ps-blue .prog-stat-value{color:var(--blue);}
+  .ps-green .prog-stat-value{color:var(--green);}
+  .ps-orange .prog-stat-value{color:var(--accent);}
+  .ps-purple .prog-stat-value{color:var(--purple);}
+  .prog-filter{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+  .prog-search{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 12px;color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;outline:none;transition:border-color .2s;}
+  .prog-search:focus{border-color:var(--accent);}
+  .prog-search::placeholder{color:var(--muted);}
+  .prog-filter-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 14px;color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
+  .prog-filter-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+  .prog-filter-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+  .prog-row-count{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;white-space:nowrap;margin-left:auto;}
+  .prog-legend{display:flex;gap:14px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+  .prog-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+  .prog-leg-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid transparent;flex-shrink:0;}
+  .prog-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .prog-table-scroll{overflow-y:auto;max-height:520px;}
+  .prog-table-scroll::-webkit-scrollbar{width:5px;}
+  .prog-table-scroll::-webkit-scrollbar-track{background:var(--surface2);}
+  .prog-table-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .prog-table-scroll::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+  .prog-table{width:100%;border-collapse:collapse;}
+  .prog-table thead{position:sticky;top:0;z-index:2;background:var(--surface2);}
+  .prog-table th{padding:9px 8px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+  .prog-table th:hover,.prog-table th.sorted{color:var(--accent);}
+  .prog-table th.th-name{text-align:left;padding-left:14px;}
+  .prog-table td{padding:6px 8px;border-bottom:1px solid rgba(37,40,48,.6);vertical-align:middle;white-space:nowrap;}
+  .prog-table tr:last-child td{border-bottom:none;}
+  .prog-table tr:hover td{background:rgba(245,166,35,.03);}
+  .td-no{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);padding-left:14px!important;width:36px;text-align:right;}
+  .td-name{font-size:12px;color:var(--text);max-width:340px;overflow:hidden;text-overflow:ellipsis;padding-left:8px!important;}
+  .td-bar{width:70px;padding:0 8px!important;}
+  .mini-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .mini-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;}
+  .td-step{text-align:center;width:40px;}
+  .sdot{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:700;border:1.5px solid transparent;transition:all .3s;}
+  .sdot.done{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+  .sdot.wip{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue);animation:wip-glow 2s infinite;}
+  .sdot.wait{background:var(--surface2);border-color:var(--border);color:var(--muted);}
+  @keyframes wip-glow{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.25)}50%{box-shadow:0 0 0 3px rgba(59,130,246,.07)}}
+  .td-pct{text-align:center;width:44px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
+  .prog-empty{padding:40px;text-align:center;color:var(--muted);font-size:13px;}
+  .overview-wrap{display:flex;gap:16px;margin-bottom:18px;align-items:stretch;flex-wrap:wrap;}
+  .donut-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;display:flex;align-items:center;gap:22px;flex-shrink:0;}
+  .donut-svg-wrap{position:relative;width:130px;height:130px;flex-shrink:0;}
+  .donut-svg-wrap svg{width:130px;height:130px;}
+  .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+  .donut-pct{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;color:var(--accent);line-height:1;}
+  .donut-sub{font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+  .donut-legend{display:flex;flex-direction:column;gap:8px;min-width:110px;}
+  .dleg{display:flex;align-items:center;gap:7px;}
+  .dleg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .dleg-info{display:flex;flex-direction:column;}
+  .dleg-label{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;}
+  .dleg-val{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1.1;}
+  .funnel-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;flex:1;min-width:240px;}
+  .funnel-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:12px;}
+  .funnel-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .funnel-step-name{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);width:36px;flex-shrink:0;text-align:right;}
+  .funnel-track{flex:1;height:13px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .funnel-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s cubic-bezier(.4,0,.2,1);}
+  .funnel-fill.c-done{background:linear-gradient(90deg,var(--green),#16a34a);}
+  .funnel-nums{font-family:'IBM Plex Mono',monospace;font-size:10px;width:68px;text-align:right;flex-shrink:0;color:var(--muted);}
+  .funnel-nums b{color:var(--accent);font-weight:500;}
+  .funnel-nums b.done{color:var(--green);}
+
+  /* ════════════════════════════════
+     RECONDITION TAB (renamed, no sub-tabs)
+  ════════════════════════════════ */
+  .rf-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;margin-top:18px;}
+  .rf-kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 18px;}
+  .rf-kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
+  .rf-kpi-value{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
+
+  /* Weekly Gantt-style table */
+  .rf-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;overflow-x:auto;}
+  .rf-table{width:100%;border-collapse:collapse;min-width:600px;}
+  .rf-table thead{background:var(--surface2);}
+  .rf-table th{padding:10px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+  .rf-table th.th-item{text-align:left;padding-left:16px;min-width:200px;}
+  .rf-table th.th-week{text-align:center;min-width:70px;}
+  .rf-table th.th-week.current-week{color:var(--accent);}
+  .rf-table td{padding:8px 10px;border-bottom:1px solid rgba(37,40,48,.6);vertical-align:middle;}
+  .rf-table tr:last-child td{border-bottom:none;}
+  .rf-table tr:hover td{background:rgba(245,166,35,.025);}
+  .rf-table td.td-item{font-size:12px;padding-left:16px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rf-table td.td-no{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);width:36px;text-align:right;padding-right:6px;}
+  .rf-table td.td-week{text-align:center;padding:4px 6px;}
+
+  .week-cell{display:inline-flex;align-items:center;justify-content:center;width:44px;height:24px;border-radius:5px;font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;transition:all .2s;}
+  .week-cell.done{background:rgba(39,174,96,.2);color:var(--green);border:1px solid rgba(39,174,96,.4);}
+  .week-cell.planned{background:rgba(245,166,35,.12);color:var(--accent);border:1px solid rgba(245,166,35,.3);}
+  .week-cell.current{background:rgba(59,130,246,.18);color:var(--blue);border:1px solid rgba(59,130,246,.4);animation:wip-glow 2s infinite;}
+  .week-cell.empty{background:transparent;color:transparent;border:1px solid transparent;}
+
+  .rf-item-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-align:center;width:44px;padding:4px 6px!important;}
+
+  /* weekly bar chart */
+  .rf-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:20px;}
+  .rf-chart-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:18px;}
+  .rf-bars{display:flex;gap:8px;align-items:flex-end;height:120px;padding:0 4px;}
+  .rf-bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:40px;}
+  .rf-bar-track{width:100%;background:var(--surface2);border-radius:4px 4px 0 0;overflow:hidden;position:relative;transition:height .6s ease;}
+  .rf-bar-fill{position:absolute;bottom:0;left:0;right:0;border-radius:4px 4px 0 0;transition:height .6s ease;}
+  .rf-bar-label{font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;}
+  .rf-bar-val{font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .rf-table th.th-week.current-week::after{content:'▼';display:block;font-size:8px;margin-top:2px;opacity:.7;}
+
+  /* ── MODAL ── */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:520px;width:100%;}
+  .modal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent);margin-bottom:8px;}
+  .modal p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;}
+  .url-box{display:flex;gap:8px;}
+  .url-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 13px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;}
+  .modal-close{margin-top:14px;width:100%;}
+  .copy-msg{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
+
+  /* ── Chart Hover Tooltip ── */
+  #reconChartTooltip, #procChartTooltip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.3);
+    backdrop-filter: blur(4px);
+    transition: opacity .12s ease;
+  }
+  .tt-week {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tt-week-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue); flex-shrink: 0;
+  }
+  .tt-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .tt-row:last-child { margin-bottom: 0; }
+  .tt-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  }
+  .tt-name {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tt-val {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    min-width: 46px;
+    text-align: right;
+  }
+  .tt-bar-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 3px;
+    margin-left: 17px;
+    margin-bottom: 2px;
+  }
+  .tt-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width .3s ease;
+  }
+  .tt-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 7px 0;
+  }
+  .tt-crosshair {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,.12);
+    pointer-events: none;
+  }
+
+  /* ── Recondition Detail Panel ── */
+  .recon-group{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .recon-group-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .15s;}
+  .recon-group-header:hover{background:rgba(245,166,35,.07);}
+  .recon-group-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;display:flex;align-items:center;gap:10px;}
+  .recon-group-pct{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;}
+  .recon-group-ring{display:flex;align-items:center;gap:8px;}
+  .recon-group-body{padding:0 20px 16px;}
+  .recon-item-row{display:grid;grid-template-columns:1fr 200px 56px;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(37,40,48,.5);}
+  .recon-item-row:last-child{border-bottom:none;}
+  .recon-item-name{font-size:12px;color:var(--text);line-height:1.4;}
+  .recon-item-bar-wrap{position:relative;}
+  .recon-item-bar-track{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+  .recon-item-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+  .recon-item-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;text-align:right;}
+  .recon-group-chevron{font-size:12px;color:var(--muted);transition:transform .2s;}
+  .recon-group-chevron.open{transform:rotate(180deg);}
+  .recon-group-body{display:none;}
+  .recon-group-body.open{display:block;}
+
+  /* ── PO Number Badge ── */
+  .po-num-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:3px 9px;border-radius:5px;
+    background:rgba(59,130,246,.1);color:var(--blue);
+    border:1px solid rgba(59,130,246,.3);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    cursor:default;white-space:nowrap;
+  }
+  .po-link-btn{
+    color:var(--blue);font-size:12px;font-family:'IBM Plex Mono',monospace;
+    text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+    padding:3px 8px;border-radius:4px;
+    border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);
+    transition:all .15s;
+  }
+  .po-link-btn:hover{background:rgba(59,130,246,.18);border-color:var(--blue);color:#fff;}
+
+  footer{padding:24px 0;border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+
+  @media(max-width:640px){
+    .summary-grid{grid-template-columns:repeat(2,1fr);}
+    .td-name{max-width:160px;}
+    .ov-modules{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
-<div class="app">
+<div class="container">
 
   <!-- HEADER -->
-  <header class="header">
-    <div class="hleft">
-      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="60" height="60" rx="14" fill="rgba(240,124,31,0.13)" stroke="rgba(240,124,31,0.4)" stroke-width="1"/>
-        <rect x="8" y="26" width="44" height="8" rx="4" fill="#f07c1f" opacity="0.85"/>
-        <line x1="15" y1="26" x2="15" y2="34" stroke="rgba(0,0,0,0.22)" stroke-width="1.2"/>
-        <line x1="22" y1="26" x2="22" y2="34" stroke="rgba(0,0,0,0.22)" stroke-width="1.2"/>
-        <line x1="29" y1="26" x2="29" y2="34" stroke="rgba(0,0,0,0.22)" stroke-width="1.2"/>
-        <line x1="36" y1="26" x2="36" y2="34" stroke="rgba(0,0,0,0.22)" stroke-width="1.2"/>
-        <line x1="43" y1="26" x2="43" y2="34" stroke="rgba(0,0,0,0.22)" stroke-width="1.2"/>
-        <circle cx="12" cy="30" r="7.5" fill="#181c27" stroke="#f07c1f" stroke-width="2"/>
-        <circle cx="12" cy="30" r="3" fill="#f07c1f" opacity="0.65"/>
-        <circle cx="12" cy="30" r="1" fill="#f07c1f"/>
-        <circle cx="48" cy="30" r="7.5" fill="#181c27" stroke="#f07c1f" stroke-width="2"/>
-        <circle cx="48" cy="30" r="3" fill="#f07c1f" opacity="0.65"/>
-        <circle cx="48" cy="30" r="1" fill="#f07c1f"/>
-        <rect x="22" y="17" width="11" height="9" rx="1.5" fill="#3b9ede" opacity="0.92"/>
-        <line x1="27.5" y1="17" x2="27.5" y2="26" stroke="rgba(255,255,255,0.28)" stroke-width="0.8"/>
-        <line x1="22" y1="21.5" x2="33" y2="21.5" stroke="rgba(255,255,255,0.28)" stroke-width="0.8"/>
-        <polyline points="37,20 42,22.5 37,25" fill="none" stroke="#f07c1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.75"/>
-        <line x1="20" y1="34" x2="18" y2="42" stroke="rgba(240,124,31,0.35)" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="40" y1="34" x2="42" y2="42" stroke="rgba(240,124,31,0.35)" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="15" y1="42" x2="45" y2="42" stroke="rgba(240,124,31,0.25)" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <div class="htitle">
-        <h1>Conveyor Belt <span>Dashboard</span></h1>
-        <p>DATA PUR · GOOGLE SHEETS LIVE SYNC</p>
+  <header>
+    <div class="header-top">
+      <div class="brand">
+        <div class="logo-mark">CM</div>
+        <div class="title-group">
+          <h1>CRUSHER M</h1>
+          <p>Project Dashboard</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-share" onclick="openShare()">🔗 Share</button>
+        <button class="btn btn-ghost" id="refreshBtn" onclick="refreshAll()">↺ Refresh</button>
+        <button class="btn btn-primary" id="exportBtn" onclick="doExport()">⬇ Export CSV</button>
       </div>
     </div>
-    <div class="hright">
-      <div class="sinfo">
-        <div class="sl">Last updated</div>
-        <div class="sv" id="lastSync">—</div>
-      </div>
-      <button class="rbtn" id="btnRefresh" onclick="loadData()">
-        <svg class="rico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-        Refresh
-      </button>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-overall" onclick="switchTab('overall')"><span class="tab-dot"></span> Overall</button>
+      <button class="tab-btn" id="tab-cost" onclick="switchTab('cost')"><span class="tab-dot"></span> Cost Summary</button>
+      <button class="tab-btn" id="tab-progress" onclick="switchTab('progress')"><span class="tab-dot"></span> Procurement</button>
+      <button class="tab-btn" id="tab-rf" onclick="switchTab('rf')"><span class="tab-dot"></span> Recondition</button>
     </div>
   </header>
 
-  <div class="statusbar">
-    <div class="sdot" id="sdot"></div>
-    <span id="stxt">กำลังเชื่อมต่อ...</span>
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="dot" id="sDot"></span>
+    <span id="sText">กำลังโหลดข้อมูล...</span>
+    <span id="sTime"></span>
   </div>
 
-  <div id="lscreen" class="lscreen">
-    <div class="loader"></div>
-    <p>กำลังโหลดข้อมูลจาก Google Sheets...</p>
-  </div>
-  <div id="escreen" class="errscreen">
-    <h3>⚠ โหลดข้อมูลไม่สำเร็จ</h3>
-    <pre id="emsg"></pre>
-  </div>
+  <!-- ══════════════════════════════
+       TAB: OVERALL
+  ══════════════════════════════ -->
+  <div class="tab-panel active" id="panel-overall">
+    <!-- KPI row -->
+    <div class="ov-hero">
+      <div class="card c-blue"><div class="card-label">Total Budget</div><div class="card-value" id="ovBudget">—</div><div class="card-sub">THB</div></div>
+      <div class="card c-orange"><div class="card-label">Total Actual</div><div class="card-value" id="ovActual">—</div><div class="card-sub">THB</div></div>
+      <div class="card c-purple"><div class="card-label">Procurement</div><div class="card-value" id="ovProcPct">—</div><div class="card-sub" id="ovProcSub">—</div></div>
+      <div class="card c-teal"><div class="card-label">Recon Progress</div><div class="card-value" id="ovReconPct">—</div><div class="card-sub">overall completion</div></div>
+    </div>
 
-  <div id="main" style="display:none">
+    <!-- Big rings + modules -->
+    <div class="sec"><span class="sec-title">ภาพรวมโครงการ</span></div>
+    <div class="ov-ring-section">
 
-    <!-- METRICS: 3 cards -->
-    <div class="mgrid" id="mgrid"></div>
-
-    <!-- SECTION 1: เปรียบเทียบเริ่มโครงการ vs ปกติ -->
-    <div class="section-label">การสั่งซื้อ: เริ่มโครงการ vs. ปกติ (BW1800 & BW2200)</div>
-    <div class="row2">
-      <div class="panel half-l">
-        <div class="ph">
-          <div class="ph-left">
-            <div class="ptitle">BW1800 — เริ่มโครงการ vs. สั่งซื้อปกติ</div>
-            <div class="psub">ปี 2014 = เริ่มโครงการ · ปี 2015+ = สั่งซื้อปกติ</div>
+      <!-- Ring 1: Budget Used -->
+      <div class="ov-ring-card" style="flex:1;min-width:220px;">
+        <div class="ring-wrap" style="flex-shrink:0;">
+          <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="80" cy="80" r="62" fill="none" stroke="#252830" stroke-width="18"/>
+            <circle id="ov-ring-budget" cx="80" cy="80" r="62" fill="none" stroke="var(--blue)" stroke-width="18"
+              stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 80 80)"
+              style="transition:stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1)"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ovRingBudgetPct" style="color:var(--blue)">—</div>
+            <div class="ring-sub">budget used</div>
           </div>
-          <div class="pbadge">BAR</div>
         </div>
-        <div style="position:relative;height:220px;"><canvas id="cBW1800" role="img" aria-label="BW1800 project start vs normal orders">BW1800</canvas></div>
-        <div class="legend" id="lBW1800"></div>
+        <div class="ring-legend">
+          <div style="font-size:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--blue);margin-bottom:10px;">💰 Budget</div>
+          <div class="rleg"><div class="rleg-dot" style="background:var(--blue)"></div><div><div class="rleg-label">Budget Used</div><div class="rleg-val" id="rlegBudget" style="color:var(--blue)">—</div></div></div>
+          <div class="rleg" style="margin-top:6px;"><div class="rleg-dot" style="background:var(--orange,#f5a623)"></div><div><div class="rleg-label">Total Actual</div><div class="rleg-val" id="rlegActual" style="color:var(--accent)">—</div></div></div>
+          <div class="rleg" style="margin-top:6px;"><div class="rleg-dot" style="background:var(--muted)"></div><div><div class="rleg-label">Total Budget</div><div class="rleg-val" id="rlegBudgetAmt" style="color:var(--muted)">—</div></div></div>
+        </div>
       </div>
-      <div class="panel half-r">
-        <div class="ph">
-          <div class="ph-left">
-            <div class="ptitle">BW2200 — เริ่มโครงการ vs. สั่งซื้อปกติ</div>
-            <div class="psub">ปี 2014 = เริ่มโครงการ · ปี 2015+ = สั่งซื้อปกติ</div>
+
+      <!-- Ring 2: Overall Progress -->
+      <div class="ov-ring-card" style="flex:1;min-width:220px;">
+        <div class="ring-wrap" style="flex-shrink:0;">
+          <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="80" cy="80" r="62" fill="none" stroke="#252830" stroke-width="18"/>
+            <circle id="ov-ring-progress" cx="80" cy="80" r="62" fill="none" stroke="var(--teal)" stroke-width="18"
+              stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 80 80)"
+              style="transition:stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1)"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ovRingPct" style="color:var(--teal)">—</div>
+            <div class="ring-sub">overall</div>
           </div>
-          <div class="pbadge">BAR</div>
         </div>
-        <div style="position:relative;height:220px;"><canvas id="cBW2200" role="img" aria-label="BW2200 project start vs normal orders">BW2200</canvas></div>
-        <div class="legend" id="lBW2200"></div>
-      </div>
-    </div>
-
-    <!-- SECTION 2: ขนาดสายพานแต่ละปี -->
-    <div class="section-label">จำนวนเมตรแยกตามขนาดสายพาน (Belt Width) แต่ละปี</div>
-    <div class="panel">
-      <div class="ph">
-        <div class="ph-left">
-          <div class="ptitle">Belt Width แต่ละปี</div>
-          <div class="psub">Stacked bar แสดงสัดส่วน BW1600 / BW1800 / BW2200 / BW2400 / อื่นๆ</div>
+        <div class="ring-legend">
+          <div style="font-size:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--teal);margin-bottom:10px;">📊 Progress</div>
+          <div class="rleg"><div class="rleg-dot" style="background:var(--purple)"></div><div><div class="rleg-label">Procurement</div><div class="rleg-val" id="rlegProc" style="color:var(--purple)">—</div></div></div>
+          <div class="rleg" style="margin-top:6px;"><div class="rleg-dot" style="background:var(--teal)"></div><div><div class="rleg-label">Recondition</div><div class="rleg-val" id="rlegRecon" style="color:var(--teal)">—</div></div></div>
+          <div class="rleg" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+            <div class="rleg-dot" style="background:var(--teal)"></div>
+            <div><div class="rleg-label">Overall Avg</div><div class="rleg-val" id="rlegOverall" style="color:var(--teal)">—</div></div>
+          </div>
         </div>
-        <div class="pbadge">STACKED BAR</div>
       </div>
-      <div style="position:relative;height:260px;"><canvas id="cWidth" role="img" aria-label="Belt width by year stacked bar">Belt width by year</canvas></div>
-      <div class="legend" id="lWidth"></div>
+
     </div>
 
-    <!-- SECTION 3: มูลค่าแต่ละปี แยก BW2200 / BW1800 / อื่น -->
-    <div class="section-label">มูลค่าการสั่งซื้อแต่ละปี แยกสายพานสาย BW2200, BW1800 และเครื่องจักรอื่น</div>
-    <div class="panel">
-      <div class="ph">
-        <div class="ph-left">
-          <div class="ptitle">มูลค่า (ล้านบาท) แยกประเภทสายพาน</div>
-          <div class="psub">BW2200 · BW1800 · สายพานเครื่องจักรอื่น (BW1600, BW2400, ...)</div>
+    <!-- Module Cards -->
+    <div class="sec"><span class="sec-title">สถานะแต่ละส่วนงาน</span></div>
+    <div class="ov-modules" id="ovModules">
+      <div class="state-box"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Yearly Progress Timeline -->
+    <div class="sec"><span class="sec-title">ความก้าวหน้ารายอาทิตย์ตลอดปี</span></div>
+    <div class="ov-timeline" id="ovTimeline">
+      <div class="ov-timeline-title">Yearly Progress Timeline</div>
+      <div id="ovWeekGrid">
+        <div style="color:var(--muted);font-size:12px">กำลังโหลด...</div>
+      </div>
+      <div class="ov-timeline-legend" id="ovTimelineLegend"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB: COST SUMMARY
+  ══════════════════════════════ -->
+  <div class="tab-panel" id="panel-cost">
+    <div class="summary-grid">
+      <div class="card c-blue"><div class="card-label">Total Budget</div><div class="card-value" id="cBudget">—</div><div class="card-sub">THB</div></div>
+      <div class="card c-orange"><div class="card-label">Total Actual</div><div class="card-value" id="cActual">—</div><div class="card-sub">THB</div></div>
+      <div class="card c-red" id="cDiffCard">
+        <div class="card-label" id="cDiffLabel">Budget vs Actual</div>
+        <div class="card-value" id="cDiff">—</div>
+        <div class="card-sub" id="cDiffSub">—</div>
+      </div>
+      <div class="card c-purple"><div class="card-label">จำนวนรายการ</div><div class="card-value" id="cItems">—</div><div class="card-sub" id="cItemsSub" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;"></div></div>
+      <div class="card c-green" id="cPctCard"><div class="card-label">% Budget Used</div><div class="card-value" id="cPct">—</div><div class="card-sub">of total budget</div></div>
+    </div>
+
+    <!-- Budget vs Actual Chart (no สรุปภาพรวม section) -->
+    <div id="costChartArea" style="display:none">
+      <div class="sec"><span class="sec-title">Budget vs Actual — รายหมวดหมู่</span></div>
+      <div class="bva-donut-wrap">
+        <div class="bva-donuts-row" id="bvaDonutsRow"></div>
+        <div class="bva-cat-list"><div class="bva-cat-title">สรุปรายหมวดหมู่</div><div id="bvaCatList"></div></div>
+      </div>
+    </div>
+
+    <div class="sec"><span class="sec-title">รายละเอียดค่าใช้จ่าย</span><span class="sec-right" id="costRowCount">—</span></div>
+    <div class="filter-bar">
+      <input class="search-box" type="text" id="costSearch" placeholder="ค้นหารายการ..." oninput="costApplyFilter()">
+      <select class="filter-select" id="catFilter" onchange="costApplyFilter()"><option value="">ทุกหมวดหมู่</option></select>
+      <select class="filter-select" id="costPageSize" onchange="costChangePageSize()">
+        <option value="25">25 รายการ</option><option value="50">50 รายการ</option><option value="100">100 รายการ</option><option value="0">ทั้งหมด</option>
+      </select>
+    </div>
+    <div class="table-wrap" id="costTableWrap"><div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล Cost...</div></div></div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB: PROCUREMENT PROGRESS
+  ══════════════════════════════ -->
+  <div class="tab-panel" id="panel-progress">
+
+    <!-- Procurement Acc. Progress Line Chart -->
+    <div class="rf-chart-wrap" style="margin-top:18px;">
+      <div class="rf-chart-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span>ความคืบหน้าสะสมรายสัปดาห์ — Procurement Progress</span>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#8b5cf6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#8b5cf6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#8b5cf6"/></svg>Purchasing Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#14b8a6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#14b8a6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#14b8a6"/></svg>Delivery Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#636776" stroke-width="1.5" stroke-dasharray="5 3"/></svg>Plan</span>
         </div>
-        <div class="pbadge">STACKED BAR</div>
       </div>
-      <div style="position:relative;height:260px;"><canvas id="cValue" role="img" aria-label="Purchase value by year grouped by belt type">Value by year</canvas></div>
-      <div class="legend" id="lValue"></div>
-    </div>
-
-    <!-- SECTION 4: ตารางข้อมูล -->
-    <div class="section-label">ข้อมูลทั้งหมด</div>
-    <div class="fsect">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#545968" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-      <span class="flbl">Filter</span>
-      <div class="fdiv"></div>
-      <div class="fg"><span class="ftag">ปี</span><select id="fY"><option value="">ทั้งหมด</option></select></div>
-      <div class="fg"><span class="ftag">ยี่ห้อ</span><select id="fB"><option value="">ทั้งหมด</option></select></div>
-      <div class="fg"><span class="ftag">Type</span><select id="fT"><option value="">ทั้งหมด</option></select></div>
-      <div class="fg"><span class="ftag">เครื่องจักร</span><select id="fM"><option value="">ทั้งหมด</option></select></div>
-      <div class="rcount" id="rc"></div>
-    </div>
-    <div class="twrap">
-      <div class="tscroll">
-        <table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table>
+      <div style="display:flex;gap:6px;margin-bottom:14px;margin-top:4px;">
+        <button id="procToggleAcc" onclick="setProcChartMode('acc')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Acc. Progress</button>
+        <button id="procToggleWk" onclick="setProcChartMode('wk')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Weekly Progress</button>
+      </div>
+      <div style="position:relative;width:100%;overflow-x:auto;">
+        <svg id="procLineChart" width="100%" style="display:block;min-width:400px;cursor:crosshair;" viewBox="0 0 960 240" preserveAspectRatio="xMinYMid meet"></svg>
       </div>
     </div>
 
-  </div><!-- /main -->
+    <div class="overview-wrap" style="margin-top:16px;">
+      <div class="donut-card">
+        <div class="donut-svg-wrap">
+          <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+            <circle id="donut-bg" cx="65" cy="65" r="52" fill="none" stroke="#252830" stroke-width="16"/>
+            <circle id="donut-ring" cx="65" cy="65" r="52" fill="none" stroke="#f5a623" stroke-width="16"
+              stroke-linecap="round" stroke-dasharray="0 327" transform="rotate(-90 65 65)"
+              style="transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1);"/>
+          </svg>
+          <div class="donut-center"><div class="donut-pct" id="donutPct">0%</div><div class="donut-sub">overall</div></div>
+        </div>
+        <div class="donut-legend">
+          <div class="dleg"><div class="dleg-dot" style="background:var(--green)"></div><div class="dleg-info"><div class="dleg-label">PO Done</div><div class="dleg-val" id="dlegDone" style="color:var(--green)">—</div></div></div>
+          <div class="dleg"><div class="dleg-dot" style="background:var(--accent)"></div><div class="dleg-info"><div class="dleg-label">In Progress</div><div class="dleg-val" id="dlegWIP" style="color:var(--accent)">—</div></div></div>
+          <div class="dleg"><div class="dleg-dot" style="background:var(--border)"></div><div class="dleg-info"><div class="dleg-label">Not Started</div><div class="dleg-val" id="dlegNone" style="color:var(--muted)">—</div></div></div>
+        </div>
+      </div>
+      <div class="funnel-card"><div class="funnel-title">รายการที่ผ่านแต่ละขั้นตอน</div><div id="funnelBars"></div></div>
+    </div>
+    <div class="prog-stats">
+      <div class="prog-stat ps-blue"><div class="prog-stat-label">Total Items</div><div class="prog-stat-value" id="psTotal">—</div></div>
+      <div class="prog-stat ps-green"><div class="prog-stat-label">PO Complete</div><div class="prog-stat-value" id="psPO">—</div></div>
+      <div class="prog-stat ps-orange"><div class="prog-stat-label">In Progress</div><div class="prog-stat-value" id="psWIP">—</div></div>
+      <div class="prog-stat ps-purple"><div class="prog-stat-label">Not Started</div><div class="prog-stat-value" id="psNone">—</div></div>
+    </div>
+    <div class="prog-filter">
+      <input class="prog-search" id="progSearch" type="text" placeholder="ค้นหารายการ..." oninput="progRender()">
+      <button class="prog-filter-btn active" id="pf-all"  onclick="progSetFilter('all')">ทั้งหมด</button>
+      <button class="prog-filter-btn"        id="pf-wip"  onclick="progSetFilter('wip')">กำลังดำเนินการ</button>
+      <button class="prog-filter-btn"        id="pf-done" onclick="progSetFilter('done')">PO แล้ว</button>
+      <button class="prog-filter-btn"        id="pf-none" onclick="progSetFilter('none')">ยังไม่เริ่ม</button>
+      <span class="prog-row-count" id="progRowCount">—</span>
+    </div>
+    <div class="prog-legend">
+      <span style="font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1px;">Legend:</span>
+      <div class="prog-leg"><div class="prog-leg-dot" style="background:rgba(245,166,35,.18);border-color:var(--accent);"></div>เสร็จแล้ว</div>
+      <div class="prog-leg"><div class="prog-leg-dot" style="background:rgba(59,130,246,.18);border-color:var(--blue);"></div>WIP ถัดไป</div>
+      <div class="prog-leg"><div class="prog-leg-dot" style="background:var(--surface2);border-color:var(--border);"></div>ยังไม่ถึง</div>
+    </div>
+    <div class="prog-table-wrap">
+      <div class="prog-table-scroll">
+        <table class="prog-table">
+          <thead>
+            <tr>
+              <th class="th-name" colspan="2" onclick="progSort('name')">รายการ <span id="ps-name"></span></th>
+              <th class="td-bar">Progress</th>
+              <th class="td-step" onclick="progSort(0)">RO</th>
+              <th class="td-step" onclick="progSort(1)">QT</th>
+              <th class="td-step" onclick="progSort(2)">MEMO</th>
+              <th class="td-step" onclick="progSort(3)">PQ</th>
+              <th class="td-step" onclick="progSort(4)">BU</th>
+              <th class="td-step" onclick="progSort(5)">PO</th>
+              <th class="td-step" onclick="progSort(6)">DAP</th>
+              <th class="td-pct" onclick="progSort('pct')">% <span id="ps-pct"></span></th>
+            </tr>
+          </thead>
+          <tbody id="progTbody"><tr><td colspan="11" class="prog-empty"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB: RECONDITION (renamed, single view)
+  ══════════════════════════════ -->
+  <div class="tab-panel" id="panel-rf">
+    <div class="rf-kpi" id="reconKPI">
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Total Items</div><div class="rf-kpi-value" id="reconTotal" style="color:var(--blue)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Completed</div><div class="rf-kpi-value" id="reconDone" style="color:var(--green)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">In Progress</div><div class="rf-kpi-value" id="reconWIP" style="color:var(--accent)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Not Started</div><div class="rf-kpi-value" id="reconNone" style="color:var(--muted)">—</div></div>
+      <div class="rf-kpi-card"><div class="rf-kpi-label">Overall %</div><div class="rf-kpi-value" id="reconPct" style="color:var(--teal)">—</div></div>
+    </div>
+
+    <!-- Multi-series Progress Line Chart -->
+    <div class="rf-chart-wrap">
+      <div class="rf-chart-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span>ความคืบหน้าสะสมรายสัปดาห์ — Recondition Progress</span>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#14b8a6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#14b8a6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#14b8a6"/></svg>Hopper Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#f5a623;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#f5a623" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#f5a623"/></svg>Sizer Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#8b5cf6;font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#8b5cf6" stroke-width="2.5"/><circle cx="12" cy="5" r="3" fill="#8b5cf6"/></svg>Truck Bridge Acc.</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">
+            <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#636776" stroke-width="1.5" stroke-dasharray="5 3"/></svg>Plan</span>
+        </div>
+      </div>
+      <!-- Toggle buttons for weekly/accumulated view -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;margin-top:4px;">
+        <button id="chartToggleAcc" onclick="setChartMode('acc')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Acc. Progress</button>
+        <button id="chartToggleWk" onclick="setChartMode('wk')" style="padding:5px 14px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Weekly Progress</button>
+      </div>
+      <div style="position:relative;width:100%;overflow-x:auto;" id="reconChartOuter">
+        <svg id="reconLineChart" width="100%" style="display:block;min-width:400px;cursor:crosshair;" viewBox="0 0 960 260" preserveAspectRatio="xMinYMid meet"></svg>
+      </div>
+    </div>
+
+    <!-- Recondition Detail Breakdown -->
+    <div class="sec"><span class="sec-title">รายละเอียด Progress แต่ละงาน</span></div>
+    <div id="reconDetailPanel" style="display:flex;flex-direction:column;gap:20px;margin-bottom:28px;">
+      <div style="color:var(--muted);font-size:12px;padding:20px 0;">กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Crusher M · Project Dashboard</span>
+    <span id="footerNote">Data: Google Sheets</span>
+  </footer>
 </div>
 
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal" style="display:none" onclick="if(event.target===this)closeShare()">
+  <div class="modal">
+    <h3>🔗 Share Dashboard</h3>
+    <p>คัดลอกลิงก์ด้านล่างเพื่อแชร์ Dashboard ให้ผู้อื่น<br>ผู้เปิดลิงก์จะเห็นข้อมูลล่าสุดจาก Google Sheets โดยตรง</p>
+    <div class="url-box">
+      <input class="url-input" id="shareUrl" readonly onclick="this.select()">
+      <button class="btn btn-primary" onclick="copyLink()">Copy</button>
+    </div>
+    <p class="copy-msg" id="copyMsg"></p>
+    <button class="btn btn-ghost modal-close" onclick="closeShare()">ปิด</button>
+  </div>
+</div>
+
+<!-- Chart Hover Tooltip (global, fixed to viewport) -->
+<div id="reconChartTooltip" style="display:none;position:fixed;z-index:9999;pointer-events:none;max-width:280px;min-width:200px;"></div>
+<div id="procChartTooltip"  style="display:none;position:fixed;z-index:9999;pointer-events:none;max-width:280px;min-width:200px;"></div>
+
 <script>
-const SHEET_ID = '14GmKP362tbU17eAAY-dYy37T_Iqtwga4HSULdPntyQ0';
-const GID = '0';
-const CSV_URLS = [
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`,
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`,
-];
+// ═══════════════════════════════════════════════
+//  DATA SOURCES
+// ═══════════════════════════════════════════════
+const BASE_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kIE3GMV9KFt4vnK5OJzkyx9-B0Ufh9zfXDVx_VYcAp8lXj-lpLnCtv8i0Dm_kqUZQC3wxd_oj8Hy/pub';
+const COST_URL      = BASE_URL + '?gid=0&single=true&output=csv';
+const PROGRESS_URL  = BASE_URL + '?gid=1861162286&single=true&output=csv';
+const RF_URL        = BASE_URL + '?gid=608131896&single=true&output=csv';
+const PROC_PROG_URL = BASE_URL + '?gid=125526876&single=true&output=csv';
 
-let ALL = [], HDR = [], sCol = -1, sAsc = true;
-let charts = {};
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let cAllRows=[],cHeaders=[],cFiltered=[];
+let cSortCol=-1,cSortAsc=true,cPage=1,cPageSize=25;
+let colB=-1,colA=-1,colCat=-1,colName=-1,colAction=-1,colNo=-1,colOrderStatus=-1,colLinkPur=-1;
 
-const C = {
-  orange:'#f07c1f', blue:'#3b9ede', green:'#2ecc71', red:'#e74c3c',
-  purple:'#9b59b6', yellow:'#f1c40f', teal:'#1abc9c', pink:'#e91e8c',
-  gray:'#8b90a0',
-  // project start vs normal
-  project:'#e74c3c', normal:'#3b9ede',
-  // width palette
-  w1600:'#f07c1f', w1800:'#3b9ede', w2200:'#2ecc71', w2400:'#9b59b6', wOther:'#545968',
-  // value palette
-  v2200:'#2ecc71', v1800:'#3b9ede', vOther:'#f07c1f',
-};
+const STEPS     = ['RO','QT','MEMO','PQ','BU','PO','DAP'];
+const STEP_COLS = [2,3,4,5,6,7,8];
+let progItems   = [];
+let progFilter  = 'all';
+let progSortKey =null, progSortAsc=true;
 
-const TT = {
-  backgroundColor:'#1e2333', borderColor:'rgba(240,124,31,.35)', borderWidth:1,
-  titleColor:'#eef0f5', bodyColor:'#8b90a0', padding:10, cornerRadius:8,
-};
+let rfRawRows=[];
+let reconItems=[];
+let rfWeeks=[];
+let reconChartData=null;   // { weekLabels, series:[{name,weekly,acc,planAcc}] }
+let reconChartMode='acc';  // 'acc' | 'wk'
+let procChartData=null;    // { weekLabels, series:[{name,color,weekly,acc,planAcc}] }
 
-const FMT = n => {
-  const v = parseFloat(String(n).replace(/,/g,''));
-  return isNaN(v) ? (n||'') : new Intl.NumberFormat('th-TH').format(Math.round(v));
-};
-
-function parseCSV(text) {
-  const rows = []; let cur = '', inQ = false; const cells = [];
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (c==='"'){inQ=!inQ;continue;}
-    if (c===','&&!inQ){cells.push(cur.trim());cur='';continue;}
-    if ((c==='\n'||c==='\r')&&!inQ){
-      if(cur.trim()||cells.length){cells.push(cur.trim());rows.push([...cells]);cells.length=0;cur='';}
-      if(c==='\r'&&text[i+1]==='\n')i++; continue;
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function parseCSV(txt){
+  return txt.split('\n').filter(l=>l.trim()).map(line=>{
+    const row=[];let inQ=false,cur='';
+    for(const c of line){
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){row.push(cur.trim());cur='';}
+      else cur+=c;
     }
-    cur+=c;
-  }
-  if(cur.trim()||cells.length){cells.push(cur.trim());rows.push([...cells]);}
-  return rows;
-}
-
-function ci(kw) {
-  const k=kw.toLowerCase();
-  let i=HDR.findIndex(h=>h.toLowerCase()===k);
-  return i>=0?i:HDR.findIndex(h=>h.toLowerCase().includes(k));
-}
-
-function uniq(arr,idx){
-  return[...new Set(arr.map(r=>r[idx]).filter(v=>v!==undefined&&v!==''))].sort((a,b)=>{
-    const na=parseFloat(a),nb=parseFloat(b);
-    return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a).localeCompare(String(b),'th');
+    row.push(cur.trim());return row;
   });
 }
+function pn(v){const n=parseFloat(String(v||0).replace(/[^0-9.-]/g,''));return isNaN(n)?0:n;}
+function fmt(n){if(Math.abs(n)>=1e6)return(n/1e6).toFixed(2)+'M';return n.toLocaleString('th-TH',{maximumFractionDigits:0});}
+function fmtF(n){return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function isUrl(v){return typeof v==='string'&&/^https?:\/\//i.test(v.trim());}
+function isLinkCol(h){return/(link|url|href|เว็บ|ลิงก์)/i.test(h);}
+function setSt(state,text){
+  document.getElementById('sDot').className='dot'+(state==='live'?' live':'');
+  document.getElementById('sText').textContent=text;
+}
+function isChecked(v){const s=String(v||'').trim().toLowerCase();return s==='1'||s==='yes'||s==='✓'||s==='x'||s==='true'||s==='done'||s==='complete'||s==='completed'||parseFloat(s)>=1;}
 
-function num(v){ return parseFloat(String(v||'').replace(/,/g,''))||0; }
-
-function killChart(key){
-  if(charts[key]){try{charts[key].destroy();}catch(e){} delete charts[key];}
+// ═══════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════
+let currentTab='overall';
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
 }
 
-async function fetchCSV(){
-  let lastErr=null;
-  for(const url of CSV_URLS){
-    try{
-      const res=await fetch(url,{mode:'cors'});
-      if(!res.ok){lastErr=`HTTP ${res.status}`;continue;}
-      const text=await res.text();
-      if(!text||text.length<10){lastErr='Empty response';continue;}
-      if(text.trim().startsWith('<!')){lastErr='Got HTML — Sheet not public';continue;}
-      return text;
-    }catch(e){lastErr=e.message;}
-  }
-  throw new Error(lastErr||'Fetch failed');
+// ═══════════════════════════════════════════════
+//  LOAD ALL
+// ═══════════════════════════════════════════════
+async function loadAll(){
+  setSt('','กำลังโหลดข้อมูล...');
+  const [costOk,progOk,rfOk,procProgOk]=await Promise.all([loadCost(),loadProgress(),loadRF(),loadProcProgress()]);
+  buildOverallTab();
+  const now=new Date().toLocaleTimeString('th-TH');
+  if(costOk&&progOk&&rfOk) setSt('live','โหลดสำเร็จทุก Sheet');
+  else setSt('','โหลดบางส่วนไม่สำเร็จ');
+  document.getElementById('sTime').textContent='· อัปเดตล่าสุด '+now;
 }
 
-async function loadData(){
-  const btn=document.getElementById('btnRefresh');
-  btn.classList.add('spinning');
-  setStatus('load');
-  document.getElementById('lscreen').style.display='flex';
-  document.getElementById('escreen').style.display='none';
-  document.getElementById('main').style.display='none';
+function refreshAll(){
+  cAllRows=[];cHeaders=[];cFiltered=[];cSortCol=-1;cSortAsc=true;cPage=1;
+  progItems=[];rfRawRows=[];reconItems=[];rfWeeks=[];procChartData=null;
+  document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div class="spinner"></div><div>กำลังดึงข้อมูล...</div></div>';
+  document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty"><div class="spinner" style="margin:0 auto 12px"></div>กำลังดึงข้อมูล...</td></tr>`;
+  document.getElementById('costChartArea').style.display='none';
+  loadAll();
+}
+
+// ─────────── COST ───────────
+async function loadCost(){
   try{
-    const text=await fetchCSV();
-    const rows=parseCSV(text);
-    let start=0;
-    for(let i=0;i<Math.min(6,rows.length);i++){if(rows[i].filter(c=>c!=='').length>3){start=i;break;}}
-    HDR=rows[start].map(h=>h.trim());
-    ALL=rows.slice(start+1).filter(r=>r.some(c=>c!==''));
-    if(ALL.length===0)throw new Error('No data rows found');
-    buildFilters();
-    document.getElementById('lscreen').style.display='none';
-    document.getElementById('main').style.display='block';
-    document.getElementById('lastSync').textContent=new Date().toLocaleString('th-TH',{hour12:false});
-    setStatus('live');
-    renderAll();
+    const res=await fetch(COST_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows=parseCSV(await res.text());
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    cHeaders=rows[0]; 
+    detectCostCols(cHeaders);
+    // Filter: keep rows that have at least some non-empty cell AND have a description
+    cAllRows=rows.slice(1).filter(r=>{
+      if(!r.some(c=>c.trim())) return false;       // completely empty row
+      if(colName>=0 && !String(r[colName]||'').trim()) return false; // no description
+      return true;
+    });
+    buildCatFilter(); costApplyFilter(); buildCostCards();
+    buildBvaDonutChart();
+    document.getElementById('costChartArea').style.display='';
+    return true;
   }catch(e){
-    document.getElementById('lscreen').style.display='none';
-    document.getElementById('escreen').style.display='block';
-    document.getElementById('emsg').textContent='Error: '+e.message+'\n\n1. เปิด Google Sheet\n2. Share → General access → "Anyone with the link" → Viewer\n3. กด Done แล้วกด Refresh';
-    setStatus('err');
+    document.getElementById('costTableWrap').innerHTML=`<div class="state-box"><div style="font-size:32px">⚠️</div><div>โหลด Cost ไม่สำเร็จ<br><small>${e.message}</small></div></div>`;
+    return false;
   }
-  btn.classList.remove('spinning');
 }
 
-function setStatus(s){
-  const d=document.getElementById('sdot'),t=document.getElementById('stxt');
-  d.className='sdot';
-  if(s==='live'){d.classList.add('live');t.textContent='Connected · Live data from Google Sheets';}
-  else if(s==='err'){d.classList.add('err');t.textContent='Connection error';}
-  else{t.textContent='กำลังเชื่อมต่อ...';}
+function detectCostCols(h){
+  const hl=h.map(x=>x.toLowerCase().replace(/\s/g,''));
+  const find=(kws,excl=[])=>hl.findIndex(x=>kws.some(k=>x.includes(k))&&!excl.some(k=>x.includes(k)));
+  colB=find(['budget','งบประมาณ','งบ']);
+  colA=find(['actual','จริง','expense','ค่าใช้จ่าย','cost','ราคา','ยอด'],['budget','งบ']);
+  if(colA===-1)colA=find(['actual','expense','cost','ราคา','ยอด']);
+  colCat=find(['category','cat','type','หมวด','ประเภท','กลุ่ม','section']);
+  colName=find(['name','item','description','รายการ','ชื่อ','detail','activity']);
+  if(colName===-1)colName=0;
+  colAction=find(['action','สถานะ','status']);
+  colOrderStatus=find(['orderstatus','สถานะการสั่งซื้อ','สั่งซื้อ','orderstat','purchase','สั่ง'],['สถานะ']);
+  // Detect LINK PUR column — contains PO numbers from IMPORTRANGE
+  colLinkPur=find(['linkpur','link_pur','linkpo','link_po','pur','po_link','polink','linkpurchase']);
+  colNo=hl.findIndex(x=>x==='no'||x==='no.'||x==='#'||x==='ลำดับ');
+  if(colNo===-1&&/^#?no\.?$/i.test(cHeaders[0]))colNo=0;
+  console.log('[Cost] cols: name='+colName+' status='+colAction+' budget='+colB+' actual='+colA+' cat='+colCat+' linkPur='+colLinkPur);
 }
 
-function buildFilters(){
-  const iY=ci('year'),iB=ci('ยี่ห้อ'),iT=ci('type'),iM=ci('เครื่องจักร');
-  [['fY',iY],['fB',iB],['fT',iT],['fM',iM]].forEach(([id,idx])=>{
-    const sel=document.getElementById(id);
-    while(sel.options.length>1)sel.remove(1);
-    if(idx>=0)uniq(ALL,idx).forEach(v=>sel.add(new Option(v,v)));
-    sel.onchange=renderAll;
+const PO_BASE_URL = 'https://hr.ith.co.th/admin/psl/';
+
+function renderPoLink(val){
+  const v = String(val||'').trim();
+  if(!v || v==='-' || v==='—' || v==='0') return `<span style="color:var(--muted);">—</span>`;
+  // Already a full URL
+  if(isUrl(v)) return `<a href="${v}" target="_blank" rel="noopener noreferrer" class="po-link-btn">🔗 PO</a>`;
+  // PO number (digits only) — build link
+  const num = v.replace(/[^0-9]/g,'');
+  if(num){
+    const url = PO_BASE_URL + num;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="po-link-btn" title="เปิด PO #${num}">🔗 ${num}</a>`;
+  }
+  return `<span style="color:var(--muted);">—</span>`;
+}
+
+function buildCostCards(){
+  let budget=0,actual=0,cntW=0,cntA=0,cntC=0;
+  cAllRows.forEach(r=>{
+    budget+=colB>=0?pn(r[colB]):0; actual+=colA>=0?pn(r[colA]):0;
+    if(colAction>=0){const s=(r[colAction]||'').trim().toLowerCase();if(s==='wait')cntW++;else if(s==='active')cntA++;else if(s==='complete'||s==='completed')cntC++;}
   });
-  document.getElementById('thead').innerHTML=HDR.map((h,i)=>
-    `<th id="th${i}" onclick="sb(${i})">${h}<span class="si" id="si${i}">↕</span></th>`
-  ).join('');
+  document.getElementById('cBudget').textContent=fmt(budget);
+  document.getElementById('cActual').textContent=fmt(actual);
+  document.getElementById('cItems').textContent=cAllRows.length;
+  document.getElementById('cItemsSub').innerHTML=`<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#ff6b6b;font-family:'IBM Plex Mono',monospace;"><span style="width:6px;height:6px;border-radius:50%;background:#e74c3c;display:inline-block;"></span>Wait ${cntW}</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#f5a623;font-family:'IBM Plex Mono',monospace;"><span style="width:6px;height:6px;border-radius:50%;background:#f5a623;display:inline-block;"></span>Active ${cntA}</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#2ecc71;font-family:'IBM Plex Mono',monospace;"><span style="width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;"></span>Complete ${cntC}</span>`;
+  const diff=actual-budget;const over=diff>0;
+  document.getElementById('cDiffCard').className='card '+(over?'c-red':'c-green');
+  document.getElementById('cDiff').textContent=fmt(Math.abs(diff));
+  document.getElementById('cDiffSub').textContent=over?'เกิน Budget':'อยู่ใน Budget';
+  const pct=budget>0?(actual/budget*100).toFixed(1):'—';
+  document.getElementById('cPctCard').className='card '+(parseFloat(pct)>100?'c-red':'c-green');
+  document.getElementById('cPct').textContent=pct+'%';
 }
 
-function getFilt(){
-  const fy=document.getElementById('fY').value,fb=document.getElementById('fB').value;
-  const ft=document.getElementById('fT').value,fm=document.getElementById('fM').value;
-  const iY=ci('year'),iB=ci('ยี่ห้อ'),iT=ci('type'),iM=ci('เครื่องจักร');
-  return ALL.filter(r=>(!fy||r[iY]==fy)&&(!fb||r[iB]==fb)&&(!ft||r[iT]==ft)&&(!fm||r[iM]==fm));
+function buildBvaDonutChart(){
+  const cats={};
+  cAllRows.forEach(r=>{const cat=(colCat>=0&&r[colCat])?r[colCat]:'อื่นๆ';if(!cats[cat])cats[cat]={b:0,a:0};cats[cat].b+=colB>=0?pn(r[colB]):0;cats[cat].a+=colA>=0?pn(r[colA]):0;});
+  const entries=Object.entries(cats).sort((x,y)=>y[1].b-x[1].b);
+  document.getElementById('bvaDonutsRow').innerHTML=entries.map(([cat,v])=>{
+    const over=v.a>v.b;const pct=v.b>0?Math.min(Math.round(v.a/v.b*100),200):0;const displayPct=Math.min(pct,100);
+    const C=2*Math.PI*40;const filled=(displayPct/100)*C;const strokeColor=over?'var(--red)':'var(--green)';const diff=v.a-v.b;
+    return`<div class="bva-donut-item"><div class="bva-donut-title">${cat}</div><div class="bva-donut-svg-wrap"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#252830" stroke-width="12"/><circle cx="55" cy="55" r="40" fill="none" stroke="${strokeColor}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${filled.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 55 55)" style="transition:stroke-dasharray .7s ease;"/></svg><div class="bva-donut-center"><div class="bva-donut-pct" style="color:${strokeColor}">${pct}%</div><div class="bva-donut-label">used</div></div></div><div class="bva-donut-nums"><div class="bva-donut-num-row"><span class="lbl">Budget</span><span class="val" style="color:var(--blue)">${fmt(v.b)}</span></div><div class="bva-donut-num-row"><span class="lbl">Actual</span><span class="val" style="color:${strokeColor}">${fmt(v.a)}</span></div></div><div class="bva-donut-diff-tag ${over?'over':'under'}">${over?'เกิน '+fmt(Math.abs(diff)):'เหลือ '+fmt(Math.abs(diff))}</div></div>`;
+  }).join('');
+  document.getElementById('bvaCatList').innerHTML=entries.map(([cat,v])=>{
+    const over=v.a>v.b;const displayA=v.b>0?Math.min(v.a/v.b*100,100):0;const diff=Math.abs(v.a-v.b);
+    return`<div class="bva-cat-row"><div class="bva-cat-head"><span class="bva-cat-name">${cat}</span><span class="bva-cat-tag ${over?'over':'under'}">${over?'▲ +'+fmt(diff):'▼ -'+fmt(diff)}</span></div><div class="bva-cat-bar-track" style="height:8px"><div class="bva-cat-bar-b" style="width:100%"></div><div class="bva-cat-bar-a ${over?'over':'under'}" style="width:${displayA.toFixed(1)}%"></div></div><div class="bva-cat-amts"><span style="color:var(--blue)">${fmtF(v.b)}</span><span style="color:${over?'var(--red)':'var(--green)'}">${fmtF(v.a)}</span></div></div>`;
+  }).join('');
 }
 
-function sb(col){if(sCol===col)sAsc=!sAsc;else{sCol=col;sAsc=true;}renderAll();}
-
-// Detect belt width category from "รายการ" column
-function getBeltWidth(row){
-  const iN=ci('รายการ');
-  const name=String(row[iN]||'').toUpperCase();
-  if(name.includes('BW1600'))return 'BW1600';
-  if(name.includes('BW1800'))return 'BW1800';
-  if(name.includes('BW2000'))return 'BW2000';
-  if(name.includes('BW2200'))return 'BW2200';
-  if(name.includes('BW2400'))return 'BW2400';
-  if(name.includes('BW2800'))return 'BW2800';
-  // fallback: check belt width column
-  const iW=ci('belt w');
-  const w=num(row[iW]);
-  if(w===1600)return'BW1600';
-  if(w===1800)return'BW1800';
-  if(w===2000)return'BW2000';
-  if(w===2200)return'BW2200';
-  if(w===2400)return'BW2400';
-  if(w===2800)return'BW2800';
-  return w?`BW${w}`:'อื่นๆ';
+function buildCatFilter(){
+  const sel=document.getElementById('catFilter');sel.innerHTML='<option value="">ทุกหมวดหมู่</option>';
+  if(colCat<0)return;
+  [...new Set(cAllRows.map(r=>r[colCat]).filter(Boolean))].sort().forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
 }
 
-function renderAll(){
-  const data = getFilt();
-  const iQ=ci('จำนวน'), iV=ci('ราคารวม'), iB=ci('ยี่ห้อ'), iT=ci('type'), iY=ci('year'), iL=ci('link');
+function costApplyFilter(){
+  const q=document.getElementById('costSearch').value.toLowerCase();const cat=document.getElementById('catFilter').value;
+  cFiltered=cAllRows.filter(r=>(!q||r.some(c=>c.toLowerCase().includes(q)))&&(!cat||r[colCat]===cat));
+  if(cSortCol>=0) cFiltered.sort((a,b)=>{const av=a[cSortCol]||'',bv=b[cSortCol]||'';const an=pn(av),bn=pn(bv);const cmp=(an||bn)?an-bn:String(av).localeCompare(String(bv),'th');return cSortAsc?cmp:-cmp;});
+  cPage=1;renderCostTable();
+}
 
-  // ── METRICS ──
-  const tM=data.reduce((s,r)=>s+num(r[iQ]),0);
-  const tV=data.reduce((s,r)=>s+num(r[iV]),0);
-  const bCnt=iB>=0?uniq(data,iB).length:0;
-  document.getElementById('mgrid').innerHTML=`
-    <div class="mc a1 fi"><div class="mico">📋</div><div class="mlbl">รายการทั้งหมด</div><div class="mval">${data.length}</div><div class="munit">รายการ</div></div>
-    <div class="mc a2 fi"><div class="mico">📏</div><div class="mlbl">จำนวนรวม</div><div class="mval">${FMT(tM)}</div><div class="munit">เมตร</div></div>
-    <div class="mc a3 fi"><div class="mico">💰</div><div class="mlbl">มูลค่ารวม</div><div class="mval">${(tV/1e6).toFixed(1)}<span style="font-size:15px;opacity:.6"> M</span></div><div class="munit">ล้านบาท</div></div>`;
+function costSortBy(i){cSortAsc=cSortCol===i?!cSortAsc:true;cSortCol=i;costApplyFilter();}
+function costChangePageSize(){cPageSize=parseInt(document.getElementById('costPageSize').value);costApplyFilter();}
+function costGoPage(p){const ps=cPageSize||cFiltered.length;const tp=Math.ceil(cFiltered.length/(ps||1));if(p<1||p>tp)return;cPage=p;renderCostTable();}
 
-  document.getElementById('rc').innerHTML=`แสดง <strong>${data.length}</strong> จาก ${ALL.length} รายการ`;
+function actionBadge(val){
+  const v=(val||'').trim().toLowerCase();
+  if(v==='wait')return`<span class="status-badge wait">Wait</span>`;
+  if(v==='active')return`<span class="status-badge active">Active</span>`;
+  if(v==='complete'||v==='completed')return`<span class="status-badge complete">Complete</span>`;
+  return`<span style="color:var(--muted);font-size:12px">${val||'—'}</span>`;
+}
 
-  // ── TABLE ──
-  let sorted=[...data];
-  if(sCol>=0){sorted.sort((a,b)=>{
-    const av=a[sCol],bv=b[sCol],na=parseFloat(String(av).replace(/,/g,'')),nb=parseFloat(String(bv).replace(/,/g,''));
-    if(!isNaN(na)&&!isNaN(nb))return sAsc?na-nb:nb-na;
-    return sAsc?String(av).localeCompare(String(bv),'th'):String(bv).localeCompare(String(av),'th');
-  });}
-  HDR.forEach((_,i)=>{
-    const el=document.getElementById('si'+i),th=document.getElementById('th'+i);
-    if(!el||!th)return;
-    th.classList.toggle('sa',sCol===i);
-    el.className='si'+(sCol===i?' on':'');
-    el.textContent=sCol===i?(sAsc?'↑':'↓'):'↕';
+/* ── PUR Progress: match cost item name → procurement step dots ── */
+function purProgressBadge(itemName){
+  if(!progItems.length) return `<span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">—</span>`;
+  // fuzzy match: find procurement item whose name most overlaps with cost item name
+  const needle = (itemName||'').toLowerCase().trim();
+  if(!needle) return `<span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">—</span>`;
+  let best=null, bestScore=0;
+  progItems.forEach(it=>{
+    const hay=it.name.toLowerCase().trim();
+    // score = longest common substring length / max(len)
+    let score=0;
+    if(hay===needle) score=1;
+    else if(hay.includes(needle)||needle.includes(hay)) score=0.8;
+    else {
+      // token overlap
+      const na=needle.split(/\s+/), ha=hay.split(/\s+/);
+      const common=na.filter(t=>ha.includes(t)&&t.length>1).length;
+      score=common/Math.max(na.length,ha.length,1);
+    }
+    if(score>bestScore){bestScore=score;best=it;}
   });
-  document.getElementById('tbody').innerHTML=sorted.map(r=>
-    '<tr>'+HDR.map((_,ci2)=>{
-      const cell=r[ci2]||'';
-      if(ci2===iT){const s=cell.toLowerCase().includes('steel');return`<td><span class="badge ${s?'bst':'bfa'}">${s?'Steel Cord':'Fabric'}</span></td>`;}
-      if(ci2===iY&&cell)return`<td><span class="badge byr">${cell}</span></td>`;
-      if(ci2===iL)return`<td>${cell&&cell.startsWith('http')?`<a class="lpdf" href="${cell}" target="_blank"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>PDF</a>`:''}</td>`;
-      const isN=!isNaN(parseFloat(String(cell).replace(/,/g,'')))&&cell!=='';
-      const isP=HDR[ci2]&&(HDR[ci2].includes('ราคา')||HDR[ci2].includes('จำนวน'));
-      if(isP&&isN)return`<td class="num">${FMT(cell)}</td>`;
-      return`<td class="${ci2===0?'tdim':''}">${cell}</td>`;
-    }).join('')+'</tr>'
-  ).join('');
+  if(!best||bestScore<0.3) return `<span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">—</span>`;
+  const steps=['RO','QT','MO','PQ','BU','PO','DA'];
+  const dots=steps.map((s,si)=>{
+    const done=best.steps[si];
+    const color=done?'var(--accent)':'var(--border)';
+    const txtColor=done?'#000':'var(--muted)';
+    return `<span title="${STEPS[si]}" style="display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:${color};color:${txtColor};font-size:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;border:1px solid ${done?'var(--accent)':'var(--border)'};flex-shrink:0;">${s}</span>`;
+  }).join('');
+  const doneCount=best.steps.filter(Boolean).length;
+  const pct=Math.round(doneCount/7*100);
+  const pctColor=pct===100?'var(--green)':pct>0?'var(--accent)':'var(--muted)';
+  return `<span style="display:inline-flex;align-items:center;gap:2px;">${dots}<span style="margin-left:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:${pctColor};font-weight:600;">${pct}%</span></span>`;
+}
 
-  // ── CHART 1 & 2: BW1800 & BW2200 เริ่มโครงการ vs ปกติ ──
-  // Project year = 2014, Normal = everything else
-  // For each BW type, build bar chart with years on X axis
-  // Bars grouped: project (red) vs normal (blue)
-  // Actually: show each year as bar, colored by project/normal category
-  ['BW1800','BW2200'].forEach(bw=>{
-    const id = bw==='BW1800'?'cBW1800':'cBW2200';
-    const lid = bw==='BW1800'?'lBW1800':'lBW2200';
-    const bwRows = data.filter(r=>getBeltWidth(r)===bw);
-    if(bwRows.length===0){killChart(id);return;}
+function diffPill(b,a){if(!b&&!a)return'—';const d=a-b;const cls=d>0?'over':'under';return`<span class="diff-pill ${cls}">${d>0?'+':''}${fmtF(d)}</span>`;}
+function pNums(cur,total){let lo=Math.max(1,cur-3),hi=Math.min(total,lo+6);if(hi-lo<6)lo=Math.max(1,hi-6);let r='';for(let p=lo;p<=hi;p++)r+=`<button class="page-btn ${p===cur?'active':''}" onclick="costGoPage(${p})">${p}</button>`;return r;}
 
-    // Group by year + category
-    const projectMap={}, normalMap={};
-    bwRows.forEach(r=>{
-      const y=String(r[iY]||'');
-      const q=num(r[iQ]);
-      if(y==='2014'){ projectMap[y]=(projectMap[y]||0)+q; }
-      else { normalMap[y]=(normalMap[y]||0)+q; }
+function renderCostTable(){
+  const ps=cPageSize||cFiltered.length;const tp=Math.ceil(cFiltered.length/(ps||1));const s=(cPage-1)*ps;const page=cFiltered.slice(s,s+ps);
+  document.getElementById('costRowCount').textContent=cFiltered.length+' รายการ';
+  if(!cFiltered.length){document.getElementById('costTableWrap').innerHTML='<div class="state-box"><div style="font-size:28px">🔍</div><div>ไม่พบรายการ</div></div>';return;}
+  const arrow=i=>cSortCol===i?(cSortAsc?' ↑':' ↓'):' ↕';
+  const hasDiff=colB>=0&&colA>=0;
+
+  // Build visible columns: all cols except No col
+  const visCols=cHeaders.map((_,i)=>i).filter(i=>i!==colNo);
+
+  // We need to find the STATUS column index and insert ORDER STATUS after it
+  // STATUS = colAction. We'll inject the extra column right after colAction in rendering.
+  const statusColVisIdx = visCols.indexOf(colAction);
+
+  // Build TH row
+  let thCells = visCols.map((i,vi)=>{
+    const thHtml = `<th class="${cSortCol===i?'sorted':''}" onclick="costSortBy(${i})">${cHeaders[i]}${arrow(i)}</th>`;
+  // After STATUS column, inject PUR Progress header
+    if(vi===statusColVisIdx){
+      return thHtml + `<th style="white-space:nowrap;color:var(--muted);min-width:200px;">PUR Progress</th>`;
+    }
+    return thHtml;
+  }).join('');
+  if(hasDiff) thCells += `<th onclick="costSortDiff()" title="Actual − Budget">Diff ↕</th>`;
+  // If STATUS col not found, still add PUR Progress header at the end
+  if(colAction<0) thCells += `<th style="white-space:nowrap;color:var(--muted);min-width:200px;">PUR Progress</th>`;
+
+  const thead=`<thead><tr>${thCells}</tr></thead>`;
+
+  const tbody=`<tbody>${page.map(r=>{
+    let cells = visCols.map((i,vi)=>{
+      const v=r[i]||'';
+      let cellHtml;
+      if(i===colAction){
+        cellHtml=`<td>${actionBadge(v)}</td>`;
+        // Inject PUR Progress column right after STATUS — match by cost item name
+        const costItemName = colName>=0 ? (r[colName]||'') : (r[1]||r[0]||'');
+        cellHtml += `<td style="padding:6px 10px;">${purProgressBadge(costItemName)}</td>`;
+        return cellHtml;
+      }
+      // Skip the old order status column if present
+      if(i===colOrderStatus && colAction>=0) return ``;
+      if(i===colB)return`<td class="num amt-budget">${v?fmtF(pn(v)):'—'}</td>`;
+      if(i===colA)return`<td class="num amt-actual">${v?fmtF(pn(v)):'—'}</td>`;
+      // LINK PUR column: render as PO badge/link
+      if(i===colLinkPur) return `<td style="text-align:center;">${renderPoLink(v)}</td>`;
+      if(isLinkCol(cHeaders[i])||isUrl(v)){
+        if(v&&isUrl(v))return`<td class="link-cell"><a href="${v.trim()}" target="_blank" rel="noopener noreferrer" class="po-link-btn">🔗 เปิดลิงก์</a></td>`;
+        // Not a URL — could be a PO number from IMPORTRANGE
+        if(v&&/^\d{4,}$/.test(v.trim())) return `<td style="text-align:center;">${renderPoLink(v)}</td>`;
+        return`<td class="link-cell"><span style="color:var(--muted);font-size:12px">—</span></td>`;
+      }
+      return`<td>${v}</td>`;
+    }).join('');
+    // If STATUS col was not found, append PUR Progress at the end
+    if(colAction<0){
+      const costItemName = colName>=0 ? (r[colName]||'') : (r[1]||r[0]||'');
+      cells += `<td style="padding:6px 10px;">${purProgressBadge(costItemName)}</td>`;
+    }
+    const diffCell=hasDiff?`<td class="num">${diffPill(pn(r[colB]),pn(r[colA]))}</td>`:'';
+    return`<tr>${cells}${diffCell}</tr>`;
+  }).join('')}</tbody>`;
+
+  const pg=tp>1?`<div class="pagination"><span>แสดง ${s+1}–${Math.min(s+ps,cFiltered.length)} จาก ${cFiltered.length} รายการ</span><div class="page-btns"><button class="page-btn" onclick="costGoPage(${cPage-1})" ${cPage<=1?'disabled':''}>‹</button>${pNums(cPage,tp)}<button class="page-btn" onclick="costGoPage(${cPage+1})" ${cPage>=tp?'disabled':''}>›</button></div></div>`:'';
+  document.getElementById('costTableWrap').innerHTML=`<table>${thead}${tbody}</table>${pg}`;
+}
+
+let cDiffSortAsc=true;
+function costSortDiff(){cDiffSortAsc=cSortCol===-999?!cDiffSortAsc:true;cSortCol=-999;cFiltered.sort((a,b)=>((pn(a[colA])-pn(a[colB]))-(pn(b[colA])-pn(b[colB])))*(cDiffSortAsc?1:-1));cPage=1;renderCostTable();}
+
+// ─────────── PROCUREMENT PROGRESS ───────────
+async function loadProgress(){
+  try{
+    const res=await fetch(PROGRESS_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows=parseCSV(await res.text());
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    const dataRows=rows.slice(1).filter(r=>r[1]&&r[1].trim());
+    progItems=dataRows.map(r=>({no:r[0]||'',name:r[1]||'',steps:STEP_COLS.map(ci=>isChecked(r[ci]))}));
+    updateProgStats(); progRender();
+    // Re-render cost table so PUR Progress column picks up procurement data
+    if(cFiltered.length) renderCostTable();
+    return true;
+  }catch(e){
+    document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty">⚠️ โหลดไม่สำเร็จ: ${e.message}</td></tr>`;
+    return false;
+  }
+}
+
+function updateProgStats(){
+  const total=progItems.length;const done=progItems.filter(it=>it.steps[5]).length;
+  const none=progItems.filter(it=>!it.steps.some(Boolean)).length;const wip=total-done-none;
+  document.getElementById('psTotal').textContent=total;document.getElementById('psPO').textContent=done;document.getElementById('psWIP').textContent=wip;document.getElementById('psNone').textContent=none;
+  buildProcurementOverview(total,done,wip,none);
+}
+
+function buildProcurementOverview(total,done,wip,none){
+  if(!total)return;
+  const pct=Math.round(done/total*100);const C=2*Math.PI*52;const filled=(pct/100)*C;
+  const ring=document.getElementById('donut-ring');ring.setAttribute('stroke-dasharray',filled.toFixed(1)+' '+C.toFixed(1));ring.setAttribute('stroke',pct===100?'var(--green)':'var(--accent)');
+  document.getElementById('donutPct').textContent=pct+'%';document.getElementById('donutPct').style.color=pct===100?'var(--green)':'var(--accent)';
+  document.getElementById('dlegDone').textContent=done+' items';document.getElementById('dlegWIP').textContent=wip+' items';document.getElementById('dlegNone').textContent=none+' items';
+  const stepCounts=STEPS.map((_,si)=>progItems.filter(it=>it.steps[si]).length);
+  document.getElementById('funnelBars').innerHTML=STEPS.map((name,si)=>{const cnt=stepCounts[si];const pctW=Math.round(cnt/total*100);const isDone=si===5;return`<div class="funnel-row"><div class="funnel-step-name">${name}</div><div class="funnel-track"><div class="funnel-fill${isDone?' c-done':''}" style="width:${pctW}%"></div></div><div class="funnel-nums"><b class="${isDone?'done':''}">${cnt}</b>/${total}</div></div>`;}).join('');
+}
+
+function progSetFilter(f){progFilter=f;['all','wip','done','none'].forEach(x=>document.getElementById('pf-'+x).classList.toggle('active',f===x));progRender();}
+function progSort(key){progSortAsc=progSortKey===key?!progSortAsc:true;progSortKey=key;progRender();}
+function progRender(){
+  const q=document.getElementById('progSearch').value.toLowerCase();
+  let list=progItems.filter(it=>{
+    if(q&&!it.name.toLowerCase().includes(q)&&!it.no.toString().includes(q))return false;
+    if(progFilter==='done'&&!it.steps[5])return false;
+    if(progFilter==='none'&&it.steps.some(Boolean))return false;
+    if(progFilter==='wip'&&(it.steps[5]||!it.steps.some(Boolean)))return false;
+    return true;
+  });
+  if(progSortKey!==null){
+    list.sort((a,b)=>{let av,bv;
+      if(progSortKey==='name'){av=a.name;bv=b.name;return progSortAsc?av.localeCompare(bv,'th'):bv.localeCompare(av,'th');}
+      if(progSortKey==='pct'){av=a.steps.filter(Boolean).length;bv=b.steps.filter(Boolean).length;}
+      else{av=a.steps[progSortKey]?1:0;bv=b.steps[progSortKey]?1:0;}
+      return progSortAsc?av-bv:bv-av;});
+  }
+  document.getElementById('progRowCount').textContent=list.length+' รายการ';
+  const arrow=k=>progSortKey===k?(progSortAsc?'↑':'↓'):'';
+  document.getElementById('ps-name').textContent=arrow('name');document.getElementById('ps-pct').textContent=arrow('pct');
+  if(!list.length){document.getElementById('progTbody').innerHTML=`<tr><td colspan="11" class="prog-empty">🔍 ไม่พบรายการ</td></tr>`;return;}
+  document.getElementById('progTbody').innerHTML=list.map(it=>{
+    const doneCount=it.steps.filter(Boolean).length;const pct=Math.round(doneCount/STEPS.length*100);
+    const wipIdx=it.steps.findIndex(s=>!s);const pctColor=pct===100?'var(--green)':pct>0?'var(--accent)':'var(--muted)';
+    const stepCells=STEPS.map((s,si)=>{let cls='wait',icon='·';if(it.steps[si]){cls='done';icon='✓';}else if(si===wipIdx){cls='wip';icon=si+1;}return`<td class="td-step"><span class="sdot ${cls}">${icon}</span></td>`;}).join('');
+    return`<tr><td class="td-no">${it.no}</td><td class="td-name" title="${it.name}">${it.name}</td><td class="td-bar"><div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div></td>${stepCells}<td class="td-pct" style="color:${pctColor}">${pct}%</td></tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  RECONDITION (single tab, no fabrication)
+// ═══════════════════════════════════════════════
+async function loadRF(){
+  try{
+    const res=await fetch(RF_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows=parseCSV(await res.text());
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    rfRawRows=rows;
+    parseRFData(rows);
+    renderRFRecon();
+    return true;
+  }catch(e){
+    console.warn('RF load error:',e);
+    document.getElementById('reconTbody').innerHTML=`<tr><td colspan="20" style="padding:30px;text-align:center;color:var(--muted)">⚠️ โหลดข้อมูลไม่สำเร็จ: ${e.message}</td></tr>`;
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  PROCUREMENT PROGRESS CHART (gid=125526876)
+// ═══════════════════════════════════════════════
+let procChartMode='acc';
+
+async function loadProcProgress(){
+  try{
+    const res=await fetch(PROC_PROG_URL+'&_='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows=parseCSV(await res.text());
+    if(rows.length<2) throw new Error('ไม่พบข้อมูล');
+    parseProcProgressData(rows);
+    return true;
+  }catch(e){
+    console.warn('[ProcProg] load error:',e);
+    return false;
+  }
+}
+
+function parseProcProgressData(rows){
+  // ── Step 1: Find the week-label header row (same as parseRFData) ──
+  let headerRowIdx=0, weekColIdxs=[], procWeeks=[];
+  for(let ri=0; ri<Math.min(rows.length,6); ri++){
+    const r=rows[ri];
+    const found=[];
+    for(let ci=0; ci<r.length; ci++){
+      const h=String(r[ci]||'').trim();
+      if(/^W\d+$/i.test(h) || /^(week|wk)\s*\d+$/i.test(h)) found.push({ci,h});
+    }
+    if(found.length>=3){
+      headerRowIdx=ri;
+      found.forEach(f=>{ procWeeks.push(f.h); weekColIdxs.push(f.ci); });
+      break;
+    }
+  }
+  if(procWeeks.length===0){
+    for(let ci=4; ci<(rows[0]||[]).length; ci++){
+      const h=String(rows[0][ci]||'').trim();
+      if(h){ procWeeks.push(h); weekColIdxs.push(ci); }
+    }
+    headerRowIdx=0;
+  }
+  console.log('[ProcProg] headerRow='+headerRowIdx+' weeks='+procWeeks.length+' first='+procWeeks[0]);
+
+  // ── Step 2: Detect group header rows & map data rows ──
+  // Sheet structure (from screenshot):
+  //   Row G   : group header (col0=number, col1="X PURCHASING PROGRESS", col2=total%)
+  //             → Weekly progress values (E:AI) are ON THIS SAME ROW
+  //   Row G+1 : Acc. cumulative progress values (E:AI)
+  //
+  // So: wkRowIdx = ri (the header row itself), accRowIdx = ri+1
+
+  function getVals(rowIdx0){
+    const r=rows[rowIdx0]||[];
+    return weekColIdxs.map(ci=>{
+      const v=String(r[ci]||'').trim().replace(/%/g,'');
+      const n=parseFloat(v);
+      return isNaN(n) ? null : n;
     });
-    const allYears=[...new Set([...Object.keys(projectMap),...Object.keys(normalMap)])].sort();
+  }
 
-    document.getElementById(lid).innerHTML=`
-      <span><span class="lsq" style="background:${C.project}"></span>เริ่มโครงการ (2014)</span>
-      <span><span class="lsq" style="background:${C.normal}"></span>สั่งซื้อปกติ (2015+)</span>`;
+  // Scan all rows for group headers
+  const SERIES_DEFS=[];
+  const colors=['#8b5cf6','#14b8a6','#f5a623','#3b82f6'];
+  for(let ri=headerRowIdx+1; ri<rows.length-1; ri++){
+    const r=rows[ri];
+    const c0=String(r[0]||'').trim();
+    const c1=String(r[1]||'').trim().toUpperCase();
+    // Group header: col0 is a digit number, col1 contains "PROGRESS"
+    if(/^\d+$/.test(c0) && c1.includes('PROGRESS') && c1.length<60){
+      const label=c1.replace(/^\d+\s*/,'').replace(/\s*PROGRESS\s*$/,'').trim()||c1;
+      SERIES_DEFS.push({
+        name:     label,
+        color:    colors[SERIES_DEFS.length % colors.length],
+        wkRowIdx: ri,      // weekly values are ON the group header row
+        accRowIdx: ri+1,   // acc values are the row immediately after
+      });
+      console.log(`[ProcProg] group "${label}" header at 0-based row ${ri}, wk=row${ri} acc=row${ri+1}`);
+    }
+  }
 
-    killChart(id);
-    charts[id]=new Chart(document.getElementById(id),{
-      type:'bar',
-      data:{
-        labels:allYears,
-        datasets:[
-          {label:'เริ่มโครงการ',data:allYears.map(y=>projectMap[y]||0),backgroundColor:C.project,borderRadius:4,borderSkipped:false},
-          {label:'สั่งซื้อปกติ',data:allYears.map(y=>normalMap[y]||0),backgroundColor:C.normal,borderRadius:4,borderSkipped:false},
-        ]
-      },
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.dataset.label}: ${FMT(c.raw)} ม.`}}},
-        scales:{
-          x:{ticks:{color:'#545968',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},stacked:false},
-          y:{ticks:{color:'#545968',font:{size:10},callback:v=>(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,.04)'},stacked:false}
-        }
+  // Fallback: hardcoded 0-based row indexes from screenshot
+  // Row 4  (Excel) = index 3 = PURCHASING PROGRESS header (weekly values here)
+  // Row 5  (Excel) = index 4 = Purchasing Acc.
+  // Row 53 (Excel) = index 52 = DELIVERY PROGRESS header (weekly values here)
+  // Row 54 (Excel) = index 53 = Delivery Acc.
+  if(SERIES_DEFS.length===0){
+    console.log('[ProcProg] using hardcoded row indexes');
+    SERIES_DEFS.push(
+      {name:'Purchasing', color:colors[0], wkRowIdx:3,  accRowIdx:4 },
+      {name:'Delivery',   color:colors[1], wkRowIdx:52, accRowIdx:53}
+    );
+  }
+
+  // ── Step 3: Build series ──
+  const series=SERIES_DEFS.map(def=>{
+    const weekly = getVals(def.wkRowIdx);
+    const acc    = getVals(def.accRowIdx);
+
+    // For weekly: treat null as 0 so the line connects continuously
+    // (Sheet has 0.00% for weeks with no activity, which parses as 0, not null)
+    const weeklyFilled = weekly.map(v => v != null ? v : 0);
+
+    // For acc: keep nulls as null (gaps = no data yet beyond current week)
+    // But convert 0s that are after the last non-zero to null (trailing zeros = future)
+    let lastNonZeroAcc = -1;
+    acc.forEach((v,i) => { if(v != null && v > 0) lastNonZeroAcc = i; });
+    const accClean = acc.map((v,i) => {
+      if(v == null) return null;
+      if(i > lastNonZeroAcc && v === 0) return null; // trailing zeros = no data
+      return v;
+    });
+
+    console.log(`[ProcProg] "${def.name}" wk[0..9]=[${weeklyFilled.slice(0,10)}]`);
+    console.log(`[ProcProg] "${def.name}" acc[0..9]=[${accClean.slice(0,10)}]`);
+
+    const maxAcc = Math.max(accClean.reduce((m,v)=>v!=null?Math.max(m,v):m, 0), 1);
+    const planAcc = procWeeks.map((_,wi) => parseFloat(((wi+1)/procWeeks.length*maxAcc).toFixed(2)));
+    return {name:def.name, color:def.color, weekly:weeklyFilled, acc:accClean, planAcc};
+  });
+
+  procChartData = {weekLabels:procWeeks, series};
+
+  // Render chart if SVG already in DOM
+  const svg=document.getElementById('procLineChart');
+  if(svg) drawLineChart(svg, procChartData, procChartMode, 'procChartTooltip');
+}
+
+// ── Parse item-level detail for Recondition breakdown ──
+let reconDetailGroups=[];
+function _parseProcItemDetails(rows, headerRowIdx, weekColIdxs){
+  // We actually read from the RF sheet for recondition items (already in reconItems)
+  // But we need group info — items belong to groups based on section headers in col0/col1
+  // reconItems already stores items; we need group labels from the RF sheet
+  // Group detection: rows where r[0] is a number (1,2,3) and r[1] is a group title
+  // This is done from rfRawRows in renderReconDetail()
+}
+
+function setProcChartMode(mode){
+  procChartMode=mode;
+  const ba=document.getElementById('procToggleAcc');
+  const bw=document.getElementById('procToggleWk');
+  if(ba&&bw){
+    if(mode==='acc'){ba.style.cssText+='background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;';bw.style.cssText+='background:var(--surface2);color:var(--muted);border-color:var(--border);font-weight:400;';}
+    else{bw.style.cssText+='background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;';ba.style.cssText+='background:var(--surface2);color:var(--muted);border-color:var(--border);font-weight:400;';}
+  }
+  if(procChartData){
+    const svg=document.getElementById('procLineChart');
+    if(svg) drawLineChart(svg,procChartData,mode,'procChartTooltip');
+  }
+}
+
+// ── Generic line chart renderer (shared by Recon + Procurement) ──
+// tooltipId: id of the global tooltip div to use
+function drawLineChart(svg, chartData, mode, tooltipId){
+  const {weekLabels,series}=chartData;
+  const n=weekLabels.length;
+  if(!n){svg.innerHTML=`<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Mono,monospace" font-size="13" fill="#636776">ไม่พบข้อมูล Week columns</text>`;return;}
+
+  const W=960,H=svg.id==='procLineChart'?240:260,PL=52,PR=20,PT=24,PB=40;
+  const chartW=W-PL-PR,chartH=H-PT-PB;
+  const isAcc=(mode!=='wk');
+
+  // For weekly mode: any non-null value counts as data (including 0%)
+  const hasAnyData = isAcc
+    ? series.some(s=>s.acc.some(v=>v!=null&&v>0))
+    : series.some(s=>s.weekly.some(v=>v!=null));
+
+  const noDataMsg=!hasAnyData?`<text x="${W/2}" y="${PT+10}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#636776" opacity=".7">ยังไม่มีข้อมูล progress — แสดงเฉพาะเส้นแผน</text>`:'';
+
+  let yMax=0;
+  series.forEach(s=>{
+    (isAcc?s.acc:s.weekly).forEach(v=>{if(v!=null&&v>yMax)yMax=v;});
+    if(isAcc) s.planAcc.forEach(v=>{if(v>yMax)yMax=v;});
+  });
+  if(yMax===0)yMax=20; // weekly values are small (per-week %) so use 20 as floor
+  yMax=Math.ceil(yMax/5)*5; // round to nearest 5 for weekly, 10 for acc
+
+  const xStep=chartW/(n>1?n-1:1);
+  const yScale=v=>chartH-(v/yMax)*chartH;
+  const px=wi=>PL+wi*xStep;
+  const py=v=>PT+yScale(v);
+
+  const yTicks=[];
+  const step=yMax<=10?1:yMax<=20?2:yMax<=50?5:yMax<=100?10:20;
+  for(let t=0;t<=yMax;t+=step)yTicks.push(t);
+  const gridLines=yTicks.map(t=>`<line x1="${PL}" y1="${py(t)}" x2="${PL+chartW}" y2="${py(t)}" stroke="#252830" stroke-width="${t===0?'1.5':'1'}"/>
+    <text x="${PL-6}" y="${py(t)+4}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${t}${isAcc?'%':''}</text>`).join('');
+
+  const tickEvery=n<=13?1:n<=26?2:n<=39?3:4;
+  // currentWi: for acc = last week with value >0; for weekly = last week with value >0
+  let currentWi=0;
+  series.forEach(s=>{
+    const vals=isAcc?s.acc:s.weekly;
+    vals.forEach((v,wi)=>{ if(v!=null&&v>0) currentWi=Math.max(currentWi,wi); });
+  });
+  if(!hasAnyData) currentWi=n-1;
+
+  // buildPath: skip only null values — connect through zeros
+  function buildPath(vals){
+    let d='';let moved=false;
+    vals.forEach((v,wi)=>{
+      if(v==null){moved=false;return;}
+      d+=(moved?` L `:`M `)+`${px(wi)},${py(v)}`;
+      moved=true;
+    });
+    return d;
+  }
+
+  const xTicks=weekLabels.map((w,wi)=>{
+    if(wi%tickEvery!==0&&wi!==n-1&&wi!==currentWi)return'';
+    return`<text x="${px(wi)}" y="${H-8}" text-anchor="middle" font-size="${wi===currentWi?'9.5':'8.5'}" font-family="IBM Plex Mono,monospace" fill="${wi===currentWi?'#3b82f6':'#636776'}" font-weight="${wi===currentWi?'700':'400'}">${w}</text>`;
+  }).join('');
+
+  const curLine=`<line x1="${px(currentWi)}" y1="${PT}" x2="${px(currentWi)}" y2="${PT+chartH}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".65"/>
+    <text x="${px(currentWi)+5}" y="${PT+12}" font-size="8.5" font-family="IBM Plex Mono,monospace" fill="#3b82f6" opacity=".8">NOW</text>`;
+  function buildArea(vals,color){let segs=[],seg=[];vals.forEach((v,wi)=>{if(v!=null)seg.push({wi,v});else if(seg.length){segs.push([...seg]);seg=[];}});if(seg.length)segs.push(seg);return segs.map(s=>{if(s.length<2)return'';const d=`M ${px(s[0].wi)},${py(0)} L ${s.map(p=>`${px(p.wi)},${py(p.v)}`).join(' L ')} L ${px(s[s.length-1].wi)},${py(0)} Z`;return`<path d="${d}" fill="${color}" opacity=".06"/>`;}).join('');}
+
+  let planLines='';
+  if(isAcc) series.forEach(s=>{const d=buildPath(s.planAcc);if(d)planLines+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="1" stroke-dasharray="5 4" opacity=".35"/>`;});
+
+  let linesHtml='';
+  series.forEach(s=>{
+    const vals=isAcc?s.acc:s.weekly;
+    if(isAcc) linesHtml+=buildArea(vals,s.color);
+    const d=buildPath(vals); if(!d)return;
+    linesHtml+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    vals.forEach((v,wi)=>{
+      if(v==null)return;
+      const isCur=wi===currentWi,isLast=wi===n-1;
+      linesHtml+=`<circle cx="${px(wi)}" cy="${py(v)}" r="${isCur||isLast?5:2.5}" fill="${s.color}" stroke="#0d0e12" stroke-width="1.5" opacity="${isCur||isLast?1:0.8}"/>`;
+      if(isCur) linesHtml+=`<text x="${px(wi)}" y="${py(v)-9}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="700">${v.toFixed(1)}%</text>`;
+    });
+  });
+
+  let endLabels='';
+  series.forEach(s=>{
+    const vals=isAcc?s.acc:s.weekly;
+    let li=-1,lv=null;
+    for(let wi=vals.length-1;wi>=0;wi--){if(vals[wi]!=null){li=wi;lv=vals[wi];break;}}
+    if(li<0||lv==null)return;
+    endLabels+=`<text x="${px(li)+8}" y="${py(lv)+4}" font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="600" opacity=".9">${s.name}</text>`;
+  });
+
+  const xAxis=`<line x1="${PL}" y1="${PT+chartH}" x2="${PL+chartW}" y2="${PT+chartH}" stroke="#363840" stroke-width="1.5"/>`;
+
+  svg.innerHTML=`
+    <defs><clipPath id="${svg.id}Clip"><rect x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"/></clipPath></defs>
+    ${noDataMsg}${gridLines}${xAxis}
+    <g clip-path="url(#${svg.id}Clip)">${planLines}${linesHtml}</g>
+    ${endLabels}${curLine}${xTicks}
+    <line id="${svg.id}CrossV" x1="0" y1="${PT}" x2="0" y2="${PT+chartH}" stroke="rgba(255,255,255,.18)" stroke-width="1" display="none"/>
+    <rect id="${svg.id}Overlay" x="${PL}" y="${PT}" width="${chartW}" height="${chartH}" fill="transparent" style="cursor:crosshair;"/>
+    ${series.map((s,si)=>`<circle id="${svg.id}Dot${si}" r="5" fill="${s.color}" stroke="#0d0e12" stroke-width="2" display="none"/>`).join('')}
+  `;
+
+  // Hover tooltip
+  const tooltip=document.getElementById(tooltipId)||document.getElementById('reconChartTooltip');
+  const crossV=svg.getElementById(svg.id+'CrossV');
+  const ovEl=svg.getElementById(svg.id+'Overlay');
+  const dots=series.map((_,si)=>svg.getElementById(svg.id+'Dot'+si));
+  const _series=series,_wl=weekLabels,_n=n,_px=px,_py=py,_PL=PL,_chartW=chartW,_W=W,_xStep=xStep,_cwi=currentWi,_isAcc=isAcc;
+
+  function showTip(e){
+    const rect=svg.getBoundingClientRect();
+    const scaleX=_W/rect.width;
+    const mouseX=(e.clientX-rect.left)*scaleX;
+    if(mouseX<_PL||mouseX>_PL+_chartW){hideTip();return;}
+    const wi=Math.max(0,Math.min(_n-1,Math.round((mouseX-_PL)/(_xStep||1))));
+    crossV.setAttribute('x1',_px(wi));crossV.setAttribute('x2',_px(wi));crossV.setAttribute('display','');
+    _series.forEach((s,si)=>{
+      const v=(_isAcc?s.acc:s.weekly)[wi];
+      if(v!=null){dots[si].setAttribute('cx',_px(wi));dots[si].setAttribute('cy',_py(v));dots[si].setAttribute('display','');}
+      else dots[si].setAttribute('display','none');
+    });
+    const isCurWk=wi===_cwi;
+    let html=`<div class="tt-week"><span class="tt-week-dot" style="background:${isCurWk?'#3b82f6':'var(--muted)'}"></span>${_wl[wi]}${isCurWk?'<span style="background:#3b82f6;color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:4px;">NOW</span>':''}<span style="margin-left:auto;color:var(--muted);font-size:9px;">${_isAcc?'Acc.':'Weekly'}</span></div>`;
+    _series.forEach(s=>{
+      const v=(_isAcc?s.acc:s.weekly)[wi];
+      const plan=_isAcc?s.planAcc[wi]:null;
+      const vStr=v!=null?v.toFixed(2)+'%':'—';
+      const diff=(v!=null&&plan!=null)?v-plan:null;
+      const diffStr=diff!=null?`<span style="color:${diff>=0?'var(--green)':'var(--red)'};font-size:9px;margin-left:6px;">${diff>=0?'▲':'▼'}${Math.abs(diff).toFixed(1)}%</span>`:'';
+      html+=`<div class="tt-row"><span class="tt-dot" style="background:${s.color};"></span><span class="tt-name">${s.name}</span><span class="tt-val" style="color:${s.color};">${vStr}</span>${diffStr}</div><div class="tt-bar-track"><div class="tt-bar-fill" style="width:${v!=null?Math.min(v,100):0}%;background:${s.color};opacity:.7;"></div></div>${plan!=null?`<div style="margin-left:17px;margin-bottom:4px;font-size:9px;color:var(--muted);">Plan: ${plan.toFixed(1)}%</div>`:''}`;
+    });
+    tooltip.innerHTML=html;
+    const vpW=window.innerWidth,vpH=window.innerHeight,ttW=260,ttH=180;
+    let tx=e.clientX+16,ty=e.clientY-60;
+    if(tx+ttW>vpW-10)tx=e.clientX-ttW-16;
+    if(ty+ttH>vpH-10)ty=vpH-ttH-10;
+    if(ty<10)ty=10;
+    tooltip.style.left=tx+'px';tooltip.style.top=ty+'px';tooltip.style.display='block';
+  }
+  function hideTip(){tooltip.style.display='none';crossV.setAttribute('display','none');dots.forEach(d=>d.setAttribute('display','none'));}
+  const newOv=ovEl.cloneNode(true);ovEl.parentNode.replaceChild(newOv,ovEl);
+  newOv.addEventListener('mousemove',showTip);newOv.addEventListener('mouseleave',hideTip);
+}
+
+// ═══════════════════════════════════════════════
+//  RECONDITION DETAIL BREAKDOWN PANEL
+// ═══════════════════════════════════════════════
+function renderReconDetail(){
+  const panel=document.getElementById('reconDetailPanel');
+  if(!panel) return;
+  if(!rfRawRows.length){panel.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:20px 0;">ไม่พบข้อมูล</div>`;return;}
+
+  // Re-parse groups from rfRawRows
+  // Group header: rows where r[0] is a digit (1,2,3...) and r[1] is a title
+  // Items: rows where r[1] starts with '-' or r[0] is empty and r[1] has content
+  const rows=rfRawRows;
+
+  // Find week col indexes again (reuse rfWeeks logic)
+  let weekColIdxs=[];
+  for(let ri=0;ri<Math.min(rows.length,6);ri++){
+    const r=rows[ri];const found=[];
+    for(let ci=0;ci<r.length;ci++){const h=String(r[ci]||'').trim();if(/^W\d+$/i.test(h)||/^(week|wk)\s*\d+$/i.test(h))found.push(ci);}
+    if(found.length>=3){weekColIdxs=found;break;}
+  }
+
+  // Col2 = TOTAL PROGRESS (0-100 as decimal 0.5 = 50%)
+  const colTotalProg=2;
+  const colDesc=1;
+
+  const groups=[];
+  let curGroup=null;
+  for(let ri=0;ri<rows.length;ri++){
+    const r=rows[ri];
+    const c0=String(r[0]||'').trim();
+    const c1=String(r[1]||'').trim();
+    const c2=String(r[2]||'').trim().replace(/%/g,'');
+    const progVal=parseFloat(c2);
+
+    // Group header: col0 is a number, col1 is uppercase title
+    if(/^\d+$/.test(c0)&&c1&&c1===c1.toUpperCase()&&c1.length>3){
+      curGroup={title:c1,pct:isNaN(progVal)?0:Math.round(progVal*(progVal<=1?100:1)),items:[]};
+      groups.push(curGroup);
+      continue;
+    }
+    // Item row: col0 empty, col1 has content
+    if(curGroup&&!c0&&c1){
+      const itemPct=isNaN(progVal)?0:Math.round(progVal*(progVal<=1?100:1));
+      curGroup.items.push({name:c1.replace(/^[-–]\s*/,''),pct:itemPct});
+    }
+  }
+
+  if(!groups.length){panel.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:20px 0;">ไม่พบข้อมูล group ใน Sheet — ตรวจสอบโครงสร้างข้อมูล</div>`;return;}
+
+  // Color palette for groups
+  const GROUP_COLORS=['#14b8a6','#f5a623','#8b5cf6','#3b82f6','#27ae60','#e74c3c','#ec4899'];
+
+  panel.innerHTML=groups.map((g,gi)=>{
+    const color=GROUP_COLORS[gi%GROUP_COLORS.length];
+    const gPct=g.pct;
+    const barColor=gPct===100?'var(--green)':gPct>50?color:gPct>0?color:'var(--border)';
+    const groupId=`reconGrp${gi}`;
+    const itemsHtml=g.items.map(it=>{
+      const iPct=it.pct;
+      const iColor=iPct===100?'#27ae60':iPct>0?color:'var(--border)';
+      // Progress bar chars style
+      return `<div class="recon-item-row">
+        <div class="recon-item-name">${it.name}</div>
+        <div class="recon-item-bar-wrap">
+          <div class="recon-item-bar-track">
+            <div class="recon-item-bar-fill" style="width:${iPct}%;background:${iColor};"></div>
+          </div>
+        </div>
+        <div class="recon-item-pct" style="color:${iColor};">${iPct}%</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="recon-group">
+      <div class="recon-group-header" onclick="toggleReconGroup('${groupId}')">
+        <div class="recon-group-title" style="color:${color};">
+          <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span>
+          ${g.title}
+          <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-weight:400;letter-spacing:.5px;">(${g.items.length} รายการ)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:120px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+              <div style="width:${gPct}%;height:100%;background:${barColor};border-radius:3px;transition:width .6s ease;"></div>
+            </div>
+            <div class="recon-group-pct" style="color:${barColor};">${gPct}%</div>
+          </div>
+          <span class="recon-group-chevron" id="${groupId}chev">▼</span>
+        </div>
+      </div>
+      <div class="recon-group-body open" id="${groupId}body">
+        ${itemsHtml||'<div style="color:var(--muted);font-size:12px;padding:12px 0;">ไม่พบรายการ</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleReconGroup(id){
+  const body=document.getElementById(id+'body');
+  const chev=document.getElementById(id+'chev');
+  if(!body)return;
+  const isOpen=body.classList.toggle('open');
+  if(chev)chev.style.transform=isOpen?'':'rotate(-90deg)';
+}
+
+function parseRFData(rows){
+  if(!rows.length) return;
+
+  // ── Step 1: Find the row that contains week labels (W1, W2 … or similar) ──
+  // Sheet has multiple header rows (month labels, "PROGRESS/WEEK", then W1 W2 …)
+  let headerRowIdx = 0;
+  let weekColIdxs = [];
+  rfWeeks = [];
+
+  for(let ri=0; ri<Math.min(rows.length,6); ri++){
+    const r = rows[ri];
+    const found = [];
+    for(let ci=0;ci<r.length;ci++){
+      const h = String(r[ci]||'').trim();
+      if(/^W\d+$/i.test(h) || /^(week|wk)\s*\d+$/i.test(h)){
+        found.push({ci, h});
+      }
+    }
+    if(found.length >= 3){   // found the week-label row
+      headerRowIdx = ri;
+      found.forEach(f=>{ rfWeeks.push(f.h); weekColIdxs.push(f.ci); });
+      break;
+    }
+  }
+
+  // Fallback: if still no week cols, use col 4 onwards from row 0
+  if(rfWeeks.length === 0){
+    const r = rows[0];
+    for(let ci=4; ci<r.length; ci++){
+      const h = String(r[ci]||'').trim();
+      if(h){ rfWeeks.push(h); weekColIdxs.push(ci); }
+    }
+    headerRowIdx = 0;
+  }
+
+  console.log('[RF] headerRowIdx='+headerRowIdx+' weekCols='+rfWeeks.length+' first='+rfWeeks[0]+' last='+rfWeeks[rfWeeks.length-1]);
+
+  // ── Step 2: Map Excel row numbers → CSV row index ──
+  // Excel rows 1..N map to rows[0..N-1] in the CSV array.
+  // User spec is in Excel 1-based row numbers.
+  function getRowVals(excelRow){
+    const r = rows[excelRow - 1] || [];
+    return weekColIdxs.map(ci=>{
+      const v = String(r[ci]||'').trim().replace(/%/g,'');
+      const n = parseFloat(v);
+      return isNaN(n) ? null : n;
+    });
+  }
+
+  // Quick sanity: log what's in those rows
+  [4,5,16,17,28,29].forEach(er=>{
+    const r = rows[er-1]||[];
+    console.log(`[RF] Excel row ${er}: col0="${r[0]}" col1="${r[1]}" weekSample=[${weekColIdxs.slice(0,5).map(ci=>r[ci]).join(',')}]`);
+  });
+
+  const SERIES_DEFS = [
+    { name:'Hopper',       color:'#14b8a6', wkRow:4,  accRow:5  },
+    { name:'Sizer',        color:'#f5a623', wkRow:16, accRow:17 },
+    { name:'Truck Bridge', color:'#8b5cf6', wkRow:28, accRow:29 },
+  ];
+
+  const series = SERIES_DEFS.map(def=>{
+    const weekly = getRowVals(def.wkRow);
+    const acc    = getRowVals(def.accRow);
+
+    // Replace 0s at start with null so they don't show as flat zero line
+    // (0 before the work starts is meaningless)
+    let firstNonZeroWk = weekly.findIndex(v=>v!=null&&v>0);
+    let firstNonZeroAcc = acc.findIndex(v=>v!=null&&v>0);
+
+    // Build plan: linear ramp 0→100 over all weeks
+    const maxAcc = Math.max(acc.reduce((m,v)=>v!=null?Math.max(m,v):m, 0), 1);
+    const planAcc = rfWeeks.map((_,wi)=>
+      parseFloat(((wi+1)/rfWeeks.length*maxAcc).toFixed(2))
+    );
+
+    const nonNullAcc = acc.filter(v=>v!=null).length;
+    const nonNullWk  = weekly.filter(v=>v!=null).length;
+    console.log(`[RF] ${def.name}: acc nonNull=${nonNullAcc} maxAcc=${maxAcc} wk nonNull=${nonNullWk}`);
+
+    return { name:def.name, color:def.color, weekly, acc, planAcc };
+  });
+
+  reconChartData = { weekLabels: rfWeeks, series };
+
+  // ── Step 3: Parse Gantt items (data rows after header) ──
+  reconItems=[];
+  let itemNo=0;
+  const dataStartRow = headerRowIdx + 1;
+  for(let ri=dataStartRow; ri<rows.length; ri++){
+    const r=rows[ri];
+    const col0=String(r[0]||'').trim().toLowerCase();
+    const col1=String(r[1]||'').trim();
+    const col2=String(r[2]||r[1]||'').trim();
+    if(col0.includes('recon')||col0.includes('fab')||col0.includes('ซ่อม')||col0.includes('ผลิต')) continue;
+    const itemName=col2||(r.length>2?String(r[2]||'').trim():'')||(r.length>1?col1:'');
+    if(!itemName) continue;
+    itemNo++;
+    const weekVals=weekColIdxs.map(ci=>{
+      const v=String(r[ci]||'').trim().toLowerCase();
+      if(isChecked(v)||v==='done'||v==='complete'||v==='d') return 'done';
+      if(v==='plan'||v==='planned'||v==='p'||v==='schedule'||v==='s') return 'planned';
+      if(v==='wip'||v==='current'||v==='c'||v==='active') return 'current';
+      return 'empty';
+    });
+    const totalActive=weekVals.filter(v=>v!=='empty').length;
+    const totalDone=weekVals.filter(v=>v==='done').length;
+    const pct=totalActive>0?Math.round(totalDone/totalActive*100):0;
+    reconItems.push({no:col1||String(itemNo),name:itemName,weekVals,pct,
+      status:totalDone===totalActive&&totalActive>0?'done':weekVals.some(v=>v==='current')?'wip':weekVals.some(v=>v!=='empty')?'wip':'none'});
+  }
+  console.log('[RF] reconItems='+reconItems.length);
+}
+
+function rfCellValue(v){
+  if(v==='done')  return `<span class="week-cell done">✓</span>`;
+  if(v==='planned')return `<span class="week-cell planned">P</span>`;
+  if(v==='current')return `<span class="week-cell current">▶</span>`;
+  return `<span class="week-cell empty"></span>`;
+}
+
+function renderRFRecon(){
+  const items=reconItems;
+  const weeks=rfWeeks;
+
+  // KPIs
+  const total=items.length;
+  const done=items.filter(it=>it.pct===100).length;
+  const none=items.filter(it=>it.pct===0).length;
+  const wip=total-done-none;
+  const overallPct=total>0?Math.round(done/total*100):0;
+  document.getElementById('reconTotal').textContent=total;
+  document.getElementById('reconDone').textContent=done;
+  document.getElementById('reconWIP').textContent=wip;
+  document.getElementById('reconNone').textContent=none;
+  document.getElementById('reconPct').textContent=overallPct+'%';
+  // ── Line Chart ──
+  if(reconChartData){
+    const svg=document.getElementById('reconLineChart');
+    if(svg) drawLineChart(svg, reconChartData, reconChartMode, 'reconChartTooltip');
+  }
+  // ── Detail breakdown ──
+  renderReconDetail();
+}
+
+function setChartMode(mode){
+  reconChartMode = mode;
+  const btnAcc = document.getElementById('chartToggleAcc');
+  const btnWk  = document.getElementById('chartToggleWk');
+  if(btnAcc && btnWk){
+    if(mode==='acc'){
+      btnAcc.style.background='var(--accent)';btnAcc.style.color='#000';btnAcc.style.borderColor='var(--accent)';
+      btnWk.style.background='var(--surface2)';btnWk.style.color='var(--muted)';btnWk.style.borderColor='var(--border)';
+    } else {
+      btnWk.style.background='var(--accent)';btnWk.style.color='#000';btnWk.style.borderColor='var(--accent)';
+      btnAcc.style.background='var(--surface2)';btnAcc.style.color='var(--muted)';btnAcc.style.borderColor='var(--border)';
+    }
+  }
+  if(reconChartData){
+    const svg=document.getElementById('reconLineChart');
+    if(svg) drawLineChart(svg, reconChartData, mode, 'reconChartTooltip');
+  }
+}
+
+function drawReconLineChart(chartData, mode){
+  const svg = document.getElementById('reconLineChart');
+  if(!svg || !chartData) return;
+
+  const { weekLabels, series } = chartData;
+  const n = weekLabels.length;
+  if(!n){
+    svg.innerHTML=`<text x="480" y="130" text-anchor="middle" dominant-baseline="middle"
+      font-family="IBM Plex Mono,monospace" font-size="13" fill="#636776">ไม่พบข้อมูล Week columns ใน Sheet</text>`;
+    return;
+  }
+
+  const W=960, H=260, PL=52, PR=20, PT=24, PB=40;
+  const chartW=W-PL-PR, chartH=H-PT-PB;
+
+  // Determine Y domain
+  const isAcc = (mode !== 'wk');
+
+  // Check if any series has actual data
+  const hasAnyData = series.some(s=>(isAcc?s.acc:s.weekly).some(v=>v!=null&&v>0));
+  const noDataMsg = !hasAnyData
+    ? `<text x="${W/2}" y="${PT+8}" text-anchor="middle" font-family="IBM Plex Mono,monospace"
+        font-size="10" fill="#636776" opacity=".7">ยังไม่มีข้อมูล progress จริง — แสดงเฉพาะเส้นแผน (Plan)</text>`
+    : '';
+  let yMax = 0;
+  series.forEach(s=>{
+    const vals = isAcc ? s.acc : s.weekly;
+    vals.forEach(v=>{ if(v!=null && v>yMax) yMax=v; });
+    if(isAcc) s.planAcc.forEach(v=>{ if(v>yMax) yMax=v; });
+  });
+  if(yMax===0) yMax=100;
+  yMax = Math.ceil(yMax/10)*10; // round up to nearest 10
+
+  const xStep = chartW / (n>1 ? n-1 : 1);
+  const yScale = v => chartH - (v / yMax) * chartH;
+  const px = wi => PL + wi * xStep;
+  const py = v  => PT + yScale(v);
+
+  // Grid lines Y
+  const yTicks = [];
+  const step = yMax <= 20 ? 5 : yMax <= 50 ? 10 : yMax <= 100 ? 20 : 25;
+  for(let t=0; t<=yMax; t+=step) yTicks.push(t);
+
+  const gridLines = yTicks.map(t=>`
+    <line x1="${PL}" y1="${py(t)}" x2="${PL+chartW}" y2="${py(t)}"
+      stroke="#252830" stroke-width="${t===0?'1.5':'1'}"/>
+    <text x="${PL-6}" y="${py(t)+4}" text-anchor="end"
+      font-size="9" font-family="IBM Plex Mono,monospace" fill="#636776">${t}${isAcc?'%':''}</text>
+  `).join('');
+
+  // X axis ticks
+  const tickEvery = n<=13?1:n<=26?2:n<=39?3:4;
+  // Detect current week: last week where at least one series has non-null, non-zero data
+  let currentWi = 0;
+  for(let wi=0;wi<n;wi++){
+    const hasData = series.some(s=>{
+      const v = isAcc ? s.acc[wi] : s.weekly[wi];
+      return v!=null && v>0;
+    });
+    if(hasData) currentWi = wi;
+  }
+  // If no data at all, set to last defined week
+  if(!hasAnyData) currentWi = Math.max(0, n-1);
+
+  const xTicks = weekLabels.map((w,wi)=>{
+    if(wi%tickEvery!==0 && wi!==n-1 && wi!==currentWi) return '';
+    const isCur = wi===currentWi;
+    return `<text x="${px(wi)}" y="${H-8}" text-anchor="middle"
+      font-size="${isCur?'9.5':'8.5'}" font-family="IBM Plex Mono,monospace"
+      fill="${isCur?'#3b82f6':'#636776'}" font-weight="${isCur?'700':'400'}">${w}</text>`;
+  }).join('');
+
+  // Current week vertical line
+  const curLine = `<line x1="${px(currentWi)}" y1="${PT}" x2="${px(currentWi)}" y2="${PT+chartH}"
+    stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".65"/>
+    <text x="${px(currentWi)+5}" y="${PT+12}" font-size="8.5" font-family="IBM Plex Mono,monospace"
+      fill="#3b82f6" opacity=".8">NOW</text>`;
+
+  // Helper: build SVG path from data array (skip nulls with M/L gaps)
+  function buildPath(vals){
+    let d=''; let moved=false;
+    vals.forEach((v,wi)=>{
+      if(v==null){ moved=false; return; }
+      d += (moved?` L `:`M `) + `${px(wi)},${py(v)}`;
+      moved=true;
+    });
+    return d;
+  }
+
+  // Helper: area under line
+  function buildArea(vals, color){
+    let segments=[];let seg=[];
+    vals.forEach((v,wi)=>{
+      if(v!=null) seg.push({wi,v});
+      else if(seg.length){ segments.push([...seg]); seg=[]; }
+    });
+    if(seg.length) segments.push(seg);
+    return segments.map(seg=>{
+      if(seg.length<2) return '';
+      const d=`M ${px(seg[0].wi)},${py(0)} L ${seg.map(p=>`${px(p.wi)},${py(p.v)}`).join(' L ')} L ${px(seg[seg.length-1].wi)},${py(0)} Z`;
+      return `<path d="${d}" fill="${color}" opacity=".07"/>`;
+    }).join('');
+  }
+
+  // Plan lines (acc mode only)
+  let planLines='';
+  if(isAcc){
+    series.forEach(s=>{
+      const d=buildPath(s.planAcc);
+      if(d) planLines+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="1" stroke-dasharray="5 4" opacity=".35"/>`;
+    });
+  }
+
+  // Data lines + areas + dots
+  let linesHtml='';
+  series.forEach(s=>{
+    const vals = isAcc ? s.acc : s.weekly;
+    const area = isAcc ? buildArea(vals, s.color) : '';
+    const d = buildPath(vals);
+    if(!d) return;
+    linesHtml += area;
+    linesHtml += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round"/>`;
+    // Dots on data points
+    vals.forEach((v,wi)=>{
+      if(v==null) return;
+      const isCur=wi===currentWi, isLast=wi===n-1;
+      const r=isCur||isLast?5:2.5;
+      linesHtml+=`<circle cx="${px(wi)}" cy="${py(v)}" r="${r}"
+        fill="${s.color}" stroke="#0d0e12" stroke-width="1.5" opacity="${isCur||isLast?1:0.8}"/>`;
+      // Label on current week
+      if(isCur){
+        const labelY = py(v)-9;
+        linesHtml+=`<text x="${px(wi)}" y="${labelY}" text-anchor="middle"
+          font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="700">${v.toFixed(1)}%</text>`;
       }
     });
   });
 
-  // ── CHART 3: Belt Width Stacked Bar per Year ──
-  {
-    const widthOrder=['BW1600','BW1800','BW2000','BW2200','BW2400','BW2800','อื่นๆ'];
-    const widthColors={'BW1600':C.w1600,'BW1800':C.w1800,'BW2200':C.w2200,'BW2400':C.w2400,'BW2000':'#f1c40f','BW2800':'#1abc9c','อื่นๆ':C.wOther};
-    const years=uniq(data,iY).sort();
-    // map: width -> year -> meters
-    const wMap={};
-    data.forEach(r=>{
-      const y=String(r[iY]||''); if(!y)return;
-      const w=getBeltWidth(r);
-      if(!wMap[w])wMap[w]={};
-      wMap[w][y]=(wMap[w][y]||0)+num(r[iQ]);
-    });
-    const widthsPresent=widthOrder.filter(w=>wMap[w]);
-    const datasets=widthsPresent.map(w=>({
-      label:w,
-      data:years.map(y=>wMap[w]?.(y)||0),
-      backgroundColor:widthColors[w]||'#8b90a0',
-      borderRadius:0,
-      borderSkipped:false,
-    }));
+  // Legend labels at end of each line (right side)
+  let endLabels='';
+  series.forEach(s=>{
+    const vals = isAcc ? s.acc : s.weekly;
+    // Find last non-null value
+    let lastWi=-1, lastV=null;
+    for(let wi=vals.length-1;wi>=0;wi--){
+      if(vals[wi]!=null){ lastWi=wi; lastV=vals[wi]; break; }
+    }
+    if(lastWi<0||lastV==null) return;
+    endLabels+=`<text x="${px(lastWi)+8}" y="${py(lastV)+4}"
+      font-size="9" font-family="IBM Plex Mono,monospace" fill="${s.color}" font-weight="600"
+      opacity=".9">${s.name}</text>`;
+  });
 
-    document.getElementById('lWidth').innerHTML=widthsPresent.map(w=>
-      `<span><span class="lsq" style="background:${widthColors[w]||'#8b90a0'}"></span>${w}</span>`
-    ).join('');
+  // X axis line
+  const xAxis=`<line x1="${PL}" y1="${PT+chartH}" x2="${PL+chartW}" y2="${PT+chartH}" stroke="#363840" stroke-width="1.5"/>`;
 
-    killChart('cWidth');
-    charts['cWidth']=new Chart(document.getElementById('cWidth'),{
-      type:'bar',
-      data:{labels:years,datasets},
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{...TT,
-          callbacks:{label:c=>` ${c.dataset.label}: ${FMT(c.raw)} ม.`}}},
-        scales:{
-          x:{ticks:{color:'#545968',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},stacked:true},
-          y:{ticks:{color:'#545968',font:{size:10},callback:v=>(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,.04)'},stacked:true}
-        }
+  svg.innerHTML=`
+    <defs>
+      <clipPath id="chartClip"><rect x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"/></clipPath>
+    </defs>
+    ${noDataMsg}
+    ${gridLines}
+    ${xAxis}
+    <g clip-path="url(#chartClip)">
+      ${planLines}
+      ${linesHtml}
+    </g>
+    ${endLabels}
+    ${curLine}
+    ${xTicks}
+    <!-- crosshair lines (updated by JS) -->
+    <line id="ttCrossV" x1="0" y1="${PT}" x2="0" y2="${PT+chartH}"
+      stroke="rgba(255,255,255,.18)" stroke-width="1" display="none"/>
+    <!-- transparent hover overlay -->
+    <rect id="chartOverlay" x="${PL}" y="${PT}" width="${chartW}" height="${chartH}"
+      fill="transparent" style="cursor:crosshair;"/>
+    <!-- hover dot indicators (one per series) -->
+    ${series.map((s,si)=>`<circle id="ttDot${si}" r="5" fill="${s.color}"
+      stroke="#0d0e12" stroke-width="2" display="none"/>`).join('')}
+  `;
+
+  // ── Tooltip interaction ──
+  const tooltip  = document.getElementById('reconChartTooltip');
+  const crossV   = svg.getElementById('ttCrossV');
+  const overlay  = svg.getElementById('chartOverlay');
+  const dots     = series.map((_,si)=>svg.getElementById('ttDot'+si));
+  const isAcc2   = isAcc; // capture for closure
+
+  // Store data snapshot for mousemove
+  const _series  = series;
+  const _wl      = weekLabels;
+  const _n       = n;
+  const _px      = px;
+  const _py      = py;
+  const _PL=PL, _PR=PR, _PT=PT, _chartW=chartW, _W=W;
+  const _xStep   = xStep;
+  const _currentWi = currentWi;
+
+  function showTooltip(e){
+    const svgRect = svg.getBoundingClientRect();
+    const scaleX  = _W / svgRect.width;   // SVG viewBox → CSS pixels ratio
+    const mouseX  = (e.clientX - svgRect.left) * scaleX;  // in SVG coords
+
+    // Clamp to chart area
+    if(mouseX < _PL || mouseX > _PL + _chartW){ hideTooltip(); return; }
+
+    // Find nearest week index
+    const wiFloat = (mouseX - _PL) / (_xStep||1);
+    const wi = Math.max(0, Math.min(_n-1, Math.round(wiFloat)));
+    const weekLabel = _wl[wi] || ('W'+(wi+1));
+
+    // Move crosshair
+    const cx = _px(wi);
+    crossV.setAttribute('x1', cx); crossV.setAttribute('x2', cx);
+    crossV.setAttribute('display','');
+
+    // Move dots
+    _series.forEach((s,si)=>{
+      const vals = isAcc2 ? s.acc : s.weekly;
+      const v = vals[wi];
+      if(v!=null){
+        dots[si].setAttribute('cx', _px(wi));
+        dots[si].setAttribute('cy', _py(v));
+        dots[si].setAttribute('display','');
+      } else {
+        dots[si].setAttribute('display','none');
       }
     });
-  }
 
-  // ── CHART 4: มูลค่า แยก BW2200 / BW1800 / อื่น ──
-  {
-    const years=uniq(data,iY).sort();
-    const v2200={},v1800={},vOther={};
-    data.forEach(r=>{
-      const y=String(r[iY]||''); if(!y)return;
-      const v=num(r[iV]);
-      const w=getBeltWidth(r);
-      if(w==='BW2200'){ v2200[y]=(v2200[y]||0)+v; }
-      else if(w==='BW1800'){ v1800[y]=(v1800[y]||0)+v; }
-      else { vOther[y]=(vOther[y]||0)+v; }
-    });
+    // Build tooltip content
+    const isCurWk = wi === _currentWi;
+    const wkBadge = isCurWk
+      ? `<span style="background:#3b82f6;color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:4px;">NOW</span>`
+      : '';
 
-    document.getElementById('lValue').innerHTML=`
-      <span><span class="lsq" style="background:${C.v2200}"></span>BW2200</span>
-      <span><span class="lsq" style="background:${C.v1800}"></span>BW1800</span>
-      <span><span class="lsq" style="background:${C.vOther}"></span>สายพานเครื่องจักรอื่น</span>`;
+    let html = `<div class="tt-week">
+      <span class="tt-week-dot" style="background:${isCurWk?'#3b82f6':'var(--muted)'}"></span>
+      ${weekLabel}${wkBadge}
+      <span style="margin-left:auto;color:var(--muted);font-size:9px;">${isAcc2?'Acc.':'Weekly'}</span>
+    </div>`;
 
-    killChart('cValue');
-    charts['cValue']=new Chart(document.getElementById('cValue'),{
-      type:'bar',
-      data:{
-        labels:years,
-        datasets:[
-          {label:'BW2200',data:years.map(y=>(v2200[y]||0)/1e6),backgroundColor:C.v2200,borderRadius:0,borderSkipped:false},
-          {label:'BW1800',data:years.map(y=>(v1800[y]||0)/1e6),backgroundColor:C.v1800,borderRadius:0,borderSkipped:false},
-          {label:'สายพานเครื่องจักรอื่น',data:years.map(y=>(vOther[y]||0)/1e6),backgroundColor:C.vOther,borderRadius:0,borderSkipped:false},
-        ]
-      },
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{...TT,
-          callbacks:{
-            label:c=>` ${c.dataset.label}: ${c.raw.toFixed(2)} M฿`,
-            footer:items=>{
-              const total=items.reduce((s,i)=>s+i.raw,0);
-              return`รวม: ${total.toFixed(2)} ล้านบาท`;
-            }
-          }}},
-        scales:{
-          x:{ticks:{color:'#545968',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},stacked:true},
-          y:{ticks:{color:'#545968',font:{size:10},callback:v=>v.toFixed(0)+' M'},grid:{color:'rgba(255,255,255,.04)'},stacked:true}
-        }
+    _series.forEach(s=>{
+      const vals = isAcc2 ? s.acc : s.weekly;
+      const v    = vals[wi];
+      const plan = isAcc2 ? s.planAcc[wi] : null;
+      const vStr = v!=null ? v.toFixed(2)+'%' : '—';
+      const planStr = plan!=null ? plan.toFixed(1)+'%' : null;
+      const barW = v!=null ? Math.min(v, 100) : 0;
+      const diff = (v!=null && plan!=null) ? v - plan : null;
+      const diffStr = diff!=null
+        ? `<span style="color:${diff>=0?'var(--green)':'var(--red)'};font-size:9px;margin-left:6px;">${diff>=0?'▲':'▼'}${Math.abs(diff).toFixed(1)}%</span>`
+        : '';
+
+      html += `
+        <div class="tt-row">
+          <span class="tt-dot" style="background:${s.color};"></span>
+          <span class="tt-name">${s.name}</span>
+          <span class="tt-val" style="color:${s.color};">${vStr}</span>
+          ${diffStr}
+        </div>
+        <div class="tt-bar-track">
+          <div class="tt-bar-fill" style="width:${barW}%;background:${s.color};opacity:.7;"></div>
+        </div>`;
+      if(planStr){
+        html += `<div style="margin-left:17px;margin-bottom:4px;font-size:9px;color:var(--muted);">Plan: ${planStr}</div>`;
       }
     });
+
+    tooltip.innerHTML = html;
+
+    // Position tooltip — follow mouse, flip if near edge
+    const vpW = window.innerWidth, vpH = window.innerHeight;
+    const ttW = 260, ttH = 180;
+    let tx = e.clientX + 16;
+    let ty = e.clientY - 60;
+    if(tx + ttW > vpW - 10) tx = e.clientX - ttW - 16;
+    if(ty + ttH > vpH - 10) ty = vpH - ttH - 10;
+    if(ty < 10) ty = 10;
+
+    tooltip.style.left  = tx + 'px';
+    tooltip.style.top   = ty + 'px';
+    tooltip.style.display = 'block';
   }
+
+  function hideTooltip(){
+    tooltip.style.display = 'none';
+    crossV.setAttribute('display','none');
+    dots.forEach(d=>d.setAttribute('display','none'));
+  }
+
+  // Remove old listeners by replacing overlay
+  const newOverlay = overlay.cloneNode(true);
+  overlay.parentNode.replaceChild(newOverlay, overlay);
+  newOverlay.addEventListener('mousemove', showTooltip);
+  newOverlay.addEventListener('mouseleave', hideTooltip);
+} // end drawReconLineChart
+
+// ═══════════════════════════════════════════════
+//  OVERALL TAB
+// ═══════════════════════════════════════════════
+function buildOverallTab(){
+  let budget=0,actual=0;
+  cAllRows.forEach(r=>{budget+=colB>=0?pn(r[colB]):0;actual+=colA>=0?pn(r[colA]):0;});
+  document.getElementById('ovBudget').textContent=fmt(budget);
+  document.getElementById('ovActual').textContent=fmt(actual);
+
+  const procTotal=progItems.length;
+  const procDone=progItems.filter(it=>it.steps[5]).length;
+  const procPct=procTotal>0?Math.round(procDone/procTotal*100):0;
+  document.getElementById('ovProcPct').textContent=procPct+'%';
+  document.getElementById('ovProcSub').textContent=`PO done ${procDone}/${procTotal}`;
+
+  const reconTotal=reconItems.length;
+  const reconDone2=reconItems.filter(it=>it.pct===100).length;
+  const reconPct2=reconTotal>0?Math.round(reconDone2/reconTotal*100):0;
+  document.getElementById('ovReconPct').textContent=reconPct2+'%';
+
+  const bPct=budget>0?Math.min((actual/budget*100),100):0;
+  const overallProgress=Math.round((procPct+reconPct2)/2); // avg of proc + recon
+  const C=2*Math.PI*62; // r=62 for both rings
+
+  // ── Ring 1: Budget Used (blue) ──
+  const ringBudget=document.getElementById('ov-ring-budget');
+  if(ringBudget){
+    const budgetColor=bPct>100?'var(--red)':bPct>80?'var(--accent)':'var(--blue)';
+    ringBudget.setAttribute('stroke-dasharray',(Math.min(bPct,100)/100*C).toFixed(1)+' '+C.toFixed(1));
+    ringBudget.setAttribute('stroke', budgetColor);
+    const bPctEl=document.getElementById('ovRingBudgetPct');
+    if(bPctEl){bPctEl.textContent=bPct.toFixed(1)+'%';bPctEl.style.color=budgetColor;}
+  }
+
+  // ── Ring 2: Overall Progress (teal/green) ──
+  const ringProg=document.getElementById('ov-ring-progress');
+  if(ringProg){
+    const progColor=overallProgress===100?'var(--green)':overallProgress>66?'var(--teal)':'var(--accent)';
+    ringProg.setAttribute('stroke-dasharray',(overallProgress/100*C).toFixed(1)+' '+C.toFixed(1));
+    ringProg.setAttribute('stroke', progColor);
+    const progEl=document.getElementById('ovRingPct');
+    if(progEl){progEl.textContent=overallProgress+'%';progEl.style.color=progColor;}
+    const overallEl=document.getElementById('rlegOverall');
+    if(overallEl) overallEl.textContent=overallProgress+'%';
+  }
+
+  // Legend values
+  document.getElementById('rlegBudget').textContent=bPct.toFixed(1)+'%';
+  document.getElementById('rlegProc').textContent=procPct+'%';
+  document.getElementById('rlegRecon').textContent=reconPct2+'%';
+  const rlegActualEl=document.getElementById('rlegActual');
+  if(rlegActualEl) rlegActualEl.textContent=fmt(actual)+' ฿';
+  const rlegBudgetAmtEl=document.getElementById('rlegBudgetAmt');
+  if(rlegBudgetAmtEl) rlegBudgetAmtEl.textContent=fmt(budget)+' ฿';
+
+  // Module cards
+  const modules=[
+    {name:'Cost & Budget',icon:'💰',pct:Math.round(bPct),total:fmt(budget),done:fmt(actual),unit:'THB',color:'var(--blue)',label:'Budget Used',status:bPct>100?'wait':bPct>80?'active':'done'},
+    {name:'Procurement',icon:'📦',pct:procPct,total:procTotal,done:procDone,unit:'items PO done',color:'var(--purple)',label:'PO Complete',status:procPct===100?'done':procPct>0?'active':'wait'},
+    {name:'Recondition',icon:'🔧',pct:reconPct2,total:reconTotal,done:reconDone2,unit:'items done',color:'var(--teal)',label:'Completed',status:reconPct2===100?'done':reconPct2>0?'active':'wait'},
+  ];
+
+  document.getElementById('ovModules').innerHTML=modules.map(m=>{
+    const C2=2*Math.PI*26;const filled2=((m.pct||0)/100)*C2;
+    return`<div class="mod-card">
+      <div class="mod-header">
+        <div class="mod-name" style="color:${m.color}">${m.icon} ${m.name}</div>
+        <span class="mod-badge ${m.status}">${m.status==='done'?'Complete':m.status==='active'?'Active':'Pending'}</span>
+      </div>
+      <div class="mod-ring-row">
+        <div class="mod-mini-ring">
+          <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="#252830" stroke-width="9"/><circle cx="32" cy="32" r="26" fill="none" stroke="${m.color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${filled2.toFixed(1)} ${C2.toFixed(1)}" transform="rotate(-90 32 32)" style="transition:stroke-dasharray .8s ease"/></svg>
+          <div class="mod-mini-center"><span class="mod-mini-pct" style="color:${m.color}">${m.pct||0}%</span></div>
+        </div>
+        <div class="mod-stats">
+          <div class="mod-stat-row"><span class="mod-stat-label">${m.label}</span><span style="color:${m.color};font-family:'IBM Plex Mono',monospace;font-size:11px">${m.done}</span></div>
+          <div class="mod-stat-row"><span class="mod-stat-label">Total</span><span style="color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px">${m.total} ${m.unit}</span></div>
+          <div class="mod-track"><div class="mod-fill" style="width:${Math.min(m.pct||0,100)}%;background:${m.color}40;border:1px solid ${m.color}60;"></div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  buildYearlyTimeline();
 }
 
-loadData();
+// ═══════════════════════════════════════════════
+//  YEARLY PROGRESS TIMELINE
+//  Shows all 52 weeks of the year as a gantt-style
+//  horizontal band. Each row = one tracked metric.
+//  Cells are coloured by status derived from data.
+// ═══════════════════════════════════════════════
+function buildYearlyTimeline(){
+  const grid = document.getElementById('ovWeekGrid');
+  const legendEl = document.getElementById('ovTimelineLegend');
+  if(!grid) return;
+
+  const dataWeeks = rfWeeks.length > 0 ? rfWeeks : [];
+  const totalWeeks = Math.max(dataWeeks.length, 52);
+  const weekLabels = [];
+  for(let w=1; w<=totalWeeks; w++) weekLabels.push(dataWeeks[w-1]||('W'+w));
+
+  const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const monthStarts=[0,4,8,12,16,20,24,28,32,36,40,44];
+
+  // ── Row definitions ──────────────────────────────
+
+  // Row 1: Recondition — weekly % from weekVals
+  function getReconWeekPct(wi){
+    if(!reconItems.length||wi>=rfWeeks.length) return null;
+    const done=reconItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]==='done').length;
+    const active=reconItems.filter(it=>wi<it.weekVals.length&&it.weekVals[wi]!=='empty').length;
+    if(active===0) return null;
+    return Math.round(done/reconItems.length*100);
+  }
+  // Overall cumulative pct for Recondition (for end-label)
+  const reconDoneTotal=reconItems.filter(it=>it.pct===100).length;
+  const reconAccPct=reconItems.length>0?Math.round(reconDoneTotal/reconItems.length*100):0;
+
+  const reconRow={
+    label:'Recondition', color:'#14b8a6',
+    accPct: reconAccPct,
+    cells: weekLabels.map((_,wi)=>{
+      if(wi>=rfWeeks.length) return {pct:null, isPlanned:false};
+      const pct=getReconWeekPct(wi);
+      const hasAct=reconItems.some(it=>wi<it.weekVals.length&&it.weekVals[wi]!=='empty');
+      return {pct, isPlanned: pct===null && hasAct};
+    })
+  };
+
+  // Rows 2+3: Purchasing + Delivery — weekly % from procChartData.series[i].weekly
+  const procRows=[];
+  if(procChartData&&procChartData.series.length){
+    // Find max weekly value across all proc series for relative scaling
+    let maxWk=0;
+    procChartData.series.forEach(s=>{
+      (s.weekly||[]).forEach(v=>{ if(v!=null&&v>maxWk) maxWk=v; });
+    });
+    maxWk=Math.max(maxWk,1);
+
+    procChartData.series.forEach(s=>{
+      // Acc pct = last non-null acc value
+      let accPct=0;
+      (s.acc||[]).forEach(v=>{ if(v!=null&&v>0) accPct=Math.round(v); });
+      const weekly=s.weekly||[];
+      // Last week with any weekly data > 0
+      let lastDataWi=-1;
+      weekly.forEach((v,wi)=>{ if(v!=null&&v>0) lastDataWi=wi; });
+
+      procRows.push({
+        label: s.name, color: s.color,
+        accPct,
+        maxWk,
+        cells: weekLabels.map((_,wi)=>{
+          const wv=weekly[wi];
+          // Mark as planned if before lastDataWi but value is 0/null
+          if(wi>lastDataWi) return {pct:null, isPlanned:false, wkVal:null};
+          if(wv==null||wv===0) return {pct:null, isPlanned:wi<=lastDataWi, wkVal:0};
+          return {pct:Math.round(wv/maxWk*100), isPlanned:false, wkVal:wv};
+        })
+      });
+    });
+  } else {
+    procRows.push({label:'Purchasing',color:'#8b5cf6',accPct:0,maxWk:1,cells:weekLabels.map(()=>({pct:null,isPlanned:false,wkVal:null}))});
+    procRows.push({label:'Delivery',  color:'#14b8a6',accPct:0,maxWk:1,cells:weekLabels.map(()=>({pct:null,isPlanned:false,wkVal:null}))});
+  }
+
+  // Current week = last week with any data
+  let currentWeekIdx=0;
+  reconRow.cells.forEach((c,wi)=>{ if(c.pct!=null&&c.pct>0) currentWeekIdx=wi; });
+  procRows.forEach(r=>r.cells.forEach((c,wi)=>{ if(c.wkVal!=null&&c.wkVal>0) currentWeekIdx=Math.max(currentWeekIdx,wi); }));
+
+  const allRows=[reconRow, ...procRows];
+  const cellW='flex:1;min-width:14px;max-width:28px;';
+
+  // ── Build HTML ───────────────────────────────────
+
+  // Month labels
+  let monthHtml=`<div style="display:flex;margin-left:130px;margin-bottom:2px;">`;
+  monthStarts.forEach((start,mi)=>{
+    const end=mi+1<monthStarts.length?monthStarts[mi+1]:totalWeeks;
+    const span=end-start;
+    monthHtml+=`<div style="flex:${span};min-width:${span*14}px;font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;border-left:1px solid rgba(245,166,35,.25);padding-left:3px;overflow:hidden;white-space:nowrap;">${MONTHS[mi]}</div>`;
+  });
+  monthHtml+=`</div>`;
+
+  // Week header
+  let headerHtml=`<div style="display:flex;align-items:center;margin-bottom:3px;">
+    <div style="width:130px;flex-shrink:0;"></div>
+    <div style="display:flex;flex:1;gap:1px;">${weekLabels.map((w,wi)=>{
+      const isMonth=monthStarts.includes(wi),isCur=wi===currentWeekIdx;
+      return `<div style="${cellW}height:12px;text-align:center;font-size:8px;font-family:'IBM Plex Mono',monospace;color:${isCur?'var(--blue)':isMonth?'rgba(245,166,35,.5)':'var(--border)'};border-left:${isMonth?'1px solid rgba(245,166,35,.2)':'none'};overflow:hidden;">${(wi%4===0||isCur)?w:''}</div>`;
+    }).join('')}</div>
+    <div style="width:44px;flex-shrink:0;"></div>
+  </div>`;
+
+  // Rows — cells use opacity/intensity based on weekly %
+  const rowsHtml=allRows.map((row,ri)=>{
+    const col=row.color;
+    const accPct=row.accPct||0;
+
+    const cellsHtml=row.cells.map((cell,wi)=>{
+      const isMonth=monthStarts.includes(wi), isCur=wi===currentWeekIdx;
+      const mB=isMonth?'border-left:1px solid rgba(245,166,35,.15);':'';
+      const curHL=isCur?'outline:1.5px solid var(--blue);outline-offset:-1px;':'';
+
+      let bg, border, opacity, label='';
+
+      if(cell.pct==null && !cell.isPlanned){
+        // No data
+        bg='var(--surface2)'; border='1px solid var(--border)'; opacity='1';
+      } else if(cell.isPlanned && (cell.pct==null||cell.pct===0)){
+        // Planned / zero during active period
+        bg='transparent'; border=`1px solid ${col}`; opacity='.35';
+      } else {
+        // Has data — intensity from pct (0-100)
+        const intensity=Math.max(cell.pct||0, 8); // min 8% so it's visible
+        opacity=String((0.15 + (intensity/100)*0.85).toFixed(2));
+        bg=col; border='none';
+        // Show % if current week or significant
+        if(isCur && cell.pct!=null && cell.pct>0){
+          label=`<span style="font-size:7px;font-family:'IBM Plex Mono',monospace;color:#fff;font-weight:700;line-height:1;">${cell.pct}</span>`;
+        }
+      }
+
+      // Build tooltip data attributes
+      const wkLabel=weekLabels[wi]||('W'+(wi+1));
+      const valStr=cell.wkVal!=null ? cell.wkVal.toFixed(2)+'%' : (cell.pct!=null ? cell.pct+'%' : '—');
+      const tipAttr=`data-tip="${wkLabel}: ${row.label} ${valStr}${isCur?' (NOW)':''}"`;
+
+      return `<div ${tipAttr} style="${cellW}height:20px;border-radius:2px;background:${bg};border:${border};opacity:${opacity};${curHL}${mB}display:flex;align-items:center;justify-content:center;cursor:default;" 
+        onmouseenter="showTimelineTip(event,'${wkLabel}','${row.label}','${valStr}','${col}',${isCur?1:0})"
+        onmouseleave="hideTimelineTip()">${label}</div>`;
+    }).join('');
+
+    return `<div style="display:flex;align-items:center;margin-bottom:5px;">
+      <div style="width:130px;flex-shrink:0;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding-right:8px;display:flex;align-items:center;gap:5px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;display:inline-block;opacity:.9;"></span>${row.label}</div>
+      <div style="display:flex;flex:1;gap:1px;">${cellsHtml}</div>
+      <div style="width:44px;flex-shrink:0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding-left:8px;color:${accPct===100?'var(--green)':accPct>0?col:'var(--muted)'};">${accPct}%</div>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML=monthHtml+headerHtml+rowsHtml;
+
+  legendEl.innerHTML=`
+    <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px;margin-right:4px;">Progress / Week:</div>
+    <div class="tl-leg"><div style="width:14px;height:10px;border-radius:2px;background:var(--teal);opacity:.2;"></div>น้อย</div>
+    <div class="tl-leg"><div style="width:14px;height:10px;border-radius:2px;background:var(--teal);opacity:.55;"></div>ปานกลาง</div>
+    <div class="tl-leg"><div style="width:14px;height:10px;border-radius:2px;background:var(--teal);opacity:1;"></div>มาก</div>
+    <div class="tl-leg" style="margin-left:8px;"><div style="width:14px;height:10px;border-radius:2px;background:transparent;border:1px solid var(--teal);opacity:.4;"></div>แผน/ไม่มีข้อมูล</div>
+    <div class="tl-leg" style="margin-left:4px;"><div style="width:14px;height:10px;border-radius:2px;background:transparent;outline:1.5px solid var(--blue);outline-offset:-1px;"></div>NOW</div>
+  `;
+}
+
+// ── Timeline cell tooltip ──
+function showTimelineTip(e, week, rowName, val, color, isCur){
+  const tip=document.getElementById('reconChartTooltip');
+  if(!tip) return;
+  tip.innerHTML=`<div class="tt-week"><span class="tt-week-dot" style="background:${isCur?'#3b82f6':color};"></span>${week}${isCur?'<span style="background:#3b82f6;color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;margin-left:4px;">NOW</span>':''}</div>
+    <div class="tt-row"><span class="tt-dot" style="background:${color};"></span><span class="tt-name">${rowName}</span><span class="tt-val" style="color:${color};">${val}</span></div>`;
+  const vpW=window.innerWidth, vpH=window.innerHeight;
+  let tx=e.clientX+14, ty=e.clientY-60;
+  if(tx+200>vpW-10) tx=e.clientX-214;
+  if(ty<10) ty=10;
+  if(ty+100>vpH-10) ty=vpH-110;
+  tip.style.left=tx+'px'; tip.style.top=ty+'px'; tip.style.display='block';
+}
+function hideTimelineTip(){
+  const tip=document.getElementById('reconChartTooltip');
+  if(tip) tip.style.display='none';
+}
+
+
+// ═══════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════
+function doExport(){if(currentTab==='cost')exportCostCSV();else if(currentTab==='progress')exportProgCSV();else exportRFCSV();}
+function exportCostCSV(){if(!cFiltered.length)return;const rows=[cHeaders.join(','),...cFiltered.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(','))];dlCSV(rows,'crusher-m-cost.csv');}
+function exportProgCSV(){if(!progItems.length)return;const head=['No','Description',...STEPS,'%'].join(',');const rows=[head,...progItems.map(it=>{const pct=Math.round(it.steps.filter(Boolean).length/STEPS.length*100);return[`"${it.no}"`,`"${it.name.replace(/"/g,'""')}"`, ...it.steps.map(s=>s?1:0), pct].join(',');})];dlCSV(rows,'crusher-m-progress.csv');}
+function exportRFCSV(){if(!reconItems.length)return;const head=['No','Description',...rfWeeks,'%'].join(',');const rows=[head,...reconItems.map(it=>[`"${it.no}"`,`"${it.name.replace(/"/g,'""')}"`, ...it.weekVals.map(v=>v==='done'?1:v==='planned'?'P':0), it.pct].join(','))];dlCSV(rows,'crusher-m-recon.csv');}
+function dlCSV(rows,filename){const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();}
+
+// ═══════════════════════════════════════════════
+//  SHARE MODAL
+// ═══════════════════════════════════════════════
+function openShare(){document.getElementById('shareUrl').value=window.location.href;document.getElementById('shareModal').style.display='flex';document.getElementById('copyMsg').textContent='';}
+function closeShare(){document.getElementById('shareModal').style.display='none';}
+function copyLink(){const inp=document.getElementById('shareUrl');inp.select();inp.setSelectionRange(0,9999);navigator.clipboard.writeText(inp.value).then(()=>{document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';}).catch(()=>{document.execCommand('copy');document.getElementById('copyMsg').textContent='✓ คัดลอกลิงก์แล้ว!';});}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+loadAll();
 </script>
 </body>
 </html>
